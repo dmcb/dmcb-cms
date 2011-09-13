@@ -1,0 +1,1 @@
+<div class="page static">	<?=$view;?></div>

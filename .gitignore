@@ -1,0 +1,14 @@
+# Ignore all site-specific files
+
+backup/
+bin/*.pl
+ci_*_application/config/config.php
+ci_*_application/config/database.php
+ci_*_application/logs/*
+ci_*_application/views/*/
+includes/*
+files/*/*
+files_managed/*/*
+/.htaccess
+/robots.txt
+/favicon.*
