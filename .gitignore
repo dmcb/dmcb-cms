@@ -2,12 +2,13 @@
 
 backup/
 bin/*.pl
+cgi-bin/
 ci_*_application/cache
 ci_*_application/config/config.php
 ci_*_application/config/database.php
 ci_*_application/logs
 ci_*_application/views/*/
-includes
+includes/
 files/*/*
 files_managed/*/*
 /.htaccess
