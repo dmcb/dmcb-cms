@@ -142,7 +142,7 @@ class File_lib {
 			while (false !== ($dirfile = readdir($handle))) 
 			{
 				//if there is a file that has additional naming after filename.fileextension, delete it
-				if (strpos($dirfile, $this->file['fullfilename'].'.') === 0) 
+				if (isset($this->file['fullfilename']) && strpos($dirfile, $this->file['fullfilename'].'.') === 0) 
 				{
 					unlink($this->folder.$dirfile);
 				}
