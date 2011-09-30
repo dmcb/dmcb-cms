@@ -5,9 +5,12 @@
  * Sessions now expire after browser closes if 'rememberme == 1' not found in session user_data
  * Sessions no longer issued for shockwave/adobe flash, since it kills sessions in ie7 using swf upload
  *
- * @package		CodeIgniter
+ * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney
+ * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ *              This code may not be used commercially without the expressed
+ *              written consent of Derek McBurney. Non-commercial use requires
+ *              attribution.
  * @link		http://dmcbdesign.com
  */
 class MY_Session extends CI_Session {

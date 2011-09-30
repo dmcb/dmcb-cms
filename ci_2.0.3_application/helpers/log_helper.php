@@ -6,9 +6,12 @@
  * This doesn't use CI's native logging, since these messages are more
  * important than debug messages, but not necessarily error messages
  *
- * @package		CodeIgniter
+ * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney
+ * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ *              This code may not be used commercially without the expressed
+ *              written consent of Derek McBurney. Non-commercial use requires
+ *              attribution.
  * @link		http://dmcbdesign.com
  */
  

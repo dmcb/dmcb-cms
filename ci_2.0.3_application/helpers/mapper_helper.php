@@ -4,9 +4,12 @@
  *
  * Maps internal links security to their actual pages & controllers
  *
- * @package		CodeIgniter
+ * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney
+ * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ *              This code may not be used commercially without the expressed
+ *              written consent of Derek McBurney. Non-commercial use requires
+ *              attribution.
  * @link		http://dmcbdesign.com
  */
  
