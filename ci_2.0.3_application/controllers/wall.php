@@ -28,7 +28,7 @@ class Wall extends MY_Controller {
 		if ($this->form_validation->run())
 		{
 			$this->load->model('notifications_model');
-			$this->notifications_model->send("4037144828@fido.ca", $this->config->item('dmcb_default_page')." alert", set_value('content'));
+			$this->notifications_model->send($this->config->item('dmcb_admin_notification'), $this->config->item('dmcb_default_page')." alert", set_value('content'));
 			$this->walls_model->add(set_value('content'), set_value('name'), set_value('city'), $_SERVER['REMOTE_ADDR']);
 		}
 	
