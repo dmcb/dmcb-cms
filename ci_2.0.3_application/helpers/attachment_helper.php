@@ -29,6 +29,8 @@ if ( ! function_exists('attached_id'))
 {
  	function attached_id($attachedto, $attachedid)
 	{
+		// Turn flat file name into nested directory file name
+		$attachedid = str_replace("+","/",$attachedid);
 		// Convert URL name to respective user/page/post id if attached to one
 		if ($attachedto == "user")
 		{
