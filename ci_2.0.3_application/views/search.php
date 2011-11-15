@@ -162,7 +162,7 @@
 		{
 			if ($i < 5 || $search_type == "files")
 			{
-				echo '<tr class="data"><td colspan="2"><a href="'.base_url().$file['urlpath'].'?search='.urlencode('"'.set_value('searchtext').'">'.$file['filename'].'.'.$file['extension'].'</a> ('.number_format(($file['filesize']/1000000),2).' mb)</td></tr>';
+				echo '<tr class="data"><td colspan="2"><a href="'.base_url().$file['urlpath'].'?search='.urlencode('"'.set_value('searchtext').'"').'">'.$file['filename'].'.'.$file['extension'].'</a> ('.number_format(($file['filesize']/1000000),2).' mb)</td></tr>';
 			}
 			$i++;
 		}
