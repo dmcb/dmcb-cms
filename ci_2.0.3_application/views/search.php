@@ -75,7 +75,7 @@
 		{
 			if ($i < 5 || $search_type == "users")
 			{
-				echo '<tr class="data"><td colspan="2"><a href="'.base_url().'profile/'.$user['urlname'].'">'.$user['displayname'].'</a></td></tr>';
+				echo '<tr class="data"><td colspan="2"><a href="'.base_url().'profile/'.$user['urlname'].'/search">'.$user['displayname'].'</a></td></tr>';
 			}
 			$i++;
 		}
