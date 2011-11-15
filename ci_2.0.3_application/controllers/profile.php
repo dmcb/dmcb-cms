@@ -87,6 +87,16 @@ class Profile extends MY_Controller {
 	{
 		// Profile data
 		$this->load->helper('picture');
+		
+		// If user was reached via search, highlight the searched word
+		if ($this->uri->segment($this->base_segment+1) == "search" && $this->session->flashdata('search_term'))
+		{
+			// Keep search highlighting going (in the event user uses back button to go back to search results)
+			$this->session->keep_flashdata('search_term');
+			
+			$this->user->user['profile'] = preg_replace('/('.$this->session->flashdata('search_term').')(?![^<]*>)(?![\S]*%)/i', $this->load->view('content_highlight', array('content' => '$1'), TRUE), $this->user->user['profile']);
+		}
+		
 		$data['user'] = $this->user->user;
 			
 		// Grab posts

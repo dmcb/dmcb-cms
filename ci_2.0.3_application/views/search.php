@@ -104,7 +104,7 @@
 				echo '<tr class="data"><td colspan="2">';
 				if ($page['link'] == NULL)
 				{
-					echo '<a href="'.base_url().$page['urlname'].'">'.$page['title'].'</a>';
+					echo '<a href="'.base_url().$page['urlname'].'/search">'.$page['title'].'</a>';
 				}
 				else
 				{
@@ -136,7 +136,7 @@
 		{
 			if ($i < 5 || $search_type == "posts")
 			{
-				echo '<tr class="data"><td colspan="2"><a href="'.base_url().$post['urlname'].'">'.$post['title'].'</a></td></tr>';
+				echo '<tr class="data"><td colspan="2"><a href="'.base_url().$post['urlname'].'/search">'.$post['title'].'</a></td></tr>';
 			}
 			$i++;
 		}
