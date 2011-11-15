@@ -24,12 +24,12 @@ class Search extends MY_Controller {
 	{
 		if ($this->acl->allow('site', 'search', TRUE) || $this->_access_denied())
 		{
-			$data['search_text'] = $this->session->flashdata('text');
+			$data['search_text'] = $this->session->flashdata('search_term');
 			$data['search_type'] = $this->session->flashdata('type');
 			$data['search_page'] = $this->session->flashdata('page');
 			
 			// Preserve search parameters
-			$this->session->keep_flashdata('text');
+			$this->session->keep_flashdata('search_term');
 			$this->session->keep_flashdata('type');
 			$this->session->keep_flashdata('page');
 		
@@ -44,7 +44,7 @@ class Search extends MY_Controller {
 				$data['search_text'] = set_value('searchtext');
 				$data['search_type'] = set_value('searchtype');
 				$data['search_page'] = set_value('searchpage');
-				$this->session->set_flashdata('text', $data['search_text']);
+				$this->session->set_flashdata('search_term', $data['search_text']);
 				$this->session->set_flashdata('type', $data['search_type']);
 				$this->session->set_flashdata('page', $data['search_page']);
 			}

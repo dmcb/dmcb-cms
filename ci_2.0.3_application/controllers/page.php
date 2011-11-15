@@ -212,6 +212,13 @@ class Page extends MY_Controller {
 			
 			// Generate page by parsing through template and page content, loading up blocks as necessary
 			$data['pagecontent'] = "";
+			
+			// If page was reached via search, highlight the searched word
+			if ($this->session->flashdata('search_term'))
+			{
+				$this->page->page['content'] = preg_replace('/('.$this->session->flashdata('search_term').')(?![^<]*>)(?![\S]*%)/i', $this->load->view('content_highlight', array('content' => '$1'), TRUE), $this->page->page['content']);
+			}
+			
 			$contents_to_parse = $this->page->page['content'];
 			if (isset($this->template->template['templateid']))
 			{

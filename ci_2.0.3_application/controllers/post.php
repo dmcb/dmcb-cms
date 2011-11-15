@@ -558,6 +558,12 @@ class Post extends MY_Controller {
 			$data['permissions'] = $this->load->view('form_post_permissions', array('post' => $this->post->post, 'roles' => $this->roles, 'userlist' => $this->userlist), TRUE);
 		}
 		
+		// If post was reached via search, highlight the searched word
+		if ($this->session->flashdata('search_term'))
+		{
+			$this->post->post['content'] = preg_replace('/('.$this->session->flashdata('search_term').')(?![^<]*>)(?![\S]*%)/i', $this->load->view('content_highlight', array('content' => '$1'), TRUE), $this->post->post['content']);
+		}
+		
 		// Render the post
 		$post_section = $this->load->view('post_post', array('post' => $this->post->post, 'next_post' => $next_post->post, 'previous_post' => $previous_post->post, 'contributors' => $this->contributors, 'parentpage' => $this->page->page, 'author' => $this->author->user, 'admin_toolbar' => $admin_toolbar), TRUE);
 		$comments_section = $this->load->view('post_comments', array('comments' => $comments, 'add_comment' => $add_comment), TRUE);
@@ -616,7 +622,7 @@ class Post extends MY_Controller {
 			$contents = str_replace('%contenthere%', $post_section, $contents);
 			$contents = str_replace('%titlehere%', $this->post->post['title'], $contents);
 			$contents = str_replace('%commentshere%', $comments_section, $contents);
-			
+				
 			$matches = array();
 			preg_match_all('/%fileshere(\[([a-z0-9,]+)\])?%/i', $contents, $matches);
 			for ($i=0; $i<sizeof($matches[0]); $i++)
