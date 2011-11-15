@@ -89,7 +89,7 @@ class Profile extends MY_Controller {
 		$this->load->helper('picture');
 		
 		// If user was reached via search, highlight the searched word
-		if ($this->uri->segment($this->base_segment+1) == "search" && $this->session->flashdata('search_term'))
+		if ($this->uri->segment(3) == "search" && $this->session->flashdata('search_term'))
 		{
 			// Keep search highlighting going (in the event user uses back button to go back to search results)
 			$this->session->keep_flashdata('search_term');
