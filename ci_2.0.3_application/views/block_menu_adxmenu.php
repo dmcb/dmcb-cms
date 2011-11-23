@@ -21,7 +21,7 @@
 		$link_html = ' href="'.$link.'"';
 	}
 	
-	echo $space.'<li><a'.$link_html.$selected_html.'>'.$title.'</a>';
+	echo $space.'<li onmouseover=""><a'.$link_html.$selected_html.'>'.$title.'</a>';
 
 	if ($children_html != NULL)
 	{
