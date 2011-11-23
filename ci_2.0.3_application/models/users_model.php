@@ -247,7 +247,8 @@ class Users_model extends CI_Model {
 	
 	function search($searchby, $num, $offset)
 	{
-		return $this->db->query("SELECT DISTINCT userid FROM users WHERE displayname LIKE ".$this->db->escape('%'.$searchby.'%')." ORDER BY displayname ASC LIMIT $offset, $num");
+		$searchby =  html_entity_decode($searchby, ENT_QUOTES);
+		return $this->db->query("SELECT DISTINCT userid FROM users WHERE displayname LIKE '%".$this->db->escape_like_str($searchby)."%' ORDER BY displayname ASC LIMIT $offset, $num");
 	}
 	
 	function search_count($searchby)

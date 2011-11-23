@@ -253,7 +253,8 @@ class Pages_model extends CI_Model {
 
 	function search($searchby, $num = NULL, $offset = NULL)
 	{
-		return $this->db->query("SELECT DISTINCT pageid FROM pages WHERE published = '1' AND URLNAME IS NOT NULL AND content LIKE ".$this->db->escape('%'.$searchby.'%')." OR title LIKE ".$this->db->escape('%'.$searchby.'%')." ORDER BY title ASC LIMIT $offset, $num");
+		$searchby =  html_entity_decode($searchby, ENT_QUOTES);
+		return $this->db->query("SELECT DISTINCT pageid FROM pages WHERE published = '1' AND URLNAME IS NOT NULL AND content LIKE '%".$this->db->escape_like_str($searchby)."%' OR title LIKE '%".$this->db->escape_like_str($searchby)."%' ORDER BY title ASC LIMIT $offset, $num");
 	}
 	
 	function search_count($searchby)

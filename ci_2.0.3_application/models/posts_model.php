@@ -402,7 +402,9 @@ class Posts_model extends CI_Model {
 		
 			$pageid_sql = "AND (".$pageid_sql.")"; 
 		}
-		return $this->db->query("SELECT DISTINCT postid FROM posts WHERE published = '1' $pageid_sql AND (content LIKE ".$this->db->escape('%'.$searchby.'%')." OR title LIKE ".$this->db->escape('%'.$searchby.'%').") ORDER BY title ASC LIMIT $offset, $num");
+
+		$searchby =  html_entity_decode($searchby, ENT_QUOTES);
+		return $this->db->query("SELECT DISTINCT postid FROM posts WHERE published = '1' $pageid_sql AND (content LIKE '%".$this->db->escape_like_str($searchby)."%' OR title LIKE '%".$this->db->escape_like_str($searchby)."%') ORDER BY title ASC LIMIT $offset, $num");
 	}
 	
 	function search_count($searchby, $pageids = NULL)
