@@ -38,9 +38,9 @@ class Template_lib {
 			$this->new_template = $this->template;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize template
 	 *
@@ -60,9 +60,9 @@ class Template_lib {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize quotas
 	 *
@@ -70,7 +70,7 @@ class Template_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function initialize_quotas()
 	{
 		if (isset($this->template['templateid']))
@@ -84,22 +84,22 @@ class Template_lib {
 				{
 					$quota['filetypes'][$quota_filetype['filetypeid']] = $quota_filetype;
 				}
-				
+
 				$quota['protection'] = array();
 				$quota_protections = $this->CI->templates_model->get_quota_protection($quota['quotaid']);
 				foreach ($quota_protections->result_array() as $quota_protection)
 				{
 					$quota['protection'][$quota_protection['roleid']] = 1;
 				}
-			
+
 				array_push($this->quotas, $quota);
 			}
 		}
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize values
 	 *
@@ -108,7 +108,7 @@ class Template_lib {
 	 * @access	public
 	 * @param	int   attachedid
 	 * @return	void
-	 */	
+	 */
 	function initialize_values($attachedid)
 	{
 		if (isset($this->template['templateid']))
@@ -120,9 +120,9 @@ class Template_lib {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Add field
 	 *
@@ -134,14 +134,14 @@ class Template_lib {
 	 * @param	int      form type code
 	 * @param	int      required
 	 * @return	void
-	 */	
+	 */
 	function add_field($name, $htmlcode, $form_type, $required)
 	{
 		$this->CI->templates_model->add_field($this->template['templateid'], $name, $htmlcode, $form_type, $required);
-	}	
-	
+	}
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Delete
 	 *
@@ -149,12 +149,12 @@ class Template_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function delete()
 	{
 		$this->CI->load->model('pages_model');
 		$pages = $this->CI->pages_model->get_using_template($this->template['templateid']);
-		foreach ($pages->result_array() as $page) 
+		foreach ($pages->result_array() as $page)
 		{
 			$object = instantiate_library('page', $page['pageid']);
 			if ($object->page['page_templateid'] == $this->template['templateid'])
@@ -168,12 +168,12 @@ class Template_lib {
 			$object->save();
 		}
 		$this->CI->templates_model->delete($this->template['templateid']);
-		$this->load->helper('template');
+		$this->CI->load->helper('template');
 		set_page_post_urlnames();
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Delete
 	 *
@@ -182,7 +182,7 @@ class Template_lib {
 	 * @access	public
 	 * @param	string   html code
 	 * @return	void
-	 */	
+	 */
 	function delete_field($htmlcode)
 	{
 		$this->CI->templates_model->delete_field($this->template['templateid'], $htmlcode);
@@ -193,9 +193,9 @@ class Template_lib {
 												$this->new_template['content']);
 		$this->save();
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Edit field
 	 *
@@ -208,14 +208,14 @@ class Template_lib {
 	 * @param	int      form type code
 	 * @param	int      required
 	 * @return	void
-	 */	
+	 */
 	function edit_field($old_htmlcode, $name, $htmlcode, $form_type, $required)
 	{
 		$this->CI->templates_model->edit_field($this->template['templateid'], $old_htmlcode, $name, $htmlcode, $form_type, $required);
 	}
 
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Save
 	 *
@@ -223,7 +223,7 @@ class Template_lib {
 	 *
 	 * @access	public
 	 * @return	array   new templateid from template creation
-	 */	
+	 */
 	function save()
 	{
 		// Check if the template wasn't initialized from an existing one
@@ -233,21 +233,21 @@ class Template_lib {
 			$this->template = $this->new_template;
 		}
 		else // If it was, update the existing template
-		{		
+		{
 			// If the template's handling of post names changes, change all pages the template affects
 			if ($this->new_template['pagepostname'] != $this->template['pagepostname'])
 			{
 				$this->CI->load->helper('template');
 				set_page_post_urlnames();
 			}
-			
+
 			$this->CI->templates_model->update($this->template['templateid'], $this->new_template);
 			$this->template = $this->new_template;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Set default
 	 *
@@ -257,7 +257,7 @@ class Template_lib {
 	 * @param	int      pageid
 	 * @param   boolean  enabled
 	 * @return	void
-	 */	
+	 */
 	function set_default($pageid, $enabled = TRUE)
 	{
 		$this->CI->templates_model->remove_default_template($pageid, $this->new_template['type']);
@@ -268,9 +268,9 @@ class Template_lib {
 		$this->CI->load->helper('template');
 		set_page_post_urlnames();
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Set values
 	 *
@@ -279,11 +279,11 @@ class Template_lib {
 	 * @access	public
 	 * @param	array   values
 	 * @return	void
-	 */	
+	 */
 	function set_values($values, $attachedid)
 	{
 		$modified = FALSE;
-	
+
 		foreach ($values as $htmlcode => $value)
 		{
 			if (!isset($this->values[$htmlcode]) || $this->values[$htmlcode] != $value)
@@ -291,7 +291,7 @@ class Template_lib {
 				$modified = TRUE;
 			}
 		}
-	
+
 		if ($modified)
 		{
 			$this->CI->templates_model->delete_values($this->template['templateid'], $this->template['type'], $attachedid);
@@ -299,7 +299,7 @@ class Template_lib {
 			{
 				$this->CI->templates_model->add_value($this->template['templateid'], $this->template['type'], $attachedid, $htmlcode, $value);
 			}
-			
+
 			// Since we've modified the template values for a page or post, update the date modified on that page or post
 			$object = instantiate_library($this->template['type'], $attachedid);
 			if ($this->template['type'] == "page")

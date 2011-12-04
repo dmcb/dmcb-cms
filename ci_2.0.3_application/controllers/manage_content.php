@@ -13,17 +13,17 @@ class Manage_content extends MY_Controller {
 	function Manage_content()
 	{
 		parent::__construct();
-		
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 	}
-	
+
 	function _remap()
 	{
 		if ($this->acl->allow('site', 'manage_content', TRUE) || $this->_access_denied())
 		{
 			$this->load->model(array('blocks_model', 'files_model', 'templates_model'));
-		
+
 			$method = $this->uri->segment(2);
 		    if ($method == "attachments" || $method == "blocks" || $method == "manageblocks" || $method == "templates")
 		    {
@@ -36,17 +36,17 @@ class Manage_content extends MY_Controller {
 		    }
 		}
 	}
-	
+
 	function index()
 	{
-		$data['packages_upload'] = $this->load->view('packages_upload', 
+		$data['packages_upload'] = $this->load->view('packages_upload',
 			array(
-				'upload_url' => 'site', 
+				'upload_url' => 'site',
 				'upload_size' => $this->config->item('dmcb_site_upload_size'),
-				'upload_types' => $this->config->item('dmcb_site_upload_types'), 
+				'upload_types' => $this->config->item('dmcb_site_upload_types'),
 				'upload_description' => $this->config->item('dmcb_site_upload_description')
 			), TRUE);
-		
+
 		// Grab attachments
 		$data['files'] = array();
 		$fileids = $this->files_model->get_attached("site");
@@ -61,7 +61,7 @@ class Manage_content extends MY_Controller {
 		{
 			$data['stockimages'][$stockimageid['fileid']] = 1;
 		}
-		
+
 		// Grab block instances & functions
 		$data['blocks'] = array();
 		$blockids = $this->blocks_model->get_page_blocks('0');
@@ -72,7 +72,7 @@ class Manage_content extends MY_Controller {
 		}
 		$data['functions'] = $this->blocks_model->get_functions_enabled();
 		$data['availablefunctions'] = $this->blocks_model->get_functions_disabled();
-		
+
 		// Grab templates
 		$data['templates'] = array();
 		$templateids = $this->templates_model->get_attached(0);
@@ -80,8 +80,8 @@ class Manage_content extends MY_Controller {
 		{
 			$object = instantiate_library('template', $templateid['templateid']);
 			array_push($data['templates'], $object->template);
-		}		
-		
+		}
+
 		$this->load->helper('template');
 
 		// Grab default templates and blocks
@@ -92,7 +92,7 @@ class Manage_content extends MY_Controller {
 		{
 			$data['default_templates'][$default_templateid['templateid']] = TRUE;
 		}
-	
+
 		$data['default_blocks'] = array();
 		$default_blockids = $this->blocks_model->get_defaults(0);
 		foreach ($default_blockids->result_array() as $default_blockid)
@@ -102,7 +102,7 @@ class Manage_content extends MY_Controller {
 
 		$this->_initialize_page('manage_content', 'Manage content', $data);
 	}
-	
+
 	function attachments()
 	{
 		$this->attachment = instantiate_library('file', $this->uri->segment(4));
@@ -124,7 +124,7 @@ class Manage_content extends MY_Controller {
 		else if ($this->uri->segment(3) == "rename")
 		{
 			$this->form_validation->set_rules('filename', 'file name', 'xss_clean|strip_tags|trim|required|max_length[100]|callback_filename_check');
-			
+
 			if ($this->form_validation->run())
 			{
 				$this->attachment->new_file['filename'] = set_value('filename');
@@ -146,7 +146,7 @@ class Manage_content extends MY_Controller {
 			$this->index();
 		}
 	}
-	
+
 	function filename_check($str)
 	{
 		$object = instantiate_library('file', array($str, $this->attachment->file['extension'], $this->attachment->file['attachedto'], $this->attachment->file['attachedid']), 'details');
@@ -173,7 +173,7 @@ class Manage_content extends MY_Controller {
 	{
 		$this->form_validation->set_rules('blocktitle', 'title', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[20]|callback_blocktitle_check');
 		$this->form_validation->set_rules('blockfunction', 'function', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[20]');
-		
+
 		if ($this->form_validation->run())
 		{
 			$this->load->library('block_lib','','new_block');
@@ -187,7 +187,7 @@ class Manage_content extends MY_Controller {
 		{
 			// Load up edited block
 			$this->block = instantiate_library('block', $this->uri->segment(4));
-			
+
 			// Ensure block selected is attached to site and not something else
 			if ($this->uri->segment(4) != NULL && (!isset($this->block->block['blockinstanceid']) || $this->block->block['pageid'] != "0"))
 			{
@@ -238,7 +238,7 @@ class Manage_content extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function manageblocks()
 	{
 		if ($this->uri->segment(3) == "enable")
@@ -251,7 +251,7 @@ class Manage_content extends MY_Controller {
 		}
 		$this->index();
 	}
-	
+
 	function templates()
 	{
 		$this->template = instantiate_library('template', $this->uri->segment(4));
@@ -274,14 +274,13 @@ class Manage_content extends MY_Controller {
 		{
 			$this->form_validation->set_rules('templatetitle', 'title', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[100]|callback_templatetitle_check');
 			$this->form_validation->set_rules('templatetype', 'type', 'xss_clean|strip_tags|trim|required');
-			
+
 			if ($this->form_validation->run())
 			{
 				$this->load->library('template_lib','','new_template');
 				$this->new_template->new_template['title'] = set_value('templatetitle');
 				$this->new_template->new_template['type'] = set_value('templatetype');
-				$this->new_template->new_template['attachedto'] = 'site';
-				$this->new_template->new_template['attachedid'] = NULL;
+				$this->new_template->new_template['pageid'] = '0';
 				$this->new_template->save();
 				redirect('template/'.$this->new_template->new_template['templateid']);
 			}
@@ -291,7 +290,7 @@ class Manage_content extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function templatetitle_check($str)
 	{
 		$object = instantiate_library('template', $str, 'title');
@@ -311,4 +310,4 @@ class Manage_content extends MY_Controller {
 		}
 	}
 }
-?> 
+?>

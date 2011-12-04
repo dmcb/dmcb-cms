@@ -13,11 +13,11 @@ class Manage_security extends MY_Controller {
 	function Manage_security()
 	{
 		parent::__construct();
-		
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 	}
-	
+
 	function _remap()
 	{
 		// Overrides ACLs - if you are an administrator, you can never be blocked out of setting security
@@ -35,12 +35,12 @@ class Manage_security extends MY_Controller {
 				// Generate custom roles list
 				if ($role['custom'] == 1)
 				{
-					array_push($data['customroles'], $role); 
+					array_push($data['customroles'], $role);
 				}
-				$this->rolestable[$role['roleid']] = $role; 
-				array_push($data['roles'], $role); 
+				$this->rolestable[$role['roleid']] = $role;
+				array_push($data['roles'], $role);
 			}
-			
+
 			// Get all priveleges
 			$priveleges = $this->acls_model->get_priveleges_all();
 			foreach ($priveleges->result_array() as $privelege)
@@ -57,16 +57,16 @@ class Manage_security extends MY_Controller {
 				}
 				if (!isset($privelege_table[$functionid][$roleid]))
 				{
-					$privelege_table[$functionid][$roleid] = 1; 
+					$privelege_table[$functionid][$roleid] = 1;
 				}
 			}
-			
+
 			// Get all enabled functions and sort through them
 			$data['functions'] = array();
 			$this->functionstable = array();
 			$functions = $this->acls_model->get_functions_enabled();
 			$functions = $this->_get_functions($functions);
-			
+
 			foreach ($functions as $function)
 			{
 				// Push function into table for look up later
@@ -92,7 +92,7 @@ class Manage_security extends MY_Controller {
 				}
 				array_push($data['functions'][$controller], $function);
 			}
-			
+
 			// Get all disabled functions and sort through them
 			$data['availablefunctions'] = array();
 			$functions = $this->acls_model->get_functions_available();
@@ -105,7 +105,7 @@ class Manage_security extends MY_Controller {
 				}
 				array_push($data['availablefunctions'][$controller], $function);
 			}
-			
+
 			// Process actions
 			if ($this->uri->segment(2) == "addrole")
 			{
@@ -115,13 +115,13 @@ class Manage_security extends MY_Controller {
 				{
 					$this->acls_model->add_role(set_value('role'));
 					redirect('manage_security');
-				}		
+				}
 			}
 			else if ($this->uri->segment(2) == "deleterole")
 			{
 				$userlist = $this->acls_model->get_userlist_by_role($this->uri->segment(3));
 				$this->acls_model->delete_role($this->uri->segment(3));
-				
+
 				// Any user losing a special role site-wide will get back their old member role
 				$roleid = $this->acls_model->get_roleid('member');
 				foreach ($userlist->result_array() as $user)
@@ -131,7 +131,7 @@ class Manage_security extends MY_Controller {
 						$this->acls_model->add($user['userid'], $roleid, 'site');
 					}
 				}
-				
+
 				redirect('manage_security');
 			}
 			else if ($this->uri->segment(2) == "enablefunction")
@@ -156,16 +156,16 @@ class Manage_security extends MY_Controller {
 				}
 				redirect('manage_security');
 			}
-			$this->_initialize_page('manage_security', 'Manage acls', $data);
+			$this->_initialize_page('manage_security', 'Manage security', $data);
 		}
 	}
-	
+
 	function rolename_check($str)
-	{	
+	{
 		$roleid = $this->acls_model->get_roleid($str);
 		if ($roleid != NULL)
 		{
-			$this->form_validation->set_message('rolename_check', "The role name $str exists, please try a new role name.");	
+			$this->form_validation->set_message('rolename_check', "The role name $str exists, please try a new role name.");
 			return FALSE;
 		}
 		else
@@ -173,7 +173,7 @@ class Manage_security extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function _get_functions($functions, $level = -1)
 	{
 		$level++;
@@ -184,10 +184,10 @@ class Manage_security extends MY_Controller {
 			array_push($results, $function);
 			$results = array_merge($results, $this->_get_functions($this->acls_model->get_functions_enabled_children($function['functionid']), $level));
 		}
-		
+
 		return $results;
 	}
-	
+
 	function _disable_function($functionid)
 	{
 		$this->acls_model->set_function_availability($functionid, 0);
@@ -197,7 +197,7 @@ class Manage_security extends MY_Controller {
 			$this->_disable_function($child['functionid']);
 		}
 	}
-	
+
 	function _enable_function($functionid)
 	{
 		$this->acls_model->set_function_availability($functionid, 1);
@@ -207,12 +207,12 @@ class Manage_security extends MY_Controller {
 			$this->_enable_function($function['functionof']);
 		}
 	}
-	
+
 	function _set_privelege($functionid, $roleid)
 	{
 		// Ensure that functions that don't allow guests or owners can't have set a privelege for them
-		if (($this->functionstable[$functionid]['guestpossible'] && $this->rolestable[$roleid]['role'] == "guest") || 
-			($this->functionstable[$functionid]['ownerpossible'] && $this->rolestable[$roleid]['role'] == "owner") || 
+		if (($this->functionstable[$functionid]['guestpossible'] && $this->rolestable[$roleid]['role'] == "guest") ||
+			($this->functionstable[$functionid]['ownerpossible'] && $this->rolestable[$roleid]['role'] == "owner") ||
 			($this->rolestable[$roleid]['role'] != "guest" && $this->rolestable[$roleid]['role'] != "owner"))
 		{
 			// Only set role if role isn't already set
@@ -225,14 +225,14 @@ class Manage_security extends MY_Controller {
 		if (isset($function['functionof']) && $function['functionof'] != NULL)
 		{
 			$this->_set_privelege($function['functionof'], $roleid);
-		}	
+		}
 	}
-	
+
 	function _unset_privelege($functionid, $roleid)
 	{
 		// Ensure that functions that don't allow guests or owners can't have set a privelege for them
-		if (($this->functionstable[$functionid]['guestpossible'] && $this->rolestable[$roleid]['role'] == "guest") || 
-			($this->functionstable[$functionid]['ownerpossible'] && $this->rolestable[$roleid]['role'] == "owner") || 
+		if (($this->functionstable[$functionid]['guestpossible'] && $this->rolestable[$roleid]['role'] == "guest") ||
+			($this->functionstable[$functionid]['ownerpossible'] && $this->rolestable[$roleid]['role'] == "owner") ||
 			($this->rolestable[$roleid]['role'] != "guest" && $this->rolestable[$roleid]['role'] != "owner"))
 		{
 			$this->acls_model->remove_function_privelege($functionid, $roleid);
@@ -244,4 +244,4 @@ class Manage_security extends MY_Controller {
 		}
 	}
 }
-?> 
+?>

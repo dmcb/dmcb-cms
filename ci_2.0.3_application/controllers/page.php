@@ -13,28 +13,28 @@ class Page extends MY_Controller {
 	function Page()
 	{
 		parent::__construct();
-		
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 		$this->load->model(array('blocks_model', 'pages_model'));
 	}
-	
+
 	function _remap()
 	{
 		$this->data = array();
-	
+
 		// If subscriptions enabled, load model
 		if ($this->acl->enabled('site', 'subscribe'))
 		{
 			$this->load->model('subscriptions_model');
 		}
-	
+
 		// Crawl through URI segments, matching deepest nested possible URL name
 		$this->base_segment = 1;
 		$this->page_urlname = NULL;
 		$urlname_to_test = $this->uri->segment($this->base_segment);
 		$object = instantiate_library('page', $urlname_to_test, 'urlname');
-		
+
 		while (isset($object->page['pageid']) && $this->base_segment<=$this->uri->total_segments())
 		{
 			$this->page_urlname = $urlname_to_test;
@@ -43,7 +43,7 @@ class Page extends MY_Controller {
 			$object = instantiate_library('page', $urlname_to_test, 'urlname');
 		}
 		$this->base_segment--;
-		
+
 		if ($this->uri->total_segments() == 0) // If no page specified, choose default
 		{
 			$this->page = instantiate_library('page', $this->config->item('dmcb_default_page'), 'urlname');
@@ -57,7 +57,7 @@ class Page extends MY_Controller {
 				redirect(base_url().$parameters_after_urlname);
 			}
 		}
-		
+
 		// Page not found
 		if (!isset($this->page->page['pageid']))
 		{
@@ -79,7 +79,7 @@ class Page extends MY_Controller {
 				$placeholder = $this->placeholders_model->get('page', $urlname_to_test);
 				$i--;
 			}
-		
+
 			if ($placeholder != NULL)
 			{
 				$this->_redirect(base_url().$placeholder['newname'], $placeholder['redirect']);
@@ -103,7 +103,7 @@ class Page extends MY_Controller {
 		{
 			// Subscriptions are enabled, this page requires one, and the user isn't allowed to edit the page and doesn't have a subscription, so deny them
 			$this->data['message'] = "'".$this->page->page['title']."' requires a subscription to view.";
-			
+
 			if ($this->session->userdata('signedon'))
 			{
 				$this->data['message'] .= "<br/><br/>Your subscription has ended, you can <a href=\"".base_url()."subscription\">subscribe for a full account</a> for unlimited access.";
@@ -112,7 +112,7 @@ class Page extends MY_Controller {
 			{
 				$this->data['message'] .= "<br/><br/>If you do have a subscription, please <a href=\"".base_url()."signon".uri_string()."\">sign on</a>.<br/>If you don't have a subscription, you can start a free trial by creating an account <a href=\"".base_url()."signon\">here</a>, or you can <a href=\"".base_url()."subscription\">subscribe for a full account</a> for unlimited access.";
 			}
-			$this->_message("Subscription required", $this->data['message']);		
+			$this->_message("Subscription required", $this->data['message']);
 		}
 		else
 		{
@@ -124,7 +124,7 @@ class Page extends MY_Controller {
 				$this->userlist = array();
 				// Store roles for use later
 				$this->roles_table = array();
-				foreach ($this->roles->result_array() as $role) 
+				foreach ($this->roles->result_array() as $role)
 				{
 					$this->roles_table[$role['roleid']] = $role['role'];
 					$users = array();
@@ -138,10 +138,10 @@ class Page extends MY_Controller {
 					array_push($this->userlist, $users);
 				}
 			}
-			
+
 			// Initialize array of page's parents
 			$this->page->initialize_page_tree();
-			
+
 			// Grab this page's template and values
 			if (isset($this->page->page['page_templateid']))
 			{
@@ -154,7 +154,7 @@ class Page extends MY_Controller {
 			}
 			$this->template = instantiate_library('template', $templateid);
 			$this->template->initialize_values($this->page->page['pageid']);
-						
+
 			// Grab this page's pagination
 			if (isset($this->page->page['pagination_blockid']))
 			{
@@ -165,7 +165,7 @@ class Page extends MY_Controller {
 				$this->load->helper('template');
 				$this->pagination_blockid = template_to_use('block', 'pagination', $this->page->page_tree);
 			}
-			
+
 			// Grab this page's RSS
 			if (isset($this->page->page['rss_blockid']))
 			{
@@ -176,7 +176,7 @@ class Page extends MY_Controller {
 				$this->load->helper('template');
 				$this->rss_blockid = template_to_use('block', 'rss', $this->page->page_tree);
 			}
-			
+
 			$method = $this->uri->segment($this->base_segment+1);
 			if ($method == "addpage" || $method == "addpost" || $method == "addtemplates" || $method == "attachments" || $method == "blocks" || $method == "editpage" || $method == "permissions" || $method == "settemplate")
 			{
@@ -189,16 +189,16 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function index()
-	{		
+	{
 		// Render RSS feed if it exists and is called upon
 		$object = instantiate_library('block', $this->rss_blockid);
 		if (isset($object->block['blockinstanceid']) && $this->uri->segment($this->base_segment+1) == "rss") // Render RSS feed
 		{
 			$object->block['feedback'] = FALSE;
 			$data['rsscontent'] = $object->output_rss();
-			$data['date'] = $object->last_modified;		
+			$data['date'] = $object->last_modified;
 			$data['feed'] = base_url().$this->page->page['urlname'].'/rss';
 			$this->_initialize_rss($this->page->page['title'], $data);
 		}
@@ -209,19 +209,19 @@ class Page extends MY_Controller {
 			{
 				$data['rss'] = $this->load->view('rssfeed', array('feed' => base_url().$this->page->page['urlname'].'/rss'), TRUE);
 			}
-			
+
 			// Generate page by parsing through template and page content, loading up blocks as necessary
 			$data['pagecontent'] = "";
-			
+
 			// If page was reached via search, highlight the searched word
 			if ($this->uri->segment($this->base_segment+1) == "search" && $this->session->flashdata('search_term'))
 			{
 				// Keep search highlighting going (in the event user uses back button to go back to search results)
 				$this->session->keep_flashdata('search_term');
-				
+
 				$this->page->page['content'] = preg_replace('/('.$this->session->flashdata('search_term').')(?![^<]*>)(?![\S]*%)/i', $this->load->view('content_highlight', array('content' => '$1'), TRUE), $this->page->page['content']);
 			}
-			
+
 			$contents_to_parse = $this->page->page['content'];
 			if (isset($this->template->template['templateid']))
 			{
@@ -241,14 +241,14 @@ class Page extends MY_Controller {
 				$contents_to_parse = str_replace('%contenthere%', $this->page->page['content'], $contents_to_parse);
 				$contents_to_parse = str_replace('%titlehere%', $this->page->page['title'], $contents_to_parse);
 			}
-			
+
 			$pagecontents = preg_split('/(%block_\S+%)/', $contents_to_parse, -1, PREG_SPLIT_DELIM_CAPTURE);
 			foreach ($pagecontents as $pagecontent)
 			{
 				if (preg_match('/^%block_\S+%$/', $pagecontent))
 				{
 					$object = instantiate_library('block', preg_replace('/^%block_(\S+)%$/', '$1', $pagecontent), 'title');
-					
+
 					// If we have a block on the page that is paginated AND we are using it, make sure to focus to it
 					if (isset($object->block['blockinstanceid']) && $object->block['blockinstanceid'] == $this->pagination_blockid)
 					{
@@ -259,7 +259,7 @@ class Page extends MY_Controller {
 							$this->focus = "pagination_block";
 						}
 					}
-					
+
 					$data['pagecontent'] .= $object->output($this->page->page_tree);
 				}
 				else
@@ -267,12 +267,12 @@ class Page extends MY_Controller {
 					$data['pagecontent'] .= $pagecontent;
 				}
 			}
-			
-			// Enable editing			
+
+			// Enable editing
 			if ($this->acl->allow('page', 'edit', FALSE, 'page', $this->page->page['pageid']))
 			{
 				$data['packages_editing'] = $this->load->view('packages_editing', NULL, TRUE);
-				
+
 				// Block instances
 				if ($this->acl->enabled('page', 'blocks'))
 				{
@@ -283,7 +283,7 @@ class Page extends MY_Controller {
 					{
 						$default_blocks[$default_blockid['blockinstanceid'].$default_blockid['type']] = TRUE;
 					}
-				
+
 					// Grab all block instances this page is allowed to use for TinyMCE editor
 					$all_blocks = array();
 					foreach ($this->page->page_tree as $pageid)
@@ -305,13 +305,13 @@ class Page extends MY_Controller {
 					{
 						$data['packages_tinymce_blocks'] = $this->load->view('packages_tinymce_blocks', array('blocks' => $all_blocks), TRUE);
 					}
-					
+
 					// Sort all blocks for editing
 					if ($this->acl->allow('page', 'blocks', FALSE, 'page', $this->page->page['pageid']))
 					{
 						$editable_blocks = array();
 						$non_editable_blocks = array();
-						
+
 						foreach ($all_blocks as $block)
 						{
 							if ($block['pageid'] == $this->page->page['pageid'])
@@ -324,11 +324,11 @@ class Page extends MY_Controller {
 							}
 						}
 						$page_blocks = array_merge($editable_blocks, $non_editable_blocks);
-						
+
 						$data['edit_blocks'] = $this->load->view('form_page_blocks', array('page' => $this->page->page, 'blocks' => $page_blocks, 'functions' => $this->blocks_model->get_functions_enabled(), 'default_blocks' => $default_blocks), TRUE);
 					}
 				}
-				
+
 				// Page and post templates
 				if ($this->acl->allow('page', 'templates', FALSE, 'page', $this->page->page['pageid']))
 				{
@@ -341,7 +341,7 @@ class Page extends MY_Controller {
 					{
 						$default_templates[$default_templateid['templateid']] = TRUE;
 					}
-				
+
 					// Grab all templates this page is allowed to use
 					$all_templates = array();
 					foreach ($this->page->page_tree as $pageid)
@@ -358,14 +358,14 @@ class Page extends MY_Controller {
 					{
 						$object = instantiate_library('template', $templateid['templateid']);
 						array_push($all_templates, $object->template);
-					}					
-					
+					}
+
 					// Sort all templates for editing
 					$all_page_templates = array();
 					$all_post_templates = array();
 					$editable_page_templates = array();
 					$editable_post_templates = array();
-					
+
 					foreach ($all_templates as $template)
 					{
 						if ($template['type'] == "page")
@@ -385,9 +385,9 @@ class Page extends MY_Controller {
 							}
 						}
 					}
-					$all_templates = array_merge($all_page_templates, $all_post_templates);	
-					$editable_templates = array_merge($editable_page_templates, $editable_post_templates);	
-					
+					$all_templates = array_merge($all_page_templates, $all_post_templates);
+					$editable_templates = array_merge($editable_page_templates, $editable_post_templates);
+
 					$data['set_template'] = $this->load->view('form_page_settemplate', array('page' => $this->page->page, 'template_in_use' => $this->template, 'templates' => $all_templates, 'default_templates' => $default_templates), TRUE);
 					$data['add_templates'] = $this->load->view('form_page_addtemplates', array('page' => $this->page->page, 'templates' => $editable_templates), TRUE);
 				}
@@ -400,18 +400,18 @@ class Page extends MY_Controller {
 				}
 				$data['edit_page'] = $this->load->view('form_page_editpage', array('page' => $this->page->page, 'fields' => $this->template->fields, 'values' => $this->template->values, 'simple_editor' => $simple_editor), TRUE);
 			}
-			
-			// Enable attachment editing			
+
+			// Enable attachment editing
 			if ($this->acl->allow('page', 'attachments', FALSE, 'page', $this->page->page['pageid']))
-			{			
-				$data['packages_upload'] = $this->load->view('packages_upload', 
+			{
+				$data['packages_upload'] = $this->load->view('packages_upload',
 					array(
-						'upload_url' => 'page/'.$this->page->page['urlname'], 
+						'upload_url' => 'page/'.$this->page->page['urlname'],
 						'upload_size' => $this->config->item('dmcb_site_upload_size'),
-						'upload_types' => $this->config->item('dmcb_site_upload_types'), 
+						'upload_types' => $this->config->item('dmcb_site_upload_types'),
 						'upload_description' => $this->config->item('dmcb_site_upload_description')
 					), TRUE);
-			
+
 				// Grab attachments
 				$this->load->model('files_model');
 				$files = array();
@@ -427,11 +427,11 @@ class Page extends MY_Controller {
 				foreach ($stockimageids->result_array() as $stockimage)
 				{
 					$object = instantiate_library('file', $stockimage['fileid']);
-					array_push($stockimages, $object->file);			
+					array_push($stockimages, $object->file);
 				}
 				$data['attachments'] = $this->load->view('form_page_attachments', array('files' => $files, 'stockimages' => $stockimages, 'page' => $this->page->page), TRUE);
 			}
-			
+
 			// Adding child pages
 			if ($this->acl->allow('page', 'addpage', FALSE, 'page', $this->page->page['pageid']))
 			{
@@ -444,7 +444,7 @@ class Page extends MY_Controller {
 				}
 				$data['add_page'] = $this->load->view('form_page_addpage', array('page' => $this->page->page, 'childpages' => $childpages), TRUE);
 			}
-			
+
 			// Adding posts
 			if ($this->acl->allow('page', 'addpost', FALSE, 'page', $this->page->page['pageid']))
 			{
@@ -470,13 +470,13 @@ class Page extends MY_Controller {
 			{
 				$data['permissions'] = $this->load->view('form_page_permissions', array('page' => $this->page->page, 'roles' => $this->roles, 'userlist' => $this->userlist), TRUE);
 			}
-			
+
 			$data['page'] = $this->page->page;
 			$data['base_segment'] = $this->base_segment;
 			$this->_initialize_page('page', $this->page->page['title'], $data, TRUE);
 		}
 	}
-	
+
 	function addpage()
 	{
 		if ($this->acl->allow('page', 'addpage', TRUE, 'page', $this->page->page['pageid']) || $this->_access_denied())
@@ -484,7 +484,7 @@ class Page extends MY_Controller {
 			$this->form_validation->set_rules('pagetitle', 'title', 'xss_clean|strip_tags|trim|htmlentities|required|min_length[2]|max_length[50]');
 			$this->form_validation->set_rules('pageurlname', 'url name', 'xss_clean|strip_tags|trim|strtolower|min_length[2]|max_length[55]|callback_childpageurlname_check');
 			$this->form_validation->set_rules('nestedurl', 'nested url', 'xss_clean|strip_tags');
-			
+
 			if ($this->form_validation->run())
 			{
 				$this->load->library('page_lib',NULL,'new_page');
@@ -492,7 +492,7 @@ class Page extends MY_Controller {
 				$this->new_page->new_page['pageof'] = $this->page->page['pageid'];
 				$this->new_page->new_page['title'] = html_entity_decode(set_value('pagetitle'), ENT_QUOTES);
 				$result = $this->new_page->save();
-				
+
 				$new_page = instantiate_library('page', $result);
 				$new_page->new_page['urlname'] = set_value('pageurlname');
 				// If a nested URL is chosen
@@ -502,7 +502,7 @@ class Page extends MY_Controller {
 				}
 				$new_page->save();
 
-				redirect($this->page->new_page['urlname'].'/editpage');
+				redirect($this->page->new_page['urlname'].'/addpage');
 			}
 			else
 			{
@@ -510,7 +510,7 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function childpageurlname_check($str)
 	{
 		//Grab page methods to ensure page url can't be a page function
@@ -519,7 +519,7 @@ class Page extends MY_Controller {
 		fclose($page_controller);
 		preg_match_all("/\s+function (\w*)\(.*\)/", $page_controller_contents, $functions);
 		$page_controller_methods = implode("|",$functions[1]);
-		
+
 		if (!preg_match('/^[a-z0-9-_]+$/i', $str))
 		{
 			$this->form_validation->set_message('childpageurlname_check', "The url name must be made of only letters, numbers, dashes, and underscores.");
@@ -541,13 +541,13 @@ class Page extends MY_Controller {
 			return FALSE;
 		}
 		else
-		{	
+		{
 			// If a nested URL is chosen and a parent page is selected, add that URL name to the name we are testing
 			if (isset($_POST['nestedurl']))
 			{
 				$str = $this->page->page['urlname'].'/'.$str;
 			}
-		
+
 			// Check for name collisions and return suggested new name
 			$suggestion = $this->page->suggest($str);
 			if ($suggestion == $str)
@@ -566,14 +566,14 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function addpost()
 	{
 		if ($this->acl->allow('page', 'addpost', TRUE, 'page', $this->page->page['pageid']) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('posttitle', 'title', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[100]');
 			$this->form_validation->set_rules('posturlname', 'url name', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[35]|callback_posturlname_check');
-			
+
 			if ($this->form_validation->run())
 			{
 				$this->load->library('post_lib','','new_post');
@@ -598,7 +598,7 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function posturlname_check($str)
 	{
 		if (!preg_match('/^[a-z0-9-_]+$/i', $str))
@@ -622,7 +622,7 @@ class Page extends MY_Controller {
 			{
 				$str = date("Ymd").'/'.$str;
 			}
-			
+
 			// Check for name collisions and return suggested new name
 			$this->load->library('post_lib','','test_post');
 			$this->test_post->post['postid'] = '0';
@@ -643,14 +643,14 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function addtemplates()
 	{
 		if ($this->acl->allow('page', 'templates', TRUE, 'page', $this->page->page['pageid']) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('templatetitle', 'title', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[100]|callback_templatetitle_check');
 			$this->form_validation->set_rules('templatetype', 'type', 'xss_clean|strip_tags|trim|required');
-			
+
 			if ($this->form_validation->run())
 			{
 				$this->load->library('template_lib','','new_template');
@@ -666,7 +666,7 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function templatetitle_check($str)
 	{
 		$object = instantiate_library('template', $str, 'title');
@@ -685,7 +685,7 @@ class Page extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function attachments()
 	{
 		if ($this->acl->allow('page', 'attachments', TRUE, 'page', $this->page->page['pageid']) || $this->_access_denied())
@@ -730,7 +730,7 @@ class Page extends MY_Controller {
 			else if ($this->uri->segment($this->base_segment+2) == "rename")
 			{
 				$this->form_validation->set_rules('filename', 'file name', 'xss_clean|strip_tags|trim|required|max_length[100]|callback_filename_check');
-				
+
 				if ($this->form_validation->run())
 				{
 					$this->attachment->new_file['filename'] = set_value('filename');
@@ -748,7 +748,7 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function filename_check($str)
 	{
 		$object = instantiate_library('file', array($str, $this->attachment->file['extension'], $this->attachment->file['attachedto'], $this->attachment->file['attachedid']), 'details');
@@ -772,14 +772,14 @@ class Page extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function blocks()
 	{
 		if ($this->acl->allow('page', 'blocks', TRUE, 'page', $this->page->page['pageid']) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('blocktitle', 'title', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[20]|callback_blocktitle_check');
 			$this->form_validation->set_rules('blockfunction', 'function', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[20]');
-				
+
 			if ($this->form_validation->run())
 			{
 				$this->load->library('block_lib','','new_block');
@@ -793,7 +793,7 @@ class Page extends MY_Controller {
 			{
 				// Load up edited block
 				$this->block = instantiate_library('block', $this->uri->segment($this->base_segment+3));
-				
+
 				// Ensure block selected is attached to site and not something else
 				if ($this->uri->segment($this->base_segment+3) != NULL && (!isset($this->block->block['blockinstanceid']) || (!isset($this->page->page_tree[$this->block->block['pageid']]) && $this->block->block['pageid'] != 0)))
 				{
@@ -850,7 +850,7 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function blocktitle_check($str)
 	{
 		$object = instantiate_library('block', $str, 'title');
@@ -869,7 +869,7 @@ class Page extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function editpage()
 	{
 		if ($this->acl->allow('page', 'edit', TRUE, 'page', $this->page->page['pageid']) || $this->_access_denied())
@@ -879,7 +879,7 @@ class Page extends MY_Controller {
 			$this->form_validation->set_rules('content', 'content', 'max_length[65000]');
 			$this->form_validation->set_rules('nestedurl', 'nested url', 'xss_clean');
 			$this->form_validation->set_rules('pagesubscription', 'needs subscription', 'xss_clean');
-			
+
 			// Add in form validation for additional template fields
 			foreach ($this->template->fields as $field)
 			{
@@ -892,10 +892,10 @@ class Page extends MY_Controller {
 				{
 					$rulestring .= '|required';
 				}
-				
+
 				$this->form_validation->set_rules($field['htmlcode'], $field['name'], $rulestring);
 			}
-		
+
 			if ($this->form_validation->run())
 			{
 				$this->page->new_page['needsubscription'] = set_value('pagesubscription');
@@ -911,7 +911,7 @@ class Page extends MY_Controller {
 				//$this->page->new_page['content'] = html_entity_decode(auto_link(set_value('content'), 'url'), ENT_QUOTES);
 				$this->page->new_page['content'] = html_entity_decode(set_value('content'), ENT_QUOTES);
 				$this->page->save();
-				
+
 				// Save additional template field values
 				if (isset($this->template->fields))
 				{
@@ -922,7 +922,7 @@ class Page extends MY_Controller {
 					}
 					$this->template->set_values($values, $this->page->page['pageid']);
 				}
-				
+
 				redirect($this->page->page['urlname'].'/editpage');
 			}
 			else
@@ -940,7 +940,7 @@ class Page extends MY_Controller {
 		fclose($page_controller);
 		preg_match_all("/\s+function (\w*)\(.*\)/", $page_controller_contents, $functions);
 		$page_controller_methods = implode("|",$functions[1]);
-		
+
 		if (!preg_match('/^[a-z0-9-_]+$/i', $str))
 		{
 			$this->form_validation->set_message('pageurlname_check', "The url name must be made of only letters, numbers, dashes, and underscores.");
@@ -962,14 +962,14 @@ class Page extends MY_Controller {
 			return FALSE;
 		}
 		else
-		{	
+		{
 			// If a nested URL is chosen and a parent page is selected, add that URL name to the name we are testing
 			if (isset($_POST['nestedurl']) && $this->page->page['pageof'] != NULL)
 			{
 				$object = instantiate_library('page', $this->page->page['pageof']);
 				$str = $object->page['urlname'].'/'.$str;
 			}
-		
+
 			// Check for name collisions and return suggested new name
 			$suggestion = $this->page->suggest($str);
 			if ($suggestion == $str)
@@ -988,7 +988,7 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function permissions()
 	{
 		if ($this->acl->allow('page', 'permissions', TRUE, 'page', $this->page->page['pageid']) || $this->_access_denied())
@@ -996,18 +996,18 @@ class Page extends MY_Controller {
 			$this->form_validation->set_rules('displayname', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_permissions_check|callback_acl_exists_check');
 			$this->form_validation->set_rules('email', 'email address', 'xss_clean|strip_tags|trim|max_length[50]|valid_email|callback_email_check');
 			$this->form_validation->set_rules('role', 'role', 'xss_clean');
-		
+
 			$this->load->model('acls_model');
 			if ($this->uri->segment($this->base_segment+2) == "set_role")
 			{
 				$this->acls_model->delete($this->uri->segment($this->base_segment+3), 'page', $this->page->page['pageid']);
 				$this->acls_model->add($this->uri->segment($this->base_segment+3), $this->uri->segment($this->base_segment+4), 'page', $this->page->page['pageid']);
-								
+
 				// Do notification
 				$this->session->set_flashdata('change', 'role change');
 				$this->session->set_flashdata('action', 'set');
 				$this->session->set_flashdata('actionon', 'user');
-				$this->session->set_flashdata('actiononid', $this->uri->segment($this->base_segment+3));				
+				$this->session->set_flashdata('actiononid', $this->uri->segment($this->base_segment+3));
 				$this->session->set_flashdata('parentid', $this->uri->segment($this->base_segment+3));
 				$this->session->set_flashdata('scope', 'page');
 				$this->session->set_flashdata('scopeid', $this->page->page['pageid']);
@@ -1018,7 +1018,7 @@ class Page extends MY_Controller {
 			else if ($this->uri->segment($this->base_segment+2) == "delete")
 			{
 				$this->acls_model->delete($this->uri->segment($this->base_segment+3), 'page', $this->page->page['pageid']);
-				
+
 				// Do notification
 				$this->session->set_flashdata('change', 'role removal');
 				$this->session->set_flashdata('action', 'removed');
@@ -1031,7 +1031,7 @@ class Page extends MY_Controller {
 				redirect('notify');
 			}
 			else if ($this->form_validation->run())
-			{	
+			{
 				if (set_value('email') != "")
 				{
 					$this->load->library('user_lib',NULL,'new_user');
@@ -1039,17 +1039,17 @@ class Page extends MY_Controller {
 					$this->new_user->new_user['displayname'] = set_value('displayname');
 					$this->new_user->new_user['roleid'] = $this->acls_model->get_roleid('member');
 					$result = $this->new_user->save();
-					
+
 					$this->acls_model->add($result['userid'], set_value('role'), 'page', $this->page->page['pageid']);
-					
+
 					redirect($this->page->page['urlname'].'/permissions');
 				}
 				else
 				{
 					$object = instantiate_library('user', set_value('displayname'), 'displayname');
-					
+
 					$this->acls_model->add($object->user['userid'], set_value('role'), 'page', $this->page->page['pageid']);
-					
+
 					// Do notification
 					$this->session->set_flashdata('change', 'added role');
 					$this->session->set_flashdata('action', 'set');
@@ -1057,7 +1057,7 @@ class Page extends MY_Controller {
 					$this->session->set_flashdata('actiononid', $object->user['userid']);
 					$this->session->set_flashdata('parentid', $object->user['userid']);
 					$this->session->set_flashdata('scope', 'page');
-					$this->session->set_flashdata('scopeid', $this->page->page['pageid']);						
+					$this->session->set_flashdata('scopeid', $this->page->page['pageid']);
 					$this->session->set_flashdata('content', $this->roles_table[set_value('role')]);
 					$this->session->set_flashdata('return', $this->page->page['urlname'].'/permissions');
 					redirect('notify');
@@ -1069,9 +1069,9 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function acl_exists_check($str)
-	{	
+	{
 		if (isset($_POST['email']) && $_POST['email'] != NULL)
 		{
 			return TRUE;
@@ -1082,7 +1082,7 @@ class Page extends MY_Controller {
 			$role = $this->acls_model->get($checkuser->user['userid'], 'post', $this->post->post['postid']);
 			if (isset($checkuser->user['userid']) && $role != NULL)
 			{
-				$this->form_validation->set_message('acl_exists_check', "$str already has permissions on this post.");	
+				$this->form_validation->set_message('acl_exists_check', "$str already has permissions on this post.");
 				return FALSE;
 			}
 			else
@@ -1091,9 +1091,9 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function displayname_permissions_check($str)
-	{	
+	{
 		if (isset($_POST['email']) && $_POST['email'] != NULL)
 		{
 			$displayname_check = instantiate_library('user', $str, 'displayname');
@@ -1115,14 +1115,14 @@ class Page extends MY_Controller {
 			else
 			{
 				return TRUE;
-			}	
+			}
 		}
 		else
 		{
 			$checkuser = instantiate_library('user', $str, 'displayname');
 			if ($str != "" && !isset($checkuser->user['userid']))
 			{
-				$this->form_validation->set_message('displayname_permissions_check', "The display name $str doesn't exist, please try a new display name.");	
+				$this->form_validation->set_message('displayname_permissions_check', "The display name $str doesn't exist, please try a new display name.");
 				return FALSE;
 			}
 			else
@@ -1131,7 +1131,7 @@ class Page extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function email_check($str)
 	{
 		$checkuser = instantiate_library('user', $str, 'email');
@@ -1145,7 +1145,7 @@ class Page extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function settemplate()
 	{
 		if ($this->acl->allow('page', 'templates', TRUE, 'page', $this->page->page['pageid']) || $this->_access_denied())
@@ -1186,7 +1186,7 @@ class Page extends MY_Controller {
 			else
 			{
 				$this->form_validation->set_rules('pagepostname', 'page post name', 'xss_clean');
-				
+
 				if ($this->form_validation->run())
 				{
 					if (!isset($this->template->template['templateid']))
