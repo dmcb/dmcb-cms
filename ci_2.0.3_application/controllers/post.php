@@ -27,7 +27,7 @@ class Post extends MY_Controller {
 		{
 			$this->load->model('subscriptions_model');
 		}
-		
+
 		// Determine post URL name
 		$urlname = "";
 		if ($this->uri->total_segments() <= 1) // If no post is specified, go to default post
@@ -44,7 +44,7 @@ class Post extends MY_Controller {
 				$postid = $default_post->row_array();
 				$this->post = instantiate_library('post', $postid['postid']);
 				// This next part doesn't really matter, deep linking to /post/addcomment will make it no longer match to default post setting
-				$this->base_segment = substr_count($this->post->post['urlname'], '/')+1; 
+				$this->base_segment = substr_count($this->post->post['urlname'], '/')+1;
 			}
 		}
 		else
@@ -68,7 +68,7 @@ class Post extends MY_Controller {
 			}
 			$this->post = instantiate_library('post', $urlname, 'urlname');
 		}
-	
+
 		if (isset($this->post->post['postid']))
 		{
 			// Get potential parent author and parent page of post
@@ -82,7 +82,7 @@ class Post extends MY_Controller {
 			// Like wise, set the post urlname in the system
 			$this->post_urlname = $this->post->post['urlname'];
 		}
-		
+
 		// No post specified
 		if (!isset($this->post->post['postid']))
 		{
@@ -121,9 +121,9 @@ class Post extends MY_Controller {
 			}
 			else
 			{
-				$this->message = "You have used your ".$this->config->item('dmcb_post_subscriptions_free_views')." free ".$this->config->item('dmcb_post_subscriptions_free_views_range')." views on posts that require a subscription and won't be able to read '".$this->post->post['title']."'.";		
+				$this->message = "You have used your ".$this->config->item('dmcb_post_subscriptions_free_views')." free ".$this->config->item('dmcb_post_subscriptions_free_views_range')." views on posts that require a subscription and won't be able to read '".$this->post->post['title']."'.";
 			}
-			
+
 			if ($this->session->userdata('signedon'))
 			{
 				$this->message .= "<br/><br/>Your subscription has ended, you can <a href=\"".base_url()."subscription\">subscribe for a full account</a> for unlimited access.";
@@ -138,22 +138,22 @@ class Post extends MY_Controller {
 		{
 			// We're in, let's load up everything
 			$this->post->post['event'] = $this->events_model->get($this->post->post['postid']);
-			
+
 			// Get post references and categories
 			$this->postreferences = array();
-			$postreferences = $this->posts_model->get_references($this->post->post['postid']);	
+			$postreferences = $this->posts_model->get_references($this->post->post['postid']);
 			$this->post->post['postcategories'] = $this->categories_model->get_by_post_published($this->post->post['postid']);
 			$postcategories = $this->categories_model->get_by_post($this->post->post['postid']);
-			
+
 			// Construct category values for edit page form
 			$this->post->post['categorynames'] = "";
 			$this->post->post['categoryvalues'] = "";
 			$this->post->post['categories'] = $this->categories_model->get_list();
-			
+
 			// Use posted values if available
 			if (isset($_POST['categoryvalues']))
 			{
-				$this->post->post['categoryvalues'] = $this->security->xss_clean($_POST['categoryvalues']);	
+				$this->post->post['categoryvalues'] = $this->security->xss_clean($_POST['categoryvalues']);
 				$this->post->post['categorynames'] = $this->security->xss_clean($_POST['categorynames']);
 			}
 			else if ($postcategories->num_rows != 0) // If category values weren't posted (i.e. editing was attempted), load up the originals
@@ -169,13 +169,13 @@ class Post extends MY_Controller {
 						$this->post->post['categorynames'] = $this->post->post['categorynames'].$postcategory['name'].";";
 					}
 					$this->post->post['categoryvalues'] = $this->post->post['categoryvalues'].$postcategory['categoryid'].";";
-				}						
+				}
 			}
 			// Construct previous post values for edit page form
 			$this->post->post['previouspostnames'] = "";
 			$this->post->post['previouspostvalues'] = "";
 			$this->post->post['previousposts'] = array();
-			
+
 			// Determine potential references the editor can use by drawing on previous posts by page or by author
 			if (isset($this->page->page['pageid']))
 			{
@@ -195,12 +195,12 @@ class Post extends MY_Controller {
 					array_push($this->post->post['previousposts'], $object->post);
 				}
 			}
-			
+
 			// Use posted values if available
 			if (isset($_POST['previouspostvalues']))
 			{
-				$this->post->post['previouspostvalues'] = $this->security->xss_clean($_POST['previouspostvalues']);	
-				$this->post->post['previouspostnames'] = $this->security->xss_clean($_POST['previouspostnames']);	
+				$this->post->post['previouspostvalues'] = $this->security->xss_clean($_POST['previouspostvalues']);
+				$this->post->post['previouspostnames'] = $this->security->xss_clean($_POST['previouspostnames']);
 			}
 			foreach ($postreferences->result_array() as $postreference)
 			{
@@ -213,8 +213,8 @@ class Post extends MY_Controller {
 				}
 				// Regardless, always ensure post references are built
 				array_push($this->postreferences, $object->post);
-			}						
-			
+			}
+
 			// Build files list
 			$this->listedfiles = array();
 			$files = $this->files_model->get_attached_listed("post",$this->post->post['postid']);
@@ -223,7 +223,7 @@ class Post extends MY_Controller {
 				$object = instantiate_library('file', $file['fileid']);
 				array_push($this->listedfiles, $object->file);
 			}
-			
+
 			// Build contributors list
 			$this->contributors = array();
 			foreach ($this->post->post['contributors'] as $userid)
@@ -231,8 +231,8 @@ class Post extends MY_Controller {
 				$object = instantiate_library('user', $userid);
 				array_push($this->contributors, $object->user);
 			}
-			
-			// Get user roles for permissions			
+
+			// Get user roles for permissions
 			if ($this->acl->allow('post', 'permissions', FALSE, 'post'))
 			{
 				$this->load->model('acls_model');
@@ -240,7 +240,7 @@ class Post extends MY_Controller {
 				$this->userlist = array();
 				// Store roles for use later
 				$this->roles_table = array();
-				foreach ($this->roles->result_array() as $role) 
+				foreach ($this->roles->result_array() as $role)
 				{
 					$this->roles_table[$role['roleid']] = $role['role'];
 					$users = array();
@@ -254,8 +254,8 @@ class Post extends MY_Controller {
 					array_push($this->userlist, $users);
 				}
 			}
-			
-			// Build theme files list			
+
+			// Build theme files list
 			if ($this->acl->enabled('post', 'theme'))
 			{
 				$this->cssfiles = array();
@@ -273,13 +273,13 @@ class Post extends MY_Controller {
 					}
 				}
 			}
-		
+
 			// Grab parent page tree if the post is attached to a page
 			if (isset($this->page->page['pageid']))
 			{
 				$this->page->initialize_page_tree();
 			}
-			
+
 			// Grab default post template and values
 			if (isset($this->page->page['post_templateid']))
 			{
@@ -292,8 +292,8 @@ class Post extends MY_Controller {
 			}
 			$this->template = instantiate_library('template', $templateid);
 			$this->template->initialize_values($this->post->post['postid']);
-			
-			
+
+
 			// Grab attachments & images
 			$filetypes = array();
 			$filetypes[0] = array();
@@ -314,13 +314,13 @@ class Post extends MY_Controller {
 					array_push($filetypes[$object->file['filetypeid']], $object->file);
 				}
 			}
-		
+
 			// Grab attachment quotas
 			$this->files = array();
 			$this->filegroups = array();
 			$quota_required = TRUE;
 			$no_quota_in_use = TRUE;
-			
+
 			if (isset($this->template->template['templateid']))
 			{
 				$this->template->initialize_quotas();
@@ -355,7 +355,7 @@ class Post extends MY_Controller {
 					$this->filegroups[$filegroup['quotaid']] = $filegroup;
 				}
 			}
-						
+
 			if (!$quota_required || $no_quota_in_use) // If the user isn't assigned to a quota, or is assigned to one but not required to use it, allow for regular post attachments
 			{
 				array_unshift($this->filegroups, array('name' => 'Attachments', 'editable' => TRUE, 'filetypes' => array(array('filetypeid' => NULL, 'name' => 'Attachments', 'files' => $filetypes[0]))));
@@ -365,7 +365,7 @@ class Post extends MY_Controller {
 					$this->files[$file['fileid']] = $file;
 				}
 			}
-			
+
 			$method = $this->uri->segment($this->base_segment+1);
 			if ($method == "addcomment" || $method == "attachments" || $method == "comment" || $method == "delete" || $method == "deletecomment" || $method == "editevent" || $method == "editpost" || $method == "permissions" || $method == "reportcomment" || $method == "taguser" ||  $method == "theme")
 			{
@@ -383,7 +383,7 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function index()
 	{
 		// Add comment stuff only if the post is published and not a draft
@@ -407,7 +407,7 @@ class Post extends MY_Controller {
 			{
 				$add_comment = $this->load->view('form_post_addcommentteaser', array('post' => $this->post->post), TRUE);
 			}
-			
+
 			// Grab comments
 			if ($this->acl->enabled('post', 'addcomment'))
 			{
@@ -418,8 +418,8 @@ class Post extends MY_Controller {
 				$this->block_lib->block['function'] = "comments";
 				$this->block_lib->block['feedback'] = "0";
 				$this->block_lib->block['values'] = array(
-					'detail' => 'full', 
-					'post' => $this->post->post['urlname'], 
+					'detail' => 'full',
+					'post' => $this->post->post['urlname'],
 					'limit' => $this->config->item('dmcb_comments_per_post'),
 					'sort' => 'asc'
 				);
@@ -434,12 +434,12 @@ class Post extends MY_Controller {
 		{
 			$admin_toolbar = $this->load->view('post_admin_toolbar', array('post' => $this->post->post, 'author' => $this->author->user), TRUE);
 		}
-		
+
 		// Enable editing
 		if ($this->acl->allow('post', 'edit', FALSE, 'post', $this->post->post['postid']))
 		{
 			$data['packages_editing'] = $this->load->view('packages_editing', NULL, TRUE);
-				
+
 			// Set editor type from template
 			$simple_editor = FALSE;
 			if (isset($this->template->template['simple']) && $this->template->template['simple'])
@@ -449,17 +449,17 @@ class Post extends MY_Controller {
 			$data['edit_post'] = $this->load->view('form_post_editpost', array('post' => $this->post->post, 'fields' => $this->template->fields, 'values' => $this->template->values, 'simple_editor' => $simple_editor), TRUE);
 		}
 
-		// Enable attachment editing			
+		// Enable attachment editing
 		if ($this->acl->allow('post', 'attachments', FALSE, 'post', $this->post->post['postid']))
-		{		
-			$data['packages_upload'] = $this->load->view('packages_upload', 
+		{
+			$data['packages_upload'] = $this->load->view('packages_upload',
 				array(
-					'upload_url' => 'post/'.$this->post->post['urlname'], 
+					'upload_url' => 'post/'.$this->post->post['urlname'],
 					'upload_size' => $this->config->item('dmcb_site_upload_size'),
-					'upload_types' => $this->config->item('dmcb_site_upload_types'), 
+					'upload_types' => $this->config->item('dmcb_site_upload_types'),
 					'upload_description' => $this->config->item('dmcb_site_upload_description')
 				), TRUE);
-			
+
 			// Grab stock images, if we have multiple, we will let the user choose if they want to set any as the post image
 			$stockimages = array();
 			$stockimageids = $this->files_model->get_stockimages();
@@ -468,13 +468,13 @@ class Post extends MY_Controller {
 				foreach ($stockimageids->result_array() as $stockimage)
 				{
 					$object = instantiate_library('file', $stockimage['fileid']);
-					array_push($stockimages, $object->file);			
+					array_push($stockimages, $object->file);
 				}
 			}
-			
+
 			$data['attachments'] = $this->load->view('form_post_attachments', array('post' => $this->post->post, 'stockimages' => $stockimages, 'filegroups' => $this->filegroups, 'files' => $this->files), TRUE);
 		}
-		
+
 		// Output any custom CSS and JS and enable theme editing if allowed
 		if ($this->acl->enabled('post', 'theme'))
 		{
@@ -502,28 +502,28 @@ class Post extends MY_Controller {
 			}
 			if ($this->acl->allow('post', 'theme', FALSE, 'post', $this->post->post['postid']))
 			{
-				$data['edit_css'] = $this->load->view('form_post_theme', array('post' => $this->post->post, 'cssfiles' => $this->cssfiles, 'jsfiles' => $this->jsfiles), TRUE);	
+				$data['edit_css'] = $this->load->view('form_post_theme', array('post' => $this->post->post, 'cssfiles' => $this->cssfiles, 'jsfiles' => $this->jsfiles), TRUE);
 			}
 		}
-		
+
 		// Enable events
 		if ($this->acl->allow('post', 'event', FALSE, 'post', $this->post->post['postid']))
 		{
-			$data['edit_event'] = $this->load->view('form_post_editevent', array('post' => $this->post->post), TRUE);	
+			$data['edit_event'] = $this->load->view('form_post_editevent', array('post' => $this->post->post), TRUE);
 		}
-		
+
 		// Enable tagging useres
 		if ($this->acl->allow('post', 'taguser', FALSE, 'post', $this->post->post['postid']))
 		{
-			$data['tag_user'] = $this->load->view('form_post_taguser', array('post' => $this->post->post, 'contributors' => $this->contributors), TRUE);	
+			$data['tag_user'] = $this->load->view('form_post_taguser', array('post' => $this->post->post, 'contributors' => $this->contributors), TRUE);
 		}
-		
+
 		// Get post neighbours
 		$next_postid = $this->posts_model->get_neighbour_post("next", $this->post->post['date'], $this->post->post['pageid'], $this->post->post['userid']);
 		$next_post = instantiate_library('post', $next_postid);
 		$previous_postid = $this->posts_model->get_neighbour_post("previous", $this->post->post['date'], $this->post->post['pageid'], $this->post->post['userid']);
 		$previous_post = instantiate_library('post', $previous_postid);
-		
+
 		// Get post images
 		$this->post->post['image'] = NULL;
 		$file = instantiate_library('file', $this->post->post['imageid']);
@@ -557,25 +557,26 @@ class Post extends MY_Controller {
 		{
 			$data['permissions'] = $this->load->view('form_post_permissions', array('post' => $this->post->post, 'roles' => $this->roles, 'userlist' => $this->userlist), TRUE);
 		}
-		
+
 		// If post was reached via search, highlight the searched word
 		if ($this->uri->segment($this->base_segment+1) == "search" && $this->session->flashdata('search_term'))
 		{
 			// Keep search highlighting going (in the event user uses back button to go back to search results)
 			$this->session->keep_flashdata('search_term');
-			
+
 			$this->post->post['content'] = preg_replace('/('.$this->session->flashdata('search_term').')(?![^<]*>)(?![\S]*%)/i', $this->load->view('content_highlight', array('content' => '$1'), TRUE), $this->post->post['content']);
 		}
-		
+
 		// Render the post
 		$post_section = $this->load->view('post_post', array('post' => $this->post->post, 'next_post' => $next_post->post, 'previous_post' => $previous_post->post, 'contributors' => $this->contributors, 'parentpage' => $this->page->page, 'author' => $this->author->user, 'admin_toolbar' => $admin_toolbar), TRUE);
 		$comments_section = $this->load->view('post_comments', array('comments' => $comments, 'add_comment' => $add_comment), TRUE);
-		$files_section = $this->load->view('post_files', array('files' => $this->listedfiles), TRUE); 
+		$files_section = $this->load->view('post_files', array('files' => $this->listedfiles), TRUE);
 		$references_section = $this->load->view('post_references', array('references' => $this->postreferences), TRUE);
 		$pingbacks_section = $this->load->view('post_pingbacks', array('pingbacks' => $this->pingbacks_model->get($this->post->post['postid'])), TRUE);
 		$featuredimage_section = $this->load->view('post_image', array('postid' => $this->post->post['postid'], 'image' => $this->post->post['image']), TRUE);
+		if ($this->post->post['image'] == NULL) $featuredimage_section = NULL;
 		$listedimages_section = $this->load->view('post_images', array('postid' => $this->post->post['postid'], 'image' => $this->post->post['image'], 'images' => $this->post->post['images']), TRUE);
-		
+
 		// If there's a page post template, load it up and use it
 		if (isset($this->template->template['templateid']))
 		{
@@ -587,7 +588,7 @@ class Post extends MY_Controller {
 				if (preg_match('/^%block_\S+%$/', $template_content))
 				{
 					$object = instantiate_library('block', preg_replace('/^%block_(\S+)%$/', '$1', $template_content), 'title');
-					
+
 					// If we have a block on the page that is paginated AND we are using it, make sure to focus to it
 					if (isset($object->block['pagination']) && $object->block['pagination'])
 					{
@@ -597,7 +598,7 @@ class Post extends MY_Controller {
 							$this->focus = "pagination_block";
 						}
 					}
-					
+
 					$contents .= $object->output($this->page->page_tree);
 				}
 				else
@@ -605,7 +606,7 @@ class Post extends MY_Controller {
 					$contents .= $template_content;
 				}
 			}
-			
+
 			// Parse for fields and insert values
 			foreach ($this->template->fields as $field)
 			{
@@ -625,37 +626,37 @@ class Post extends MY_Controller {
 			$contents = str_replace('%contenthere%', $post_section, $contents);
 			$contents = str_replace('%titlehere%', $this->post->post['title'], $contents);
 			$contents = str_replace('%commentshere%', $comments_section, $contents);
-				
+
 			$matches = array();
 			preg_match_all('/%fileshere(\[([a-z0-9,]+)\])?%/i', $contents, $matches);
 			for ($i=0; $i<sizeof($matches[0]); $i++)
 			{
 				if (isset($matches[2][$i]) && isset($this->filegroups[$matches[2][$i]]))
 				{
-					$files_section = $this->load->view('post_files_group', array('filegroup' => $this->filegroups[$matches[2][$i]]), TRUE); 
+					$files_section = $this->load->view('post_files_group', array('filegroup' => $this->filegroups[$matches[2][$i]]), TRUE);
 				}
 				else
 				{
-					$files_section = $this->load->view('post_files', array('files' => $this->listedfiles), TRUE); 
+					$files_section = $this->load->view('post_files', array('files' => $this->listedfiles), TRUE);
 				}
 				$contents = str_replace($matches[0][$i], $files_section, $contents);
 			}
-			
+
 			$contents = str_replace('%referenceshere%', $references_section, $contents);
 			$contents = str_replace('%pingbackshere%', $pingbacks_section, $contents);
 			$contents = str_replace('%featuredimage%', $featuredimage_section, $contents);
 			$contents = str_replace('%listedimages%', $listedimages_section, $contents);
-			
+
 			$data['postcontent'] = $this->load->view('post_wrapper_dynamic', array('content' => $contents), TRUE);
 		}
 		else // If no post template exists, load default hard-coded view
 		{
-			$data['postcontent'] = $this->load->view('post_wrapper_static', array('post' => $this->post->post, 'post_section' => $post_section, 'comments_section' => $comments_section, 'files_section' => $files_section, 'references_section' => $references_section, 'pingbacks_section' => $pingbacks_section), TRUE);	
+			$data['postcontent'] = $this->load->view('post_wrapper_static', array('post' => $this->post->post, 'post_section' => $post_section, 'comments_section' => $comments_section, 'files_section' => $files_section, 'references_section' => $references_section, 'pingbacks_section' => $pingbacks_section), TRUE);
 		}
-	
+
 		$this->_initialize_page('post', $this->post->post['title'], $data, TRUE);
 	}
-	
+
 	function addcomment()
 	{
 		if ($this->acl->allow('post', 'addcomment', TRUE, 'post', $this->post->post['postid']) || $this->_access_denied())
@@ -666,11 +667,11 @@ class Post extends MY_Controller {
 				$this->form_validation->set_rules('password', 'password', 'xss_clean|trim|md5');
 				$this->form_validation->set_rules('email', 'email address', 'xss_clean|strip_tags|trim|required|max_length[50]|valid_email|callback_commentlogin_check|callback_code_check|callback_banned_check');
 			}
-			
+
 			// Anti-spam measure - if hidden 'information' field is filled, we know it's a bot
 			$this->form_validation->set_rules('information', 'information', 'exact_length[0]');
 			$this->form_validation->set_rules('comment', 'comment', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[15000]|callback_ip_check');
-			
+
 			if ($this->form_validation->run())
 			{
 				$reviewed = 1;
@@ -683,14 +684,14 @@ class Post extends MY_Controller {
 						$featured = $user->user['statusid'];
 					}
 				}
-				if ($featured == -1) 
+				if ($featured == -1)
 				{
 					$reviewed = 0;
 				}
-				
+
 				$comment = str_replace("\n","<br/>",set_value('comment'));
 				$comment = preg_replace("/<br\/>(<br\/>)+/","<br/><br/>",$comment);
-				
+
 				if ($this->session->userdata('signedon'))
 				{
 					$this->comments_model->add($this->post->post['postid'], $this->session->userdata('userid'), $comment, $featured, $reviewed);
@@ -699,16 +700,16 @@ class Post extends MY_Controller {
 				{
 					$this->comments_model->add_anonymous($this->post->post['postid'], set_value('displayname'), set_value('email'), $_SERVER['REMOTE_ADDR'], $comment, $featured, $reviewed);
 				}
-				
+
 				if ($featured == -1)
 				{
 					$message = 'Thanks for adding your two cents!  Your comment will be posted pending approval from the moderators. Click <a href="'.base_url().$this->post->post['urlname'].'">here</a> to return to \''.$this->post->post['title'].'\'';
 				}
 				else
 				{
-					$message = 'Thanks for adding your two cents! Click <a href="'.base_url().$this->post->post['urlname'].'">here</a> to return to \''.$this->post->post['title'].'\'';	
+					$message = 'Thanks for adding your two cents! Click <a href="'.base_url().$this->post->post['urlname'].'">here</a> to return to \''.$this->post->post['title'].'\'';
 				}
-					
+
 				$subject = "Success!";
 				$this->_message("Add comment", $message, $subject);
 			}
@@ -718,7 +719,7 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function commentdisplayname_check($str)
 	{
 		$email_check = NULL;
@@ -751,7 +752,7 @@ class Post extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function commentlogin_check($str)
 	{
 		$object = instantiate_library('user', $str, 'email');
@@ -769,7 +770,7 @@ class Post extends MY_Controller {
 					$update_user = instantiate_library('user', $str, 'email');
 					$update_user->new_user['lastsignon'] = date('Y-m-d H:i:s');
 					$update_user->save();
-					
+
 					$session = array(
 						'userid' => $object->user['userid'],
 						'displayname' => $object->user['displayname'],
@@ -799,7 +800,7 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function code_check($str)
 	{
 		$object = instantiate_library('user', $str, 'email');
@@ -815,18 +816,18 @@ class Post extends MY_Controller {
 			return FALSE;
 		}
 	}
-	
+
 	function banned_check($str)
 	{
 		$this->form_validation->set_message('banned_check', "Your account has been banned.  Contact support@".$this->config->item('dmcb_server')." to be reinstated.");
 		$object = instantiate_library('user', $str, 'email');
 		return !$object->check_banned();
 	}
-	
+
 	function ip_check($str)
 	{
 		$this->form_validation->set_message('ip_check', "Your ip address has been associated with spam and is temporarily blocked from anonymous commenting.  Please sign up for an account to comment.");
-	
+
 		if (set_value('password') == "")
 		{
 			$check = $this->comments_model->check_banned($_SERVER['REMOTE_ADDR']);
@@ -888,7 +889,7 @@ class Post extends MY_Controller {
 			else if ($this->uri->segment($this->base_segment+2) == "rename")
 			{
 				$this->form_validation->set_rules('filename', 'file name', 'xss_clean|strip_tags|trim|required|max_length[100]|callback_filename_check');
-				
+
 				if ($this->form_validation->run())
 				{
 					$this->attachment->new_file['filename'] = set_value('filename');
@@ -906,7 +907,7 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function filename_check($str)
 	{
 		$object = instantiate_library('file', array($str, $this->attachment->file['extension'], $this->attachment->file['attachedto'], $this->attachment->file['attachedid']), 'details');
@@ -928,7 +929,7 @@ class Post extends MY_Controller {
 		else
 			return TRUE;
 	}
-	
+
 	function comment()
 	{
 		// By default, no comment is specified, go to comments section generically
@@ -975,13 +976,13 @@ class Post extends MY_Controller {
 		}
 		$this->index();
 	}
-	
+
 	function delete()
 	{
 		if ($this->acl->allow('post', 'edit', TRUE, 'post', $this->post->post['postid']) || $this->_access_denied())
 		{
 			$this->post->delete();
-			if (isset($this->page->page['pageid'])) 
+			if (isset($this->page->page['pageid']))
 			{
 				$this->message = 'You have successfully deleted '.$this->post->post['title'].'. Click <a href="'.base_url().$this->page->page['urlname'].'">here</a> to return to '.strtolower($this->page->page['title']).'.';
 			}
@@ -992,7 +993,7 @@ class Post extends MY_Controller {
 			$this->_message('Delete', $this->message, 'Success');
 		}
 	}
-	
+
 	function deletecomment()
 	{
 		$comment = $this->comments_model->get($this->uri->segment($this->base_segment+2));
@@ -1010,7 +1011,7 @@ class Post extends MY_Controller {
 			redirect('signon'.uri_string());
 		}
 	}
-	
+
 	function editevent()
 	{
 		if ($this->acl->allow('post', 'event', TRUE, 'post', $this->post->post['postid']) || $this->_access_denied())
@@ -1021,7 +1022,7 @@ class Post extends MY_Controller {
 			$this->form_validation->set_rules('eventendtime', 'end time', 'xss_clean|strip_tags|trim|min_length[4]|max_length[5]|callback_time_check');
 			$this->form_validation->set_rules('eventlocation', 'location', 'xss_clean|strip_tags|trim|min_length[2]|max_length[50]');
 			$this->form_validation->set_rules('eventaddress', 'address', 'xss_clean|strip_tags|trim|min_length[2]|max_length[150]');
-			
+
 			if ($this->uri->segment($this->base_segment+2) == "delete")
 			{
 				$this->events_model->delete($this->post->post['postid']);
@@ -1047,7 +1048,7 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function time_check($str)
 	{
 		if ($str == "")
@@ -1071,7 +1072,7 @@ class Post extends MY_Controller {
 			$this->form_validation->set_rules('posturlname', 'url name', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[35]|callback_urlname_check');
 			$this->form_validation->set_rules('postcontent', 'content', 'required|min_length[2]|max_length[65000]');
 			$this->form_validation->set_rules('postsubscription', 'needs subscription', 'xss_clean|strip_tags');
-			
+
 			// Add in form validation for additional template fields
 			foreach ($this->template->fields as $field)
 			{
@@ -1084,10 +1085,10 @@ class Post extends MY_Controller {
 				{
 					$rulestring .= '|required';
 				}
-				
+
 				$this->form_validation->set_rules($field['htmlcode'], $field['name'], $rulestring);
 			}
-			
+
 			if ($this->form_validation->run())
 			{
 				if (isset($_POST['categoryvalues']))
@@ -1111,7 +1112,7 @@ class Post extends MY_Controller {
 						}
 					}
 				}
-				
+
 				if (isset($_POST['previouspostvalues']))
 				{
 					$this->posts_model->remove_references($this->post->post['postid']);
@@ -1124,7 +1125,7 @@ class Post extends MY_Controller {
 						}
 					}
 				}
-				
+
 				if ($this->acl->enabled('site', 'subscribe'))
 				{
 					$this->post->new_post['needsubscription'] = set_value('postsubscription');
@@ -1148,7 +1149,7 @@ class Post extends MY_Controller {
 				//$this->post->new_post['content'] = html_entity_decode(auto_link(set_value('postcontent'), 'url'), ENT_QUOTES);
 				$this->post->new_post['content'] = html_entity_decode(set_value('postcontent'), ENT_QUOTES);
 				$this->post->save();
-				
+
 				// Save additional template field values
 				if (isset($this->template->fields))
 				{
@@ -1159,18 +1160,18 @@ class Post extends MY_Controller {
 					}
 					$this->template->set_values($values, $this->post->post['postid']);
 				}
-				
+
 				if ($_POST['buttonchoice'] == "save")
 				{
 					redirect($this->post->new_post['urlname'].'/editpost');
 				}
 				else
 				{
-					if (isset($this->page->page['pageid'])) 
+					if (isset($this->page->page['pageid']))
 					{
 						redirect($this->page->page['urlname']);
 					}
-					else 
+					else
 					{
 						redirect('profile/'.$this->author->user['urlname']);
 					}
@@ -1182,7 +1183,7 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function urlname_check($str)
 	{
 		if (!preg_match('/^[a-z0-9-_]+$/i', $str))
@@ -1206,7 +1207,7 @@ class Post extends MY_Controller {
 			{
 				$str = date("Ymd").'/'.$str;
 			}
-		
+
 			// Check for name collisions and return suggested new name
 			$suggestion = $this->post->suggest($str);
 			if ($suggestion == $str)
@@ -1225,7 +1226,7 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function permissions()
 	{
 		if ($this->acl->allow('post', 'permissions', TRUE, 'post', $this->post->post['postid']) || $this->_access_denied())
@@ -1233,18 +1234,18 @@ class Post extends MY_Controller {
 			$this->form_validation->set_rules('displayname', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_permissions_check|callback_acl_exists_check');
 			$this->form_validation->set_rules('email', 'email address', 'xss_clean|strip_tags|trim|max_length[50]|valid_email|callback_email_check');
 			$this->form_validation->set_rules('role', 'role', 'xss_clean');
-		
+
 			$this->load->model('acls_model');
 			if ($this->uri->segment($this->base_segment+2) == "set_role")
 			{
 				$this->acls_model->delete($this->uri->segment($this->base_segment+3), 'post', $this->post->post['postid']);
 				$this->acls_model->add($this->uri->segment($this->base_segment+3), $this->uri->segment($this->base_segment+4), 'post', $this->post->post['postid']);
-								
+
 				// Do notification
 				$this->session->set_flashdata('change', 'role change');
 				$this->session->set_flashdata('action', 'set');
 				$this->session->set_flashdata('actionon', 'user');
-				$this->session->set_flashdata('actiononid', $this->uri->segment($this->base_segment+3));				
+				$this->session->set_flashdata('actiononid', $this->uri->segment($this->base_segment+3));
 				$this->session->set_flashdata('parentid', $this->uri->segment($this->base_segment+3));
 				$this->session->set_flashdata('scope', 'post');
 				$this->session->set_flashdata('scopeid', $this->post->post['postid']);
@@ -1255,7 +1256,7 @@ class Post extends MY_Controller {
 			else if ($this->uri->segment($this->base_segment+2) == "delete")
 			{
 				$this->acls_model->delete($this->uri->segment($this->base_segment+3), 'post', $this->post->post['postid']);
-				
+
 				// Do notification
 				$this->session->set_flashdata('change', 'role removal');
 				$this->session->set_flashdata('action', 'removed');
@@ -1268,7 +1269,7 @@ class Post extends MY_Controller {
 				redirect('notify');
 			}
 			else if ($this->form_validation->run())
-			{	
+			{
 				if (set_value('email') != "")
 				{
 					$this->load->library('user_lib',NULL,'new_user');
@@ -1276,17 +1277,17 @@ class Post extends MY_Controller {
 					$this->new_user->new_user['displayname'] = set_value('displayname');
 					$this->new_user->new_user['roleid'] = $this->acls_model->get_roleid('member');
 					$result = $this->new_user->save();
-					
+
 					$this->acls_model->add($result['userid'], set_value('role'), 'post', $this->post->post['postid']);
-					
+
 					redirect($this->post->post['urlname'].'/permissions');
 				}
 				else
 				{
 					$object = instantiate_library('user', set_value('displayname'), 'displayname');
-					
+
 					$this->acls_model->add($object->user['userid'], set_value('role'), 'post', $this->post->post['postid']);
-					
+
 					// Do notification
 					$this->session->set_flashdata('change', 'added role');
 					$this->session->set_flashdata('action', 'set');
@@ -1294,7 +1295,7 @@ class Post extends MY_Controller {
 					$this->session->set_flashdata('actiononid', $object->user['userid']);
 					$this->session->set_flashdata('parentid', $object->user['userid']);
 					$this->session->set_flashdata('scope', 'post');
-					$this->session->set_flashdata('scopeid', $this->post->post['postid']);						
+					$this->session->set_flashdata('scopeid', $this->post->post['postid']);
 					$this->session->set_flashdata('content', $this->roles_table[set_value('role')]);
 					$this->session->set_flashdata('return', $this->post->post['urlname'].'/permissions');
 					redirect('notify');
@@ -1306,9 +1307,9 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function acl_exists_check($str)
-	{	
+	{
 		if (isset($_POST['email']) && $_POST['email'] != NULL)
 		{
 			return TRUE;
@@ -1319,7 +1320,7 @@ class Post extends MY_Controller {
 			$role = $this->acls_model->get($checkuser->user['userid'], 'post', $this->post->post['postid']);
 			if (isset($checkuser->user['userid']) && $role != NULL)
 			{
-				$this->form_validation->set_message('acl_exists_check', "$str already has permissions on this post.");	
+				$this->form_validation->set_message('acl_exists_check', "$str already has permissions on this post.");
 				return FALSE;
 			}
 			else
@@ -1328,9 +1329,9 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function displayname_permissions_check($str)
-	{	
+	{
 		if (isset($_POST['email']) && $_POST['email'] != NULL)
 		{
 			$displayname_check = instantiate_library('user', $str, 'displayname');
@@ -1352,14 +1353,14 @@ class Post extends MY_Controller {
 			else
 			{
 				return TRUE;
-			}	
+			}
 		}
 		else
 		{
 			$checkuser = instantiate_library('user', $str, 'displayname');
 			if ($str != "" && !isset($checkuser->user['userid']))
 			{
-				$this->form_validation->set_message('displayname_permissions_check', "The display name $str doesn't exist, please try a new display name.");	
+				$this->form_validation->set_message('displayname_permissions_check', "The display name $str doesn't exist, please try a new display name.");
 				return FALSE;
 			}
 			else
@@ -1368,7 +1369,7 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function email_check($str)
 	{
 		$checkuser = instantiate_library('user', $str, 'email');
@@ -1394,13 +1395,13 @@ class Post extends MY_Controller {
 		{
 			$this->comments_model->set_reported($this->uri->segment($this->base_segment+2));
 			$this->_message(
-				'Report', 
+				'Report',
 				'Thank you for reporting the comment. Click <a href="'.base_url().$this->post->post['urlname'].'">here</a> to return to \''.$this->post->post['title'].'\'.',
 				'Thanks'
 			);
 		}
 	}
-	
+
 	function taguser()
 	{
 		if ($this->acl->allow('post', 'taguser', TRUE, 'post', $this->post->post['postid']) || $this->_access_denied())
@@ -1409,7 +1410,7 @@ class Post extends MY_Controller {
 			{
 				$this->form_validation->set_rules('contributor'.($i+1), 'display name of the tagged user', 'xss_clean|strip_tags|trim|min_length[3]|max_length[30]|callback_displayname_exists_check');
 			}
-		
+
 			if ($this->form_validation->run())
 			{
 				$contributors = array();
@@ -1432,13 +1433,13 @@ class Post extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function displayname_exists_check($str)
-	{	
+	{
 		$checkuser = instantiate_library('user', $str, 'displayname');
 		if ($str != "" && !isset($checkuser->user['userid']))
 		{
-			$this->form_validation->set_message('displayname_exists_check', "The display name $str doesn't exist, please try a new display name.");	
+			$this->form_validation->set_message('displayname_exists_check', "The display name $str doesn't exist, please try a new display name.");
 			return FALSE;
 		}
 		else
@@ -1446,7 +1447,7 @@ class Post extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function theme()
 	{
 		if ($this->acl->allow('post', 'theme', TRUE, 'post', $this->post->post['postid']) || $this->_access_denied())
@@ -1461,7 +1462,7 @@ class Post extends MY_Controller {
 			{
 				$this->form_validation->set_rules('js'.($i+1), 'js file location', 'xss_clean|strip_tags|trim|min_length[3]|max_length[250]|callback_theme_file_check');
 			}
-			
+
 			if ($this->form_validation->run())
 			{
 				$this->post->remove_theme_files();
@@ -1485,29 +1486,29 @@ class Post extends MY_Controller {
 						$added[strtolower(set_value($field))] = TRUE;
 					}
 				}
-				
+
 				$this->post->new_post['css'] = html_entity_decode(set_value('css'), ENT_QUOTES);
 				$this->post->new_post['javascript'] = html_entity_decode(set_value('javascript'), ENT_QUOTES);
 				$this->post->save();
-				
+
 				redirect($this->post->new_post['urlname'].'/theme');
-			}	
+			}
 			else
 			{
 				$this->index();
 			}
 		}
 	}
-	
+
 	function theme_file_check($str)
-	{	
+	{
 		if ($str == "")
 		{
 			return TRUE;
 		}
 		else if (substr($str, 0, 1) != '/')
 		{
-			$this->form_validation->set_message('theme_file_check', "The file must be a relative path starting with '/'. You cannot link to files outside the website.");	
+			$this->form_validation->set_message('theme_file_check', "The file must be a relative path starting with '/'. You cannot link to files outside the website.");
 			return FALSE;
 		}
 		else

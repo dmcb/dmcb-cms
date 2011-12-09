@@ -240,6 +240,41 @@ class Page extends MY_Controller {
 				}
 				$contents_to_parse = str_replace('%contenthere%', $this->page->page['content'], $contents_to_parse);
 				$contents_to_parse = str_replace('%titlehere%', $this->page->page['title'], $contents_to_parse);
+
+				// Get page images
+				$this->page->page['image'] = NULL;
+				$file = instantiate_library('file', $this->page->page['imageid']);
+				if (isset($file->file['fileid']))
+				{
+					$this->page->page['image'] = $file->file;
+				}
+				else
+				{
+					// Stock image code
+					$this->load->helper('picture');
+					$stockimage = stock_image($this->page->page['pageid']);
+					if ($stockimage != NULL)
+					{
+						$this->page->page['image'] = $stockimage;
+					}
+				}
+				$this->page->page['images'] = array();
+				$fileids = $this->files_model->get_attached_images('page', $this->page->page['pageid']);
+				foreach ($fileids->result_array() as $fileid)
+				{
+					$file = instantiate_library('file', $fileid['fileid']);
+					if (isset($file->file['fileid']))
+					{
+						array_push($this->page->page['images'], $file->file);
+					}
+				}
+
+				$featuredimage_section = $this->load->view('page_image', array('pageid' => $this->page->page['pageid'], 'image' => $this->page->page['image']), TRUE);
+				if ($this->page->page['image'] == NULL) $featuredimage_section = NULL;
+				$listedimages_section = $this->load->view('page_images', array('pageid' => $this->page->page['pageid'], 'image' => $this->page->page['image'], 'images' => $this->page->page['images']), TRUE);
+
+				$contents_to_parse = str_replace('%featuredimage%', $featuredimage_section, $contents_to_parse);
+				$contents_to_parse = str_replace('%listedimages%', $listedimages_section, $contents_to_parse);
 			}
 
 			$pagecontents = preg_split('/(%block_\S+%)/', $contents_to_parse, -1, PREG_SPLIT_DELIM_CAPTURE);
