@@ -12,7 +12,7 @@
  *              attribution.
  * @link		http://dmcbdesign.com
  */
- 
+
 // ------------------------------------------------------------------------
 
 /**
@@ -32,17 +32,17 @@
 if ( ! function_exists('generate_menu_pages'))
 {
 	function generate_menu_pages(&$menu_pages, $menu, $pageid = NULL, $maxlevel = NULL, $all = FALSE, $level = 0)
-	{	
+	{
 		$CI =& get_instance();
 		$CI->load->model('pages_model');
-		
+
 		if ($maxlevel == NULL || $level < $maxlevel)
 		{
 			$children = $CI->pages_model->get_children($menu, $pageid);
-			foreach ($children->result_array() as $child) 
+			foreach ($children->result_array() as $child)
 			{
 				$object = instantiate_library('page', $child['pageid']);
-				
+
 				// If showing all pages isn't set, than check if the page isn't published, or it's set to be hidden from view if protected and the user doesn't have the proper role, don't show it in menu
 				if ($all || ($object->page['published'] == 1 && (!$object->page['protected'] || ($object->page['protected'] && $CI->acl->access($object->page['protection'], $object)))))
 				{
@@ -74,16 +74,16 @@ if ( ! function_exists('generate_menu_pages'))
 if ( ! function_exists('generate_menu_html'))
 {
 	function generate_menu_html($view, $menu, $pageid = NULL, $maxlevel = NULL, $back_button = FALSE, $all = FALSE, $level = 0, &$itemnumber = 0)
-	{	
+	{
 		$CI =& get_instance();
 		$CI->load->model('pages_model');
 		$menu_html = "";
-		
+
 		if ($maxlevel == NULL || $level < $maxlevel)
 		{
 			// Get menu children
 			$children = $CI->pages_model->get_children($menu, $pageid);
-			
+
 			// If the back button is enabled and an specific page is used to build the menu off of, and there's only one level of menu items, place a back button
 			if ($back_button)
 			{
@@ -105,7 +105,7 @@ if ( ! function_exists('generate_menu_html'))
 							$title = 'Back to main menu';
 							$link = base_url();
 						}
-						
+
 						$menu_html .= $CI->load->view($view, array('title' => $title, 'link' => $link, 'selected' => FALSE, 'children_html' => NULL, 'level' => 0, 'itemnumber' => 0), TRUE);
 					}
 				}
@@ -118,16 +118,16 @@ if ( ! function_exists('generate_menu_html'))
 					}
 				}
 			}
-			
-			foreach ($children->result_array() as $child) 
+
+			foreach ($children->result_array() as $child)
 			{
 				$object = instantiate_library('page', $child['pageid']);
-				
+
 				// If showing all pages isn't set, than check if the page isn't published, or it's set to be hidden from view if protected and the user doesn't have the proper role, don't show it in menu
 				if ($all || ($object->page['published'] == 1 && (!$object->page['protected'] || ($object->page['protected'] && $CI->acl->access($object->page['protection'], $object)))))
 				{
 					$children_html = generate_menu_html($view, $menu, $object->page['pageid'], $maxlevel, $back_button, $all, $level+1, $newset = 0);
-					
+
 					// Determine what the link of the menu item is and if it is selected
 					$link;
 					$selected = FALSE;
@@ -170,13 +170,13 @@ if ( ! function_exists('generate_menu_html'))
 						}
 						$link = base_url().$object->page['urlname'];
 					}
-					
+
 					$itemnumber++;
-					$menu_html .= $CI->load->view($view, array('title' => $object->page['title'], 'link' => $link, 'selected' => $selected, 'children_html' => $children_html, 'level' => $level, 'itemnumber' => $itemnumber), TRUE);
+					$menu_html .= $CI->load->view($view, array('title' => $object->page['title'], 'link' => $link, 'imageid' => $object->page['imageid'], 'selected' => $selected, 'children_html' => $children_html, 'level' => $level, 'itemnumber' => $itemnumber), TRUE);
 				}
 			}
 		}
-		
+
 		// If we are creating the menu configured to contain the sign on/sign off links, add them
 		if ($menu == $CI->config->item('dmcb_signon_menu') && $pageid == NULL && $level == 0)
 		{
@@ -204,9 +204,9 @@ if ( ! function_exists('generate_menu_html'))
 					}
 					$menu_html .= $CI->load->view($view, array('title' => $title, 'link' => base_url().'signon', 'selected' => FALSE, 'children_html' => NULL, 'level' => $level), TRUE);
 				}
-			}	
+			}
 		}
-		
+
 		if ($level == 0) // Wrap the menu
 		{
 			$menu_html = $CI->load->view($view.'_wrapper', array('menu_html' => $menu_html), TRUE);
