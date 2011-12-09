@@ -165,7 +165,7 @@ class Block_lib {
 		if ($this->error != NULL)
 		{
 			// Only return error output if block allows it
-			if ($this->block['feedback'])
+			if (!isset($this->block['feedback']) || $this->block['feedback'])
 			{
 				$output = $this->CI->load->view('block_error', array("content" => $this->error), TRUE);
 			}
