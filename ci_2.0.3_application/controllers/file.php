@@ -18,7 +18,7 @@ class File extends MY_Controller {
 	function _remap()
 	{
 		// Check for hot linking
-		if ($this->config->item('dmcb_file_hotlinking') == "false" && 
+		if ($this->config->item('dmcb_file_hotlinking') == "false" &&
 			(isset($_SERVER['REMOTE_ADDR']) && !in_array($_SERVER['REMOTE_ADDR'], $this->config->item('dmcb_file_hotlinking_whitelist'))) &&
 			(!isset($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], base_url()) !== 0))
 		{
@@ -47,7 +47,7 @@ class File extends MY_Controller {
 			}
 			$available = FALSE;
 			$this->_message(
-				'Error', 
+				'Error',
 				$message
 			);
 		}
@@ -59,8 +59,8 @@ class File extends MY_Controller {
 			$downloadfilename = NULL;
 			$downloadextension = NULL;
 			$downloadwidth = $this->config->item('dmcb_max_image_width');
-			$downloadheight = NULL;		
-			
+			$downloadheight = NULL;
+
 			// Grab file name and width/height properties if given from URL
 			$lastsegmentoffset = 0;
 			if (ctype_digit($this->uri->segment($this->uri->total_segments()-1)) && ctype_digit($this->uri->segment($this->uri->total_segments()))) //check if last two segments are width and height numbers
@@ -74,7 +74,7 @@ class File extends MY_Controller {
 				$downloadwidth = $this->uri->segment($this->uri->total_segments());
 				$lastsegmentoffset = 1;
 			}
-			
+
 			 // Assemble the download details from the URI segments
 			$nestedname = FALSE;
 			$attachedto = $this->uri->segment(2);
@@ -86,7 +86,7 @@ class File extends MY_Controller {
 				{
 					$nestedname = TRUE;
 				}
-				
+
 				if ($nestedname && $i != $this->uri->total_segments()-$lastsegmentoffset) // If nested mode is on and the segment isn't the last, it's a nested page so convert to flat folder structure
 				{
 					$downloadpath .= "+".$this->uri->segment($i);
@@ -94,8 +94,8 @@ class File extends MY_Controller {
 				else
 				{
 					$downloadpath .= "/".$this->uri->segment($i);
-				}				
-				
+				}
+
 				// Final segments have to be the filename and file extension
 				if ($i == $this->uri->total_segments()-$lastsegmentoffset)
 				{
@@ -111,11 +111,11 @@ class File extends MY_Controller {
 					}
 				}
 			}
-			
+
 			// Create image height and width values from supplied URL values and config
 			if ($downloadheight != "")
 			{
-				if ($downloadheight > $this->config->item('dmcb_max_image_height')) 
+				if ($downloadheight > $this->config->item('dmcb_max_image_height'))
 				{
 					$downloadheight = $this->config->item('dmcb_max_image_height');
 				}
@@ -131,19 +131,19 @@ class File extends MY_Controller {
 			{
 				$available = FALSE; // Since file is managed, guilty until proven innocent
 				$downloadpath = "files_managed".substr($downloadpath, strpos($downloadpath, "/"));; // Swap files for files_managed
-				
+
 				// Get internal attachedid from named attachedid
 				$this->load->helper('attachment_helper');
 				$attachedid = attached_id($attachedto, $attachedid);
 
 				// Grab the file
 				$file = instantiate_library('file', array($downloadfilename, $downloadextension, $attachedto, $attachedid), 'details');
-				
+
 				if (!isset($file->file['fileid']) || (isset($file->file['fileid']) && $attachedid == NULL && $attachedto != "site") || !file_exists($downloadpath))
 				{
 					$this->_message(
-						'Error', 
-						"The file you have requested doesn't exist.", 
+						'Error',
+						"The file you have requested doesn't exist.",
 						'Error '.$this->uri->uri_string()
 					);
 				}
@@ -160,12 +160,12 @@ class File extends MY_Controller {
 					{
 						$page = instantiate_library('page', $attachedid);
 					}
-						
+
 					// Files that are the post image will show regardless if it's protected
 					if (!isset($post->post['postid']) || isset($post->post['postid']) && $post->post['imageid'] != $file->file['fileid'])
 					{
 						$this->load->model('subscriptions_model');
-					
+
 						// Log the user on to see if they are allowed permission to edit the file
 						$allowed_to_edit = FALSE;
 						if ($attachedto == "post")
@@ -202,9 +202,9 @@ class File extends MY_Controller {
 							}
 							else
 							{
-								$this->message = "You have used your ".$this->config->item('dmcb_post_subscriptions_free_views')." free ".$this->config->item('dmcb_post_subscriptions_free_views_range')." views on posts that require a subscription and won't be able to read '".$file->file['filename'].".".$file->file['extension']."'.";		
+								$this->message = "You have used your ".$this->config->item('dmcb_post_subscriptions_free_views')." free ".$this->config->item('dmcb_post_subscriptions_free_views_range')." views on posts that require a subscription and won't be able to read '".$file->file['filename'].".".$file->file['extension']."'.";
 							}
-							
+
 							if ($this->session->userdata('signedon'))
 							{
 								$this->message .= "<br/><br/>Your subscription has ended, you can <a href=\"".base_url()."subscription\">subscribe for a full account</a> for unlimited access.";
@@ -231,7 +231,7 @@ class File extends MY_Controller {
 					}
 				}
 			}
-			
+
 			if ($available)
 			{
 				// If the file is meant to be rendered within a webpage, check if it's an image and run resizing, otherwise just cough it up
@@ -242,7 +242,7 @@ class File extends MY_Controller {
 					$originalwidth = NULL;
 					$originalheight = NULL;
 					$originalratio = NULL;
-					
+
 					// If the file is an image, we can extract out it's mime type and original dimensions
 					if (isset($info[0]))
 					{
@@ -256,10 +256,10 @@ class File extends MY_Controller {
 						$this->load->helper('file');
 						header("Content-type: ".get_mime_by_extension($downloadpath));
 					}
-					
+
 					// Caching information, perhaps make this smarter depending on the type of file?
 					header("Expires: ".gmdate("D, d M Y H:i:s", time() + 3600)." GMT");
-					
+
 					// Crop or resize
 					if (isset($info[0]) && isset($downloadheight))
 					{
@@ -314,46 +314,46 @@ class File extends MY_Controller {
 			}
 		}
 	}
-	
-	function _image_crop($newwidth, $newheight, $source, $dest) 
+
+	function _image_crop($newwidth, $newheight, $source, $dest)
 	{
 		$info = @getimagesize($source);
-		$type = substr(strrchr($info['mime'], '/'), 1);  
-		
-		switch ($type)  
-		{  
-			case 'jpeg':  
-			$image_create_func = 'ImageCreateFromJPEG';  
-			$image_save_func = 'ImageJPEG';  
-			break;  
+		$type = substr(strrchr($info['mime'], '/'), 1);
 
-			case 'png':  
-			$image_create_func = 'ImageCreateFromPNG';  
-			$image_save_func = 'ImagePNG';  
-			break;  
+		switch ($type)
+		{
+			case 'jpeg':
+			$image_create_func = 'ImageCreateFromJPEG';
+			$image_save_func = 'ImageJPEG';
+			break;
 
-			case 'bmp':  
-			$image_create_func = 'ImageCreateFromBMP';  
-			$image_save_func = 'ImageBMP';  
-			break;  
+			case 'png':
+			$image_create_func = 'ImageCreateFromPNG';
+			$image_save_func = 'ImagePNG';
+			break;
 
-			case 'gif':  
-			$image_create_func = 'ImageCreateFromGIF';  
-			$image_save_func = 'ImageGIF';  
-			break;  
+			case 'bmp':
+			$image_create_func = 'ImageCreateFromBMP';
+			$image_save_func = 'ImageBMP';
+			break;
 
-			default:  
-			$image_create_func = 'ImageCreateFromJPEG';  
-			$image_save_func = 'ImageJPEG';  
-		}  
+			case 'gif':
+			$image_create_func = 'ImageCreateFromGIF';
+			$image_save_func = 'ImageGIF';
+			break;
+
+			default:
+			$image_create_func = 'ImageCreateFromJPEG';
+			$image_save_func = 'ImageJPEG';
+		}
 
 	    $width = $info[0];
 	    $height = $info[1];
 
-		ini_set('memory_limit', '64M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 64M')
+		ini_set('memory_limit', '128M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 64M')
 	    $data = $image_create_func($source);
 	    $croppedimage = imagecreatetruecolor($newwidth, $newheight);
-		
+
 		imagealphablending($croppedimage, false);
 		imagesavealpha($croppedimage,true);
 		$transparent = imagecolorallocatealpha($croppedimage, 255, 255, 255, 127);
@@ -361,30 +361,30 @@ class File extends MY_Controller {
 	    $widthm = $width/$newwidth;
 	    $heightm = $height/$newheight;
 
-	    if ($newwidth < $newheight) 
+	    if ($newwidth < $newheight)
 		{
 	        $adjusted_width = $width / $heightm;
 	        $half_width = $adjusted_width / 2;
 	        $intwidth = $half_width - ($newwidth/2);
-			
+
 			imagefilledrectangle($croppedimage, 0, 0, $adjusted_width, $newheight, $transparent);
 	        imagecopyresampled($croppedimage,$data,-$intwidth,0,0,0,$adjusted_width,$newheight,$width,$height);
-	    } 
-		else if (($newwidth >= $newheight)) 
+	    }
+		else if (($newwidth >= $newheight))
 		{
 	        $adjusted_height = $height / $widthm;
 	        $half_height = $adjusted_height / 2;
 	        $intheight = $half_height - ($newheight/2);
-			
+
 			imagefilledrectangle($croppedimage, 0, 0, $newwidth, $adjusted_height, $transparent);
 	        imagecopyresampled($croppedimage,$data,0,-$intheight,0,0,$newwidth,$adjusted_height,$width,$height);
-	    } 
+	    }
 		else
 		{
 			imagefilledrectangle($croppedimage, 0, 0, $newwidth, $newwidth, $transparent);
 	        imagecopyresampled($croppedimage,$data,0,0,0,0,$newwidth,$newwidth,$width,$height);
 	    }
-		
+
 		if ($image_save_func == "ImageJPEG") $image_save_func($croppedimage,$dest,96);
 		else $image_save_func($croppedimage,$dest);
 		imagedestroy($data);
@@ -395,53 +395,53 @@ class File extends MY_Controller {
 	function _image_resize($newwidth, $source, $dest)
 	{
 		$info = @getimagesize($source);
-		$type = substr(strrchr($info['mime'], '/'), 1);  
-		
-		switch ($type)  
-		{  
-			case 'jpeg':  
-			$image_create_func = 'ImageCreateFromJPEG';  
-			$image_save_func = 'ImageJPEG';  
-			break;  
+		$type = substr(strrchr($info['mime'], '/'), 1);
 
-			case 'png':  
-			$image_create_func = 'ImageCreateFromPNG';  
-			$image_save_func = 'ImagePNG';  
-			break;  
+		switch ($type)
+		{
+			case 'jpeg':
+			$image_create_func = 'ImageCreateFromJPEG';
+			$image_save_func = 'ImageJPEG';
+			break;
 
-			case 'bmp':  
-			$image_create_func = 'ImageCreateFromBMP';  
-			$image_save_func = 'ImageBMP';  
-			break;  
+			case 'png':
+			$image_create_func = 'ImageCreateFromPNG';
+			$image_save_func = 'ImagePNG';
+			break;
 
-			case 'gif':  
-			$image_create_func = 'ImageCreateFromGIF';  
-			$image_save_func = 'ImageGIF';  
-			break;  
+			case 'bmp':
+			$image_create_func = 'ImageCreateFromBMP';
+			$image_save_func = 'ImageBMP';
+			break;
 
-			default:  
-			$image_create_func = 'ImageCreateFromJPEG';  
-			$image_save_func = 'ImageJPEG';  
-		}  
+			case 'gif':
+			$image_create_func = 'ImageCreateFromGIF';
+			$image_save_func = 'ImageGIF';
+			break;
+
+			default:
+			$image_create_func = 'ImageCreateFromJPEG';
+			$image_save_func = 'ImageJPEG';
+		}
 
 	    $width = $info[0];
 	    $height = $info[1];
-		
-		ini_set('memory_limit', '64M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 64M')
+
+		ini_set('memory_limit', '128M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 64M')
 		$data = $image_create_func($source);
-		
+
 		$ratio_orig = $width/$height;
 		$newheight = floor($newwidth/$ratio_orig);
 
 		$resizedimage = imagecreatetruecolor($newwidth, $newheight);
-		
+
 		imagealphablending($resizedimage, false);
 		imagesavealpha($resizedimage,true);
 		$transparent = imagecolorallocatealpha($resizedimage, 255, 255, 255, 127);
 		imagefilledrectangle($resizedimage, 0, 0, $newwidth, $newheight, $transparent);
-		
+
 		imagecopyresampled($resizedimage, $data, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
-		
+
 		if ($image_save_func == "ImageJPEG") $image_save_func($resizedimage,$dest,96);
 		else $image_save_func($resizedimage,$dest);
 		imagedestroy($data);
