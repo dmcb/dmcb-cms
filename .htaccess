@@ -8,11 +8,11 @@
 	RewriteBase /
 	RewriteCond %{REQUEST_URI} ^/(stats|failed_auth\.html).*$ [NC]
 	RewriteRule . - [L]
-	
+
 	# Strip off www
 	RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
 	RewriteRule ^(.*)$ http://%1/$1 [L,R=301]
-	
+
 	# Friendly CI url names
 	RewriteCond %{REQUEST_URI} ^/system.*
 	RewriteRule ^(.*)$ index.php?/$1 [L]
@@ -32,6 +32,14 @@
 	AddOutputFilterByType DEFLATE application/rss+xml
 	AddOutputFilterByType DEFLATE application/javascript
 	AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+<IfModule mod_php5.c>
+	php_value memory_limit 128M
+	php_value post_max_size 128M
+	php_value upload_max_filesize 120M
+	php_value max_execution_time 360
+	php_value max_input_time 360
 </IfModule>
 
 #<IfModule mod_expires.c>

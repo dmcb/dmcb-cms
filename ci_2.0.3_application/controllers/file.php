@@ -350,7 +350,7 @@ class File extends MY_Controller {
 	    $width = $info[0];
 	    $height = $info[1];
 
-		ini_set('memory_limit', '128M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 64M')
+		ini_set('memory_limit', '128M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 128M')
 	    $data = $image_create_func($source);
 	    $croppedimage = imagecreatetruecolor($newwidth, $newheight);
 
@@ -389,7 +389,6 @@ class File extends MY_Controller {
 		else $image_save_func($croppedimage,$dest);
 		imagedestroy($data);
 		imagedestroy($croppedimage);
-		ini_set('memory_limit', '16M'); //undo hack
 	}
 
 	function _image_resize($newwidth, $source, $dest)
@@ -427,7 +426,7 @@ class File extends MY_Controller {
 	    $width = $info[0];
 	    $height = $info[1];
 
-		ini_set('memory_limit', '128M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 64M')
+		ini_set('memory_limit', '128M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 128M')
 		$data = $image_create_func($source);
 
 		$ratio_orig = $width/$height;
@@ -446,7 +445,6 @@ class File extends MY_Controller {
 		else $image_save_func($resizedimage,$dest);
 		imagedestroy($data);
 		imagedestroy($resizedimage);
-		ini_set('memory_limit', '16M'); //undo hack
 	}
 }
 ?>

@@ -18,6 +18,11 @@ class Upload extends MY_Controller {
 
 	function file()
 	{
+		ini_set('post_max_size', '128M');
+		ini_set('upload_max_filesize', '120M');
+		ini_set('max_execution_time', '360');
+		ini_set('max_input_time', '360');
+
 		$attachedid = NULL;
 		$attachedto = $this->uri->segment(3);
 		$attachedto_object = NULL;
@@ -30,7 +35,7 @@ class Upload extends MY_Controller {
 				$attachedname .= '/';
 			}
 		}
-		
+
 		if ($attachedto == "user") // Uploading to a user profile, limit to images
 		{
 			$config['allowed_types'] = str_replace('*.', '', str_replace(';','|',$this->config->item('dmcb_profile_upload_types')));
@@ -42,7 +47,7 @@ class Upload extends MY_Controller {
 		{
 			$config['allowed_types'] = str_replace('*.', '', str_replace(';','|',$this->config->item('dmcb_site_upload_types')));
 			$config['max_size']	= $this->config->item('dmcb_site_upload_size');
-			
+
 			// Uploads directly to the site don't need an attachedid, but if it's uploaded to a post or page, grab it
 			if ($attachedto == "page")
 			{
@@ -55,7 +60,7 @@ class Upload extends MY_Controller {
 				$attachedid = $attachedto_object->post['postid'];
 			}
 		}
-		
+
 		// If the upload is replacing a file, grab the fileid of the file to replace
 		$replacefileid = NULL;
 		if (isset($_POST['replace']))
@@ -70,24 +75,24 @@ class Upload extends MY_Controller {
 				}
 			}
 		}
-		
+
 		// If the upload is going to a specific file type, specify it
 		$filetypeid = NULL;
 		if (isset($_POST['filetype']))
 		{
 			$filetypeid = $_POST['filetype'];
-		}		
-		
+		}
+
 		$config['upload_path'] = 'files_managed/'.$attachedto.'/'.str_replace('/', '+', $attachedname); // Upload to managed area first, sort it out later, also replace / with + for flat file structure
 		$config['remove_spaces'] = true;
 		$config['encrypt_name'] = false;
 		$this->load->library('upload', $config);
-		
-		if (!file_exists($config['upload_path'])) 
+
+		if (!file_exists($config['upload_path']))
 		{
 			mkdir($config['upload_path']);
 		}
-		
+
 		// Set the return path and other specific options depending on where the upload is to
 		if ($attachedto == "site")
 		{
@@ -113,7 +118,7 @@ class Upload extends MY_Controller {
 		{
 			$returnurl = $attachedto.'/'.$attachedid.'/attachments';
 		}
-		
+
 		$uploadtype = "";
 		$result = "";
 		if (isset($_FILES["swfuploadfile"])) // Upload is a swfupload, and it's swfupload's first pass, so physically upload file
@@ -131,12 +136,12 @@ class Upload extends MY_Controller {
 			$uploadtype = "regular";
 			$result = $this->upload->do_upload('Filedata');
 		}
-		
+
 		if(!$result && $uploadtype == "regular") // A non swfupload fail
 		{
 			$this->_message(
-				'Manage uploads', 
-				$this->upload->display_errors('', '').' Click <a href="'.base_url().$returnurl.'">here</a> to return to editing.', 
+				'Manage uploads',
+				$this->upload->display_errors('', '').' Click <a href="'.base_url().$returnurl.'">here</a> to return to editing.',
 				'Error'
 			);
 		}
@@ -152,20 +157,20 @@ class Upload extends MY_Controller {
 			}
 			else // Otherwise, it's a regular upload or swfupload's first pass, and we will get the file name through CI
 			{
-				$filedata = $this->upload->data();	
-				$filename = $filedata['file_name'];		
+				$filedata = $this->upload->data();
+				$filename = $filedata['file_name'];
 			}
-			
+
 			if ($uploadtype != "swfuploadupload") // We aren't on swfupload's first pass, so we are either on its second or a regular upload, so we will parse the file into the database and return to the user
 			{
 				// However, we will only parse the file if the user has an established session
 				// We couldn't check earlier in this code for the session because when swfupload does it's first pass, it's through the flash/ajax applet, and that doesn't handle sessions and can't grab CI session
 				/* Which means, now that we are back to the CI form submission, if there's no valid session here and they don't have attachments privelege,
 				   we will delete the file that was attempted to be uploaded and return an error */
-				   
+
 				$allowed_to_upload = FALSE;
 				$object = instantiate_library('user', $this->session->userdata('userid'));
-				
+
 				if (isset($object->user['userid']))
 				{
 					if ($attachedto == "page" && $this->acl->allow('page', 'attachments', FALSE, 'page', $attachedid))
@@ -176,7 +181,7 @@ class Upload extends MY_Controller {
 					{
 						// Grab post's parent so we can grab a template
 						$attachedto_parent = instantiate_library('page', $attachedto_object->post['pageid']);
-						
+
 						if (isset($attachedto_parent->page['pageid']))
 						{
 							$attachedto_parent->initialize_page_tree();
@@ -190,16 +195,16 @@ class Upload extends MY_Controller {
 								$templateid = template_to_use('template', 'post', $attachedto_parent->page_tree);
 							}
 							$template = instantiate_library('template', $templateid);
-							
+
 							// Check if there's a template
 							if (isset($template->template['templateid']))
 							{
 								// Grab template quotas
 								$template->initialize_quotas();
-								
+
 								$quota_required = TRUE;
 								$no_quota_in_use = TRUE;
-								
+
 								// Go through quotas determing which one the user is set to, if any
 								foreach ($template->quotas as $filegroup)
 								{
@@ -213,7 +218,7 @@ class Upload extends MY_Controller {
 									{
 										$quota_required = FALSE;
 									}
-									
+
 									// If we are uploading to a specific file type, and that file type is permitted in this template, we must check if we reached the cap
 									if ((!$quota_required || $filegroup_editable) && $filetypeid != NULL && isset($filegroup['filetypes'][$filetypeid]))
 									{
@@ -229,7 +234,7 @@ class Upload extends MY_Controller {
 										}
 									}
 								}
-								
+
 								// If the user isn't assigned to a quota, or is assigned to one but not required to use it
 								// And the file isn't a part of a quota but a regular file attachment, allow the upload
 								if (!isset($failure_message) && $filetypeid == NULL && (!$quota_required || $no_quota_in_use))
@@ -260,7 +265,7 @@ class Upload extends MY_Controller {
 						$allowed_to_upload = TRUE;
 					}
 				}
-				
+
 				if ($allowed_to_upload)
 				{
 					if ($attachedto != "email") // But only parse file into the database when it's not an email attachment, which are temporary uploads
@@ -286,7 +291,7 @@ class Upload extends MY_Controller {
 					{
 						unlink($config['upload_path'].'/'.$filename);
 					}
-					
+
 					if (!isset($failure_message))
 					{
 						$this->_access_denied();
@@ -303,7 +308,7 @@ class Upload extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function _parsefile($filepath, $filename, $attachedto, $attachedid, $replacefileid, $filetypeid)
 	{
 		// If the file isn't replacing an existing one, we need to create it in the database
@@ -319,12 +324,12 @@ class Upload extends MY_Controller {
 			{
 				$isimage = "1";
 			}
-			
+
 			// Break down filename into it's name and extension
 			$filepieces = explode(".", $filename);
 			$extension = $filepieces[count($filepieces)-1];
 			$filename = substr($filename, 0, strrpos($filename, "."));
-		
+
 			// Create file
 			$this->load->library('file_lib','','new_file');
 			$this->new_file->new_file['filename'] = $filename;
@@ -333,11 +338,11 @@ class Upload extends MY_Controller {
 			$this->new_file->new_file['attachedto'] = $attachedto;
 			$this->new_file->new_file['attachedid'] = $attachedid;
 			$this->new_file->new_file['filetypeid'] = $filetypeid;
-			
+
 			// Although CI ensures a unique upload name, our upload was to 'files_managed', and if there's a file with the same name sitting in the 'files' folder we will have problems
 			// Let's have the file library suggest a new file name that lacks spaces, invalid symbols and caps doesn't collide with an existing file
 			$this->new_file->suggest();
-			
+
 			if ($filename.'.'.$extension != $this->new_file->new_file['filename'].'.'.$this->new_file->new_file['extension'])
 			{
 				copy($filepath.'/'.$filename.'.'.$extension, $filepath.'/'.$this->new_file->new_file['filename'].'.'.$this->new_file->new_file['extension']);
