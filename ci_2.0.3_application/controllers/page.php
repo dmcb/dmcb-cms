@@ -54,7 +54,7 @@ class Page extends MY_Controller {
 			// If we did load up a page and it's the default page, drop it's name from the URL (unless we are posting to the page and/or there's parameters after the URL)
 			if (isset($this->page->page['pageid']) && $this->page->page['urlname'] == $this->config->item('dmcb_default_page') && $_SERVER['REQUEST_METHOD'] !== 'POST' && $this->uri->total_segments() == $this->base_segment)
 			{
-				redirect(base_url().$parameters_after_urlname);
+				redirect(base_url());
 			}
 		}
 
