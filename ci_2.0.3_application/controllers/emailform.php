@@ -88,4 +88,3 @@ class Emailform extends MY_Controller {
 		$this->_message($title, $data['message'], $data['subject']);
 	}
 }
-?> 

@@ -280,4 +280,3 @@ class Manage_pages extends MY_Controller {
 		return TRUE;
 	}
 }
-?> 

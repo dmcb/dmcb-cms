@@ -158,4 +158,3 @@ class Files_model extends CI_Model {
 			WHERE fileid=".$this->db->escape($fileid));	
 	}
 }
-?>

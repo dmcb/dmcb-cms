@@ -249,4 +249,3 @@ class Acls_model extends CI_Model {
 		$this->db->query("INSERT INTO acls_roles_priveleges (functionid, roleid) VALUES (".$this->db->escape($functionid).", ".$this->db->escape($roleid).")");
 	}
 }
-?>

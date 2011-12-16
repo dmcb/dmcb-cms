@@ -310,4 +310,3 @@ class Manage_content extends MY_Controller {
 		}
 	}
 }
-?>

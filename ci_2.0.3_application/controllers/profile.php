@@ -531,4 +531,3 @@ class Profile extends MY_Controller {
 		}
 	}
 }
-?>

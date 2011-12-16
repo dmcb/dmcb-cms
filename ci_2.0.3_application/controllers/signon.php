@@ -213,4 +213,3 @@ class Signon extends MY_Controller {
 		return !$object->check_banned();
 	}
 }
-?> 

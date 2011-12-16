@@ -41,4 +41,3 @@ class Activate extends MY_Controller {
 		$this->_message("Activate account", $data['message'], $data['subject']);
 	}
 }
-?> 

@@ -47,4 +47,3 @@ class Walls_model extends CI_Model {
 		return $row['count(*)'];
 	}
 }
-?>

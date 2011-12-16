@@ -328,4 +328,3 @@ class Subscription extends MY_Controller {
 		return (in_array($format, $formats)) ? true : false;
 	}
 }
-?> 

@@ -292,4 +292,3 @@ class Pages_model extends CI_Model {
 			WHERE pageid=".$this->db->escape($pageid));	
 	}
 }
-?>

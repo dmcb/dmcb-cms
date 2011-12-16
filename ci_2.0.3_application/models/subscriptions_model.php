@@ -186,4 +186,3 @@ class Subscriptions_model extends CI_Model {
 		}
 	}
 }
-?>

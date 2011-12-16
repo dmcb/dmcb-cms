@@ -447,4 +447,3 @@ class File extends MY_Controller {
 		imagedestroy($resizedimage);
 	}
 }
-?>

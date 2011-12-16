@@ -1517,4 +1517,3 @@ class Post extends MY_Controller {
 		}
 	}
 }
-?>

@@ -123,5 +123,3 @@ class Facebook_connect
 		}
 	}
 }
-
-?>

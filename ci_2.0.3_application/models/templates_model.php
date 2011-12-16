@@ -199,4 +199,3 @@ class Templates_model extends CI_Model {
 			WHERE templateid=".$this->db->escape($templateid));				
 	}
 }
-?>

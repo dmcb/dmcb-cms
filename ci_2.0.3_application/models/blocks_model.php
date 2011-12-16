@@ -156,4 +156,3 @@ class Blocks_model extends CI_Model {
 			WHERE blockinstanceid=".$this->db->escape($blockinstanceid));	
 	}
 }
-?>

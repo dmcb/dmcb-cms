@@ -866,4 +866,3 @@ class Manage_users extends MY_Controller {
 		}
 	}
 }
-?> 

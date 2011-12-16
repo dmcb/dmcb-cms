@@ -40,4 +40,3 @@ class Wall extends MY_Controller {
 		$this->_initialize_page('wall', 'Wall', $data);
 	}
 }
-?>

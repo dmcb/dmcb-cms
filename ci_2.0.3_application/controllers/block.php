@@ -207,4 +207,3 @@ class Block extends MY_Controller {
 		}
 	}
 }
-?>

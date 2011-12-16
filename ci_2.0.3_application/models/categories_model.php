@@ -229,4 +229,3 @@ class Categories_model extends CI_Model {
 		$this->db->query("DELETE FROM categories WHERE categoryid = ".$this->db->escape($tomerge));
 	}
 }
-?>

@@ -288,4 +288,3 @@ class Users_model extends CI_Model {
 			WHERE userid=".$this->db->escape($userid));
 	}
 }
-?>

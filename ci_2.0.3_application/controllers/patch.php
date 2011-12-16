@@ -1100,5 +1100,3 @@ class Patch extends MY_Controller {
 		// $this->db->query("ALTER TABLE  `templates` DROP  `standard`;");
 	// }
 }
-
-?>

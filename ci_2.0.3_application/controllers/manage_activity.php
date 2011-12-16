@@ -541,4 +541,3 @@ class Manage_activity extends MY_Controller {
 		}
 	}
 }
-?> 

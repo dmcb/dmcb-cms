@@ -358,5 +358,3 @@ class Upload extends MY_Controller {
 		}
 	}
 }
-
-?>

@@ -45,4 +45,3 @@ class Views_model extends CI_Model {
 		return $this->db->query("SELECT posts.*, sum(views.hits) FROM views, posts WHERE DATE_SUB(CURDATE(),INTERVAL 14 DAY) <= views.week AND posts.postid = views.typeid AND posts.published = '1' AND posts.featured != '-1' AND posts.pageid IS NULL GROUP BY posts.postid ORDER BY sum(views.hits) DESC LIMIT 0, 10");
 	}
 }
-?>

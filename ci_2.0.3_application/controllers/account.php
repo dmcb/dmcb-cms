@@ -208,4 +208,3 @@ class Account extends MY_Controller {
 		}
 	}
 }
-?>  

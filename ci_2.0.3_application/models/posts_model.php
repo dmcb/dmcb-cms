@@ -459,4 +459,3 @@ class Posts_model extends CI_Model {
 			WHERE postid=".$this->db->escape($postid));	
 	}
 }
-?>

@@ -253,4 +253,3 @@ class Comments_model extends CI_Model {
 		$this->db->query("UPDATE posts_comments SET content = ".$this->db->escape($content).", reviewed = '0', new = '0' WHERE commentid = ".$this->db->escape($commentid));
 	}
 }
-?>

@@ -1247,4 +1247,3 @@ class Page extends MY_Controller {
 		}
 	}
 }
-?>

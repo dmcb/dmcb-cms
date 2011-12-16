@@ -130,4 +130,3 @@ class Events_model extends CI_Model {
 		return $row['total'];
 	}
 }
-?>

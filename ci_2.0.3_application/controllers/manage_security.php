@@ -244,4 +244,3 @@ class Manage_security extends MY_Controller {
 		}
 	}
 }
-?>

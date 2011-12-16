@@ -209,4 +209,3 @@ class Search extends MY_Controller {
 		}
 	}
 }
-?>

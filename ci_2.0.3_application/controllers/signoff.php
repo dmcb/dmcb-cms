@@ -40,4 +40,3 @@ class Signoff extends MY_Controller {
 		redirect('signon');
 	}
 }
-?> 
