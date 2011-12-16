@@ -32,7 +32,7 @@
 				{
 					echo ' & ';
 				}
-				
+
 				if ($contributor['enabledprofile'])
 				{
 					echo '<a href="'.base_url().'profile/'.$contributor['urlname'].'">'.$contributor['displayname'].'</a>';
@@ -41,7 +41,7 @@
 				{
 					echo $contributor['displayname'];
 				}
-				
+
 				$i++;
 			}
 		}
@@ -51,7 +51,7 @@
 		}
 	?>
 	</h5>
-	
+
 	<br/>
 
 	<?php
@@ -60,17 +60,17 @@
 		echo '<a href="'.base_url().$post['urlname'].'"><img src="'.base_url().$post['image']['urlpath'].'/280/160" alt="'.$post['title'].'" /></a>';
 	}
 
-	$summary = split("<!-- pagebreak -->",$post['content']);
+	$summary = explode("<!-- pagebreak -->",$post['content']);
 
 	echo character_limiter(strip_tags(preg_replace("/<img[^>]+\>/i", "", $summary[0])),300);
 	echo '</p>';
-	
+
 	$subscription = "";
-	if ($post['needsubscription'] == "1" && $this->acl->enabled('site', 'subscribe')) 
+	if ($post['needsubscription'] == "1" && $this->acl->enabled('site', 'subscribe'))
 	{
 		$subscription = ' <span class="restricted">subscription required</span>';
 	}
-	
+
 	if ($post['commentcount'] == 1 && $post['enabledcomments']) echo '<a href="'.base_url().$post['urlname'].'">Continue reading ('.$post['commentcount'].' comment)</a>'.$subscription.' > <br/>';
 	else if ($post['commentcount'] > 0 && $post['enabledcomments']) echo '<a href="'.base_url().$post['urlname'].'">Continue reading ('.$post['commentcount'].' comments)</a>'.$subscription.' > <br/>';
 	else echo '<p><a href="'.base_url().$post['urlname'].'">Continue reading</a>'.$subscription.' > <br/>';

@@ -9,7 +9,7 @@
 				echo '			<author>'.$post['user']['email'].' ('.$post['user']['displayname'].')</author>'.PHP_EOL;
 			}
 			?>
-			<description><![CDATA[<?php $summary = split("<!-- pagebreak -->",$post['content']); echo htmlspecialchars_decode(preg_replace("/<img[^>]+\>/i", "", $summary[0])); ?>]]></description>
+			<description><![CDATA[<?php $summary = explode("<!-- pagebreak -->",$post['content']); echo htmlspecialchars_decode(preg_replace("/<img[^>]+\>/i", "", $summary[0])); ?>]]></description>
 <?php
 			if (isset($post['image']))
 			{

@@ -40,9 +40,9 @@ class Block_lib {
 			$this->new_block = $this->block;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize block
 	 *
@@ -67,9 +67,9 @@ class Block_lib {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Delete
 	 *
@@ -77,7 +77,7 @@ class Block_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function delete()
 	{
 		// Update page content to reflect deleted block
@@ -90,12 +90,12 @@ class Block_lib {
 													$object->page['content']);
 			$object->save();
 		}
-		
+
 		$this->CI->blocks_model->delete($this->block['blockinstanceid']);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Generate
 	 *
@@ -103,13 +103,13 @@ class Block_lib {
 	 *
 	 * @access	private
 	 * @return	void
-	 */	
+	 */
 	function _generate()
 	{
 		// Clear output
 		$this->contents = array();
 		$this->error = "";
-		
+
 		if (isset($this->block['function']))
 		{
 			$function = "_block_".$this->block['function'];
@@ -125,11 +125,11 @@ class Block_lib {
 		else
 		{
 			$this->error = $this->CI->load->view('block_error', array("content" => "Invalid block name."), TRUE);
-		} 	
+		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Output
 	 *
@@ -138,13 +138,13 @@ class Block_lib {
 	 * @access	public
 	 * @param   optional parameter for a page tree
 	 * @return	string formatted block views
-	 */	
+	 */
 	function output($page_tree = NULL)
 	{
 		// Get block view contents
 		$this->_generate();
 		$output = "";
-		
+
 		// If there were no errors, do a couple of final checks
 		if ($this->error == NULL)
 		{
@@ -152,15 +152,15 @@ class Block_lib {
 			if (isset($this->block['parent']) && !$this->block['parent']['enabled'])
 			{
 				$this->error = "Block type isn't enabled";
-			}		
-			
+			}
+
 			// Don't render block if a page tree is specified, and this block isn't attached to any of it or the site
 			if (isset($page_tree) && $this->block['pageid'] != '0' && !isset($page_tree[$this->block['pageid']]))
 			{
 				$this->error = "Block exists but is not usable on this page";
 			}
 		}
-		
+
 		// If error message was generated, render it instead of data
 		if ($this->error != NULL)
 		{
@@ -188,9 +188,9 @@ class Block_lib {
 
 		return $output;
 	}
-	 
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Output rss
 	 *
@@ -198,7 +198,7 @@ class Block_lib {
 	 *
 	 * @access	public
 	 * @return	string  formatted block views
-	 */	
+	 */
 	function output_rss()
 	{
 		// Get block view contents
@@ -221,9 +221,9 @@ class Block_lib {
 			return $output;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Save
 	 *
@@ -231,7 +231,7 @@ class Block_lib {
 	 *
 	 * @access	public
 	 * @return	array   information from block creation
-	 */	
+	 */
 	function save()
 	{
 		// Check if the block wasn't initialized from an existing one
@@ -254,7 +254,7 @@ class Block_lib {
 					}
 				}
 			}
-			
+
 			// If block has been set to be rss or pagination, remove others from rss or pagination for that page
 			/*
 			if ($this->new_block['rss'] != $this->rss && $this->new_block['rss'] == 1)
@@ -283,7 +283,7 @@ class Block_lib {
 					}
 				}
 			}*/
-			
+
 			// If the title changes, update page content
 			if ($this->new_block['title'] != $this->block['title'])
 			{
@@ -317,14 +317,14 @@ class Block_lib {
 					}
 				}
 			}
-			
+
 			$this->CI->blocks_model->update($this->block['blockinstanceid'], $this->new_block);
 			$this->block = $this->new_block;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Set default
 	 *
@@ -334,7 +334,7 @@ class Block_lib {
 	 * @param	int      pageid
 	 * @param   boolean  enabled
 	 * @return	void
-	 */	
+	 */
 	function set_default($pageid, $type, $enabled = TRUE)
 	{
 		$this->CI->blocks_model->remove_default_block($pageid, $type);
@@ -343,14 +343,14 @@ class Block_lib {
 			$this->CI->blocks_model->set_default_block($this->block['blockinstanceid'], $pageid, $type);
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
 
 	/**
 	 * Block functions below
-	 */	
+	 */
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Authors block
 	 *
@@ -380,7 +380,7 @@ class Block_lib {
 		{
 			$this->block['values']['limit'] = 3;
 		}
-		
+
 		// Get data and process
 		$this->offset = 0;
 		if ($this->pagination)
@@ -406,12 +406,12 @@ class Block_lib {
 					$this->last_modified = $object->user['datemodified'];
 				}
 				array_push($this->contents, array("view" => "block_".$this->block['function']."_".$this->block['values']['detail'], "data" => array("user" => $object->user, "count" => $count, "current" => $current)));
-			}	
+			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Authors_new block
 	 *
@@ -436,7 +436,7 @@ class Block_lib {
 		{
 			$this->block['values']['limit'] = 3;
 		}
-		
+
 		// Get data and process
 		$this->offset = 0;
 		if ($this->pagination)
@@ -463,13 +463,13 @@ class Block_lib {
 				}
 				$author['commentcount'] = $this->CI->comments_model->get_post_comments_count($author['postid']);
 				array_push($this->contents, array("view" => "block_".$this->block['function']."_".$this->block['values']['detail'], "data" => array("author" => $author, "user" => $object->user, "count" => $count, "current" => $current)));
-			}	
+			}
 		}
 
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Breadcrumb block
 	 *
@@ -493,7 +493,7 @@ class Block_lib {
 		{
 			$this->block['values']['placeholders'] = "no";
 		}
-		
+
 		// Convert parameters to something usable
 		if ($this->block['values']['page'] == "current")
 		{
@@ -503,7 +503,7 @@ class Block_lib {
 				$this->block['values']['page'] = $this->CI->page_urlname;
 			}
 		}
-		
+
 		// Get data and process
 		$object = instantiate_library('page', $this->block['values']['page'], 'urlname');
 		if (!isset($object->page['pageid']))
@@ -513,7 +513,7 @@ class Block_lib {
 		else
 		{
 			$links = array();
-		
+
 			// If we are on a post, grab it
 			if (isset($this->CI->post_urlname))
 			{
@@ -523,7 +523,7 @@ class Block_lib {
 					array_unshift($links, array("title" => $post->post['title'], "url" => $post->post['urlname']));
 				}
 			}
-			
+
 			array_unshift($links, array("title" => $object->page['title'], "url" => $object->page['urlname']));
 			while ($object->page['pageof'] != NULL)
 			{
@@ -537,18 +537,18 @@ class Block_lib {
 					array_unshift($links, array("title" => $object->page['title'], "url" => $object->page['link']));
 				}
 			}
-			
+
 			if (isset($this->block['values']['home']))
 			{
 				array_unshift($links, array("title" => $this->block['values']['home'], "url" => ""));
 			}
-			
+
 			array_push($this->contents, array("view" => "block_".$this->block['function'], "data" => array("links" => $links)));
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Categories block
 	 *
@@ -576,7 +576,7 @@ class Block_lib {
 		{
 			$this->block['values']['featured'] = "yes";
 		}
-		
+
 		// Convert parameters to something usable
 		if ($this->block['values']['page'] == "current")
 		{
@@ -599,7 +599,7 @@ class Block_lib {
 		{
 			$featured = "0";
 		}
-		
+
 		// Get data and process
 		$categories = $this->CI->categories_model->get_published($this->block['values']['page'], $featured);
 		if ($categories->num_rows() == 0 && $this->block['feedback'])
@@ -619,13 +619,13 @@ class Block_lib {
 			{
 				$category['url'] = $this->block['values']['page'];
 			}
-			
+
 			if ($this->block['values']['detail'] != "tagcloud")
 			{
 				$category['name'] = "All";
 				array_push($this->contents, array("view" => "block_".$this->block['function']."_".$this->block['values']['detail'], "data" => array("category" => $category)));
 			}
-			
+
 			$category_list = array();
 			$max_count = 0;
 			$min_count = 999999;
@@ -642,7 +642,7 @@ class Block_lib {
 				}
 				array_push($category_list, $category);
 			}
-			
+
 			foreach ($category_list as $category)
 			{
 				$current++;
@@ -654,16 +654,16 @@ class Block_lib {
 				{
 					$category['url'] = $this->block['values']['page'].'/category/'.$category['urlname'];
 				}
-				
+
 				$category['size'] = ((($category['count'] - $min_count + 1) / ($max_count - $min_count + 1) * 100) + 100)."%";
 
 				array_push($this->contents, array("view" => "block_".$this->block['function']."_".$this->block['values']['detail'], "data" => array("category" => $category, "count" => $count, "current" => $current)));
-			}	
+			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Comments block
 	 *
@@ -681,7 +681,7 @@ class Block_lib {
 	{
 		$this->CI->load->helper(array('pagination','picture'));
 		$this->CI->load->model('comments_model');
-		
+
 		// Set defaults
 		if (!isset($this->block['values']['page']))
 		{
@@ -694,16 +694,16 @@ class Block_lib {
 		if (!isset($this->block['values']['limit']))
 		{
 			$this->block['values']['limit'] = 5;
-		}	
+		}
 		if (!isset($this->block['values']['post']))
 		{
 			$this->block['values']['post'] = NULL;
-		}	
+		}
 		if (!isset($this->block['values']['sort']))
 		{
 			$this->block['values']['sort'] = "desc";
 		}
-		
+
 		// Convert parameters to something usable
 		if ($this->block['values']['page'] == "current")
 		{
@@ -747,12 +747,12 @@ class Block_lib {
 					$comment['email'] = $comment['user']['email'];
 				}
 				array_push($this->contents, array("view" => "block_".$this->block['function']."_".$this->block['values']['detail'], "data" => array("comment" => $comment, "count" => $count, "current" => $current)));
-			}	
+			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Events block
 	 *
@@ -772,7 +772,7 @@ class Block_lib {
 	{
 		$this->CI->load->helper(array('pagination', 'picture'));
 		$this->CI->load->model(array('events_model', 'categories_model', 'comments_model', 'users_model'));
-		
+
 		// Set defaults
 		if (!isset($this->block['values']['page']))
 		{
@@ -797,8 +797,8 @@ class Block_lib {
 		if (!isset($this->block['values']['limit']))
 		{
 			$this->block['values']['limit'] = 10;
-		}	
-		
+		}
+
 		// Convert parameters to something usable
 		if ($this->block['values']['page'] == "current")
 		{
@@ -808,7 +808,7 @@ class Block_lib {
 				$this->block['values']['page'] = $this->CI->page_urlname;
 			}
 		}
-		
+
 		// If pages children are specified, we have to get them
 		if ($this->block['values']['page'] != "all" && $this->block['values']['page'] != "nopage" && $this->block['values']['page_children'] == "yes")
 		{
@@ -829,7 +829,7 @@ class Block_lib {
 				}
 			}
 		}
-		
+
 		if ($this->block['values']['featured'] == "yes")
 		{
 			$featured = NULL;
@@ -842,7 +842,7 @@ class Block_lib {
 		{
 			$featured = "0";
 		}
-	
+
 		// Get data and process
 		$this->offset = 0;
 		if ($this->pagination)
@@ -871,7 +871,7 @@ class Block_lib {
 				{
 					$event['canedit'] = TRUE;
 				}
-				if ($event['userid'] != NULL) 
+				if ($event['userid'] != NULL)
 				{
 					$user = instantiate_library('user', $event['userid']);
 					$event['user'] = $user->user;
@@ -888,9 +888,9 @@ class Block_lib {
 
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Facebook block
 	 *
@@ -909,7 +909,7 @@ class Block_lib {
 		{
 			$urlname = $this->CI->page_urlname;
 		}
-		
+
 		if (!isset($urlname))
 		{
 			if ($this->block['feedback'])
@@ -922,9 +922,9 @@ class Block_lib {
 			array_push($this->contents, array("view" => "block_".$this->block['function'], "data" => array("urlname" => urlencode(base_url().$urlname))));
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Files block
 	 *
@@ -952,7 +952,7 @@ class Block_lib {
 				$this->block['values']['page'] = $this->CI->page_urlname;
 			}
 		}
-		
+
 		// Get data and process
 		$object = instantiate_library('page', $this->block['values']['page'], 'urlname');
 		if ($object->page['pageid'] == NULL && $this->block['values']['page'] != "nopage")
@@ -963,7 +963,7 @@ class Block_lib {
 		{
 			$this->files = $this->CI->files_model->get_attached_listed("page",$object->page['pageid']);
 		}
-		
+
 		if (isset($this->files))
 		{
 			$count = $this->files->num_rows();
@@ -984,9 +984,9 @@ class Block_lib {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Flickr block
 	 *
@@ -1007,7 +1007,7 @@ class Block_lib {
 		if (!isset($this->block['values']['limit']))
 		{
 			$this->block['values']['limit'] = 8;
-		}	
+		}
 		if (!isset($this->block['values']['size']))
 		{
 			$this->block['values']['size'] = 'small';
@@ -1021,8 +1021,8 @@ class Block_lib {
 			foreach ($photos->get_items(0, $this->block['values']['limit']) as $photo)
 			{
 				preg_match_all('/<img src="([^"]*)"([^>]*)>/i', $photo->get_description(), $matches);
-				$url = explode('/', $matches[1][0]);  
-				$filename = array_pop($url); 
+				$url = explode('/', $matches[1][0]);
+				$filename = array_pop($url);
 				$url[] = preg_replace('/(_(s|t|m|b))?\./i', $flickrextension[$this->block['values']['size']], $filename);
 				$url = implode('/', $url);
 				array_push($this->contents, array("view" => "block_".$this->block['function']."_".$flickrviews[$this->block['values']['size']], "data" => array("url" => $url, "photo" => $photo)));
@@ -1033,9 +1033,9 @@ class Block_lib {
 			$this->error = "No query specified for flickr results.";
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Form block
 	 *
@@ -1051,9 +1051,9 @@ class Block_lib {
 			array_push($this->contents, array("view" => "content", "data" => array("content" => '<input type="hidden" name="'.$this->CI->security->get_csrf_token_name().'" value="'.$this->CI->security->get_csrf_hash().'" />')));
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Image block
 	 *
@@ -1071,7 +1071,7 @@ class Block_lib {
 	function _block_image()
 	{
 		$this->CI->load->model('pages_model');
-	
+
 		// Set defaults
 		if (!isset($this->block['values']['page']))
 		{
@@ -1085,7 +1085,7 @@ class Block_lib {
 		{
 			$this->block['values']['stock'] = "yes";
 		}
-		
+
 		// Convert parameters to something usable
 		if ($this->block['values']['page'] == "current")
 		{
@@ -1095,7 +1095,7 @@ class Block_lib {
 				$this->block['values']['page'] = $this->CI->page_urlname;
 			}
 		}
-		
+
 		// Get data and process
 		$page = instantiate_library('page', $this->block['values']['page'], 'urlname');
 		if (!isset($page->page['pageid']))
@@ -1115,7 +1115,7 @@ class Block_lib {
 				$this->CI->load->helper('picture');
 				$image = stock_image($page->page['pageid']);
 			}
-			
+
 			// Add size parameters
 			$size = "";
 			if (isset($this->block['values']['maxwidth']))
@@ -1126,16 +1126,16 @@ class Block_lib {
 			{
 				$size .= "/".$this->block['values']['maxheight'];
 			}
-			
+
 			if (isset($image))
 			{
 				array_push($this->contents, array("view" => 'block_image_'.$this->block['values']['detail'], "data" => array("image" => base_url().$image, 'size' => $size)));
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Menu block
 	 *
@@ -1154,7 +1154,7 @@ class Block_lib {
 	function _block_menu()
 	{
 		$this->CI->load->model('pages_model');
-	
+
 		// Set defaults
 		if (!isset($this->block['values']['page']))
 		{
@@ -1176,7 +1176,7 @@ class Block_lib {
 		{
 			$this->block['values']['limit'] = NULL;
 		}
-		
+
 		// Convert parameters to something usable
 		if ($this->block['values']['page'] == "current")
 		{
@@ -1194,7 +1194,7 @@ class Block_lib {
 		{
 			$this->block['values']['back_button'] = FALSE;
 		}
-		
+
 		// Get data and process
 		$page = instantiate_library('page', $this->block['values']['page'], 'urlname');
 		if (!isset($page->page['pageid']))
@@ -1221,16 +1221,16 @@ class Block_lib {
 			{
 				$pageid = NULL;
 			}
-			
+
 			$this->CI->load->helper('menu_helper');
 			$menu_html = generate_menu_html('block_menu_'.$this->block['values']['detail'], $this->block['values']['menu'], $pageid, $this->block['values']['limit'], $this->block['values']['back_button']);
-			
+
 			array_push($this->contents, array("view" => "content", "data" => array("content" => $menu_html)));
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Posts block
 	 *
@@ -1252,7 +1252,7 @@ class Block_lib {
 	{
 		$this->CI->load->helper(array('pagination', 'picture'));
 		$this->CI->load->model(array('pages_model', 'posts_model', 'categories_model', 'files_model', 'comments_model', 'users_model'));
-		
+
 		// Set defaults
 		if (!isset($this->block['values']['page']))
 		{
@@ -1281,12 +1281,12 @@ class Block_lib {
 		if (!isset($this->block['values']['limit']))
 		{
 			$this->block['values']['limit'] = 3;
-		}	
+		}
 		if (!isset($this->block['values']['user']))
 		{
 			$this->block['values']['user'] = NULL;
 		}
-		
+
 		// Convert parameters to something usable
 		if ($this->block['values']['page'] == "current")
 		{
@@ -1296,7 +1296,7 @@ class Block_lib {
 				$this->block['values']['page'] = $this->CI->page_urlname;
 			}
 		}
-		
+
 		 // If pages children are specified, we have to get them
 		if ($this->block['values']['page'] != "all" && $this->block['values']['page'] != "nopage" && $this->block['values']['page_children'] == "yes")
 		{
@@ -1317,7 +1317,7 @@ class Block_lib {
 				}
 			}
 		}
-		
+
 		if ($this->block['values']['sort'] == "popularity")
 		{
 			$sort = "posts.views DESC";
@@ -1334,7 +1334,7 @@ class Block_lib {
 		{
 			$sort = "posts.date DESC";
 		}
-		
+
 		if ($this->block['values']['featured'] == "yes")
 		{
 			$featured = NULL;
@@ -1347,7 +1347,7 @@ class Block_lib {
 		{
 			$featured = "0";
 		}
-		
+
 		// Grab category data
 		$categoryid = NULL;
 		if ($this->block['values']['category'] == "all") // This posts block is open to all categories so grab from URL
@@ -1367,11 +1367,11 @@ class Block_lib {
 		{
 			$categoryid = "0";
 		}
-		else // This posts block requires specific category, ignore URL 
+		else // This posts block requires specific category, ignore URL
 		{
 			$categoryid = $this->CI->categories_model->get_by_urlname($this->block['values']['category']);
 		}
-		
+
 		// Report error for invalid category
 		if ($categoryid == NULL && $this->block['values']['category'] != "all" && $this->block['values']['category'] != "none") // Check to ensure category specified exists
 		{
@@ -1408,12 +1408,12 @@ class Block_lib {
 				{
 					$object->post['canedit'] = TRUE;
 				}
-				if ($object->post['userid'] != NULL) 
+				if ($object->post['userid'] != NULL)
 				{
 					$user = instantiate_library('user', $object->post['userid']);
 					$object->post['user'] = $user->user;
 				}
-				
+
 				// Build contributors list
 				$object->post['contributorslist'] = array();
 				foreach ($object->post['contributors'] as $userid)
@@ -1421,21 +1421,21 @@ class Block_lib {
 					 $user = instantiate_library('user', $userid);
 					 array_push($object->post['contributorslist'], $user->user);
 				}
-				
+
 				// Get parent if different than current page
 				$page = instantiate_library('page', $object->post['pageid']);
 				if (isset($page->page['pageid']) && isset($this->CI->page_urlname) && $page->page['urlname'] != $this->CI->page_urlname)
 				{
 					$object->post['parent'] = $page->page;
-					
+
 				}
-				
+
 				// Get categories
 				$object->post['categories'] = $this->CI->categories_model->get_by_post_published($object->post['postid']);
-				
+
 				// Get comments
 				$object->post['commentcount'] = $this->CI->comments_model->get_post_comments_count($object->post['postid']);
-				
+
 				// Get featured image
 				$object->post['image'] = NULL;
 				$file = instantiate_library('file', $object->post['imageid']);
@@ -1453,7 +1453,7 @@ class Block_lib {
 						$object->post['image'] = $stockimage;
 					}
 				}
-				
+
 				if ($this->block['values']['detail'] != "template")
 				{
 					array_push($this->contents, array("view" => "block_".$this->block['function']."_".$this->block['values']['detail'], "data" => array("currentpage" => $this->CI->page_urlname, "post" => $object->post, "count" => $count, "current" => $current)));
@@ -1466,7 +1466,7 @@ class Block_lib {
 					{
 						$page->initialize_page_tree();
 					}
-					
+
 					// Grab post template and values
 					if (isset($page->page['post_templateid']))
 					{
@@ -1477,10 +1477,10 @@ class Block_lib {
 						$this->CI->load->helper('template');
 						$templateid = template_to_use('template', 'page', $page->page_tree);
 					}
-					
+
 					$this->template = instantiate_library('template', $templateid);
 					$this->template->initialize_values($object->post['postid']);
-					
+
 					// If there's a page post template, load it up and use it
 					if (isset($this->template->template['templateid']))
 					{
@@ -1495,19 +1495,19 @@ class Block_lib {
 								array_push($object->post['images'], $file->file);
 							}
 						}
-						
+
 						// Enable moderating tool bar
 						$admin_toolbar = NULL;
 						if ($object->post['published'] == '1' && $this->CI->acl->allow('post', 'edit', FALSE, 'post', $object->post['postid']))
 						{
 							$admin_toolbar = $this->CI->load->view('post_admin_toolbar', array('post' => $object->post, 'author' => NULL), TRUE);
 						}
-					
+
 						// Render the post
 						$post_section = $this->CI->load->view('post_post', array('post' => $object->post, 'next_post' => NULL, 'previous_post' => NULL, 'contributors' => NULL, 'parentpage' => NULL, 'author' => NULL, 'admin_toolbar' => $admin_toolbar), TRUE);
 						$featuredimage_section = $this->CI->load->view('post_image', array('postid' => $object->post['postid'], 'image' => $object->post['image']), TRUE);
 						$listedimages_section = $this->CI->load->view('post_images', array('postid' => $object->post['postid'], 'image' => $object->post['image'], 'images' => $object->post['images']), TRUE);
-					
+
 						// Load up blocks as necessary
 						$post_contents = "";
 						$template_contents = preg_split('/(%block_\S+%)/', $this->template->template['content'], -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -1523,7 +1523,7 @@ class Block_lib {
 								$post_contents .= $template_content;
 							}
 						}
-						
+
 						// Parse for fields and insert values
 						foreach ($this->template->fields as $field)
 						{
@@ -1548,7 +1548,7 @@ class Block_lib {
 						$post_contents = str_replace('%pingbackshere%', "", $post_contents);
 						$post_contents = str_replace('%featuredimage%', $featuredimage_section, $post_contents);
 						$post_contents = str_replace('%listedimages%', $listedimages_section, $post_contents);
-						
+
 						array_push($this->contents, array("view" => 'post_wrapper_dynamic', "data" => array('content' => $post_contents)));
 					}
 					else
@@ -1559,9 +1559,9 @@ class Block_lib {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Scrape block
 	 *
@@ -1620,9 +1620,9 @@ class Block_lib {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Twitter block
 	 *
@@ -1661,7 +1661,7 @@ class Block_lib {
 					$tweet_count++;
 					if (!$hasuser && $hastag)
 					{
-						$namepieces = split(" ",$tweet->get_author()->get_name());
+						$namepieces = explode(" ",$tweet->get_author()->get_name());
 						$object = instantiate_library('user', $namepieces[0], 'twitter');
 						$user = $object->user;
 						array_push($this->contents, array("view" => "block_".$this->block['function']."_tag", "data" => array("tweet" => $tweet, "author" => $namepieces[0], "user" => $user)));
@@ -1682,9 +1682,9 @@ class Block_lib {
 			$this->error = "No query specified for twitter results.";
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * User_displayname block
 	 *
@@ -1705,11 +1705,11 @@ class Block_lib {
 		else
 		{
 			$this->error = "Cannot show email address when user isn't signed on. This block should only appear on pages that require a sign on.";
-		}	
+		}
 	}
 
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * User_email block
 	 *
@@ -1732,9 +1732,9 @@ class Block_lib {
 			$this->error = "Cannot show email address when user isn't signed on. This block should only appear on pages that require a sign on.";
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Wall block
 	 *
@@ -1772,9 +1772,9 @@ class Block_lib {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Wrapper block
 	 *
@@ -1831,11 +1831,11 @@ class Block_lib {
 						{
 							$page = $this->CI->page_urlname;
 						}
-						
+
 						$page_object = instantiate_library('page', $page, 'urlname');
 						$page_object->initialize_page_tree();
 						$object = instantiate_library('block', preg_replace('/^%block_(\S+)%$/', '$1', $pagecontent), 'title');
-						
+
 						// If we have a block on the page that is paginated AND we are using it, make sure to focus to it
 						if (isset($object->block['pagination']) && $object->block['pagination'])
 						{
@@ -1844,7 +1844,7 @@ class Block_lib {
 								$this->CI->focus = "pagination_block";
 							}
 						}
-						
+
 						$content .= $object->output($page_object->page_tree);
 					}
 				}

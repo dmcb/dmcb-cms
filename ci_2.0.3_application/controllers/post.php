@@ -1094,8 +1094,8 @@ class Post extends MY_Controller {
 				if (isset($_POST['categoryvalues']))
 				{
 					$this->categories_model->delete_by_post($this->post->post['postid']);
-					$values = split(";",$this->security->xss_clean($_POST['categoryvalues']));
-					$names = split(";",$this->security->xss_clean($_POST['categorynames']));
+					$values = explode(";",$this->security->xss_clean($_POST['categoryvalues']));
+					$names = explode(";",$this->security->xss_clean($_POST['categorynames']));
 					for ($i=0; $i<sizeof($values); $i++)
 					{
 						if ($values[$i] != "")
@@ -1116,7 +1116,7 @@ class Post extends MY_Controller {
 				if (isset($_POST['previouspostvalues']))
 				{
 					$this->posts_model->remove_references($this->post->post['postid']);
-					$values = split(";",$this->security->xss_clean($_POST['previouspostvalues']));
+					$values = explode(";",$this->security->xss_clean($_POST['previouspostvalues']));
 					for ($i=0; $i<sizeof($values); $i++)
 					{
 						if ($values[$i] != "")

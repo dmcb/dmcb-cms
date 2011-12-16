@@ -1,6 +1,6 @@
 <div class="event full">
 	<h2><?=$event['title'];?></h2>
-	
+
 	<h6>
 	<?php
 		if ($event['canedit'])
@@ -9,7 +9,7 @@
 		}
 	?>
 	</h6>
-	
+
 	<?php
 		echo '<div class="notice">';
 		echo 'When: '.date("F jS, Y", strtotime($event['date']));
@@ -25,17 +25,17 @@
 
 	<?php
 
-	$summary = split("<!-- pagebreak -->",$event['content']);
+	$summary = explode("<!-- pagebreak -->",$event['content']);
 
 	echo '<br/>'.$summary[0];
 	echo '</p>';
-	
+
 	$subscription = "";
-	if ($event['needsubscription'] == "1" && $this->acl->enabled('site', 'subscribe')) 
+	if ($event['needsubscription'] == "1" && $this->acl->enabled('site', 'subscribe'))
 	{
 		$subscription = ', <span class="restricted">Subscription only</span>';
 	}
-	
+
 	if ($event['commentcount'] == 1 && isset($summary[1])) echo '<a href="'.base_url().$event['urlname'].'">Continue reading ('.$event['commentcount'].' comment)</a>'.$subscription.' | ';
 	else if ($event['commentcount'] > 0 && isset($summary[1])) echo '<a href="'.base_url().$event['urlname'].'">Continue reading ('.$event['commentcount'].' comments)</a>'.$subscription.' | ';
 	else if ($event['commentcount'] > 0) echo '<a href="'.base_url().$event['urlname'].'">Read comments ('.$event['commentcount'].')</a>'.$subscription.' | ';

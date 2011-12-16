@@ -32,7 +32,7 @@
 				{
 					echo ' & ';
 				}
-				
+
 				if ($contributor['enabledprofile'])
 				{
 					echo '<a href="'.base_url().'profile/'.$contributor['urlname'].'">'.$contributor['displayname'].'</a>';
@@ -54,17 +54,17 @@
 
 	<?php
 
-	$summary = split("<!-- pagebreak -->",$post['content']);
+	$summary = explode("<!-- pagebreak -->",$post['content']);
 
 	echo '<br/>'.$summary[0];
 	echo '</p>';
-	
+
 	$subscription = "";
-	if ($post['needsubscription'] == "1" && $this->acl->enabled('site', 'subscribe')) 
+	if ($post['needsubscription'] == "1" && $this->acl->enabled('site', 'subscribe'))
 	{
 		$subscription = ' <span class="restricted">Subscription required</span>';
 	}
-	
+
 	if ($post['commentcount'] == 1 && isset($summary[1]) && $post['enabledcomments']) echo '<a href="'.base_url().$post['urlname'].'">Continue reading ('.$post['commentcount'].' comment)</a>'.$subscription.' > <br/>';
 	else if ($post['commentcount'] > 0 && isset($summary[1]) && $post['enabledcomments']) echo '<a href="'.base_url().$post['urlname'].'">Continue reading ('.$post['commentcount'].' comments)</a>'.$subscription.' > <br/>';
 	else if ($post['commentcount'] > 0 && $post['enabledcomments']) echo '<a href="'.base_url().$post['urlname'].'">Read comments ('.$post['commentcount'].')</a>'.$subscription.' > <br/>';
