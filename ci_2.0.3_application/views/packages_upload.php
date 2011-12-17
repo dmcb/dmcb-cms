@@ -11,7 +11,7 @@
 				upload_url: "<?=base_url();?>upload/file/<?=$upload_url;?>",	// Relative to the SWF file, or absolute
 				file_post_name: "swfuploadfile",
 				post_params: {"sessionid": "<?php echo $this->session->userdata('session_id'); ?>"},	// These are the post params of the FIRST post to upload controller
-				
+
 				// File Upload Settings
 				file_size_limit : "<?=$upload_size;?>",
 				file_types : "<?=$upload_types;?>",
@@ -25,18 +25,19 @@
 				file_queued_handler : fileQueued,
 				file_queue_error_handler : fileQueueError,
 				file_dialog_complete_handler : fileDialogComplete,
-				
+
 				// upload_start_handler : uploadStart,
 				upload_progress_handler : uploadProgress,
 				upload_error_handler : uploadError,
 				upload_success_handler : uploadSuccess,
 				upload_complete_handler : uploadComplete,
-				
+
 				// Button Settings
 				button_image_url : "<?=base_url();?>includes/swfupload/2.2.0.5/browse.gif",	// Relative to the SWF file, or absolute
 				button_placeholder_id : "spanButtonPlaceholder",
-				button_width: 78,
-				button_height: 20,
+				<?php $size = getimagesize('includes/swfupload/2.2.0.5/browse.gif'); ?>
+				button_width: <?php echo $size[0];?>,
+				button_height: <?php echo $size[1]/2;?>,
 				button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
 
 				// Flash Settings
@@ -46,7 +47,7 @@
 					progress_target : "fsUploadProgress",
 					upload_successful : false
 				},
-				
+
 				// Debug settings
 				debug: false
 			});
