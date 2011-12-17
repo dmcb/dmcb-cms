@@ -37,7 +37,7 @@
 				button_placeholder_id : "spanButtonPlaceholder",
 				<?php $size = getimagesize('includes/swfupload/2.2.0.5/browse.gif'); ?>
 				button_width: <?php echo $size[0];?>,
-				button_height: <?php echo $size[1]/2;?>,
+				button_height: <?php echo $size[1]/4;?>,
 				button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
 
 				// Flash Settings
