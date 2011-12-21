@@ -303,7 +303,7 @@ class File extends MY_Controller {
 							}
 							$downloadpath_with_dimensions = $downloadpath."..".$downloadheight;
 						}
-						else
+						else // If no width or height was specified, ensure the image comes in under the size of the maximum dimensions
 						{
 							$downloadwidth = $info[0];
 							$downloadheight = $info[1];
@@ -311,11 +311,22 @@ class File extends MY_Controller {
 							{
 								$downloadwidth = $this->config->item('dmcb_max_image_width');
 							}
-							if ($downloadheight > $this->config->item('dmcb_max_image_height'))
+							$ratio = $info[0]/$info[1];
+							$height = floor($downloadwidth/$ratio);
+							if ($height > $this->config->item('dmcb_max_image_height'))
 							{
-								$downloadheight = $this->config->item('dmcb_max_image_height');
+								$height = $this->config->item('dmcb_max_image_height');
+								$downloadwidth = floor($ratio*$height);
 							}
-							$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth.".".$downloadheight;
+
+							if ($downloadwidth == $info[0] && $downloadheight == $info[1])
+							{
+								$downloadpath_with_dimensions = $downloadpath;
+							}
+							else
+							{
+								$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth;
+							}
 						}
 
 						// If the file hasn't already been resized to those dimensions, do a resize
