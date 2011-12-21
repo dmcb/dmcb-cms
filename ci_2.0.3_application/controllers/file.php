@@ -58,10 +58,10 @@ class File extends MY_Controller {
 			$downloadpath = "files";
 			$downloadfilename = NULL;
 			$downloadextension = NULL;
-			$downloadwidth = $this->config->item('dmcb_max_image_width');
+			$downloadwidth = NULL;
 			$downloadheight = NULL;
 
-			// Grab file name and width/height properties if given from URL
+			// Grab file name and width/height properties if given from URL, this is the OLD way, and it is to be removed
 			$lastsegmentoffset = 0;
 			if (ctype_digit($this->uri->segment($this->uri->total_segments()-1)) && ctype_digit($this->uri->segment($this->uri->total_segments()))) //check if last two segments are width and height numbers
 			{
@@ -79,7 +79,7 @@ class File extends MY_Controller {
 			$nestedname = FALSE;
 			$attachedto = $this->uri->segment(2);
 			$attachedid = "";
-			for ($i=2; $i<=$this->uri->total_segments()-$lastsegmentoffset; $i++)
+			for ($i=2; $i< $this->uri->total_segments()-$lastsegmentoffset; $i++)
 			{
 				// Convert nested file path of page or post to a flat folder structure internally
 				if ($this->uri->segment($i-2) == "page" || $this->uri->segment($i-2) == "post") // If the file's a page or post, it could be nested
@@ -96,12 +96,7 @@ class File extends MY_Controller {
 					$downloadpath .= "/".$this->uri->segment($i);
 				}
 
-				// Final segments have to be the filename and file extension
-				if ($i == $this->uri->total_segments()-$lastsegmentoffset)
-				{
-					$downloadfilename = substr($this->uri->segment($i), 0, strrpos($this->uri->segment($i), "."));
-					$downloadextension = substr($this->uri->segment($i), strrpos($this->uri->segment($i), ".")+1);
-				}
+				// Assemble the id of where the file is attached to
 				if ($i > 2 && $i < $this->uri->total_segments()-$lastsegmentoffset)
 				{
 					$attachedid .= $this->uri->segment($i);
@@ -112,8 +107,27 @@ class File extends MY_Controller {
 				}
 			}
 
-			// Create image height and width values from supplied URL values and config
-			if ($downloadheight != "")
+			// Final segment has to be the filename and file extension
+			$filepieces = explode(".",$this->uri->segment($this->uri->total_segments()-$lastsegmentoffset));
+			$downloadfilename = $filepieces[0];
+			$downloadextension = $filepieces[sizeof($filepieces)-1];
+			$downloadpath .= "/".$downloadfilename.".".$downloadextension;
+			if (sizeof($filepieces) == 3 && ctype_digit($filepieces[1]))
+			{
+				$downloadwidth = $filepieces[1];
+			}
+			else if (sizeof($filepieces) == 4 && !ctype_digit($filepieces[1]) && ctype_digit($filepieces[2]))
+			{
+				$downloadheight = $filepieces[2];
+			}
+			else if (sizeof($filepieces) == 4 && ctype_digit($filepieces[1]) && ctype_digit($filepieces[2]))
+			{
+				$downloadwidth = $filepieces[1];
+				$downloadheight = $filepieces[2];
+			}
+
+			// Cap maximum image height and width values if necessary, and round sizes based off config settings
+			if ($downloadheight != NULL)
 			{
 				if ($downloadheight > $this->config->item('dmcb_max_image_height'))
 				{
@@ -121,11 +135,14 @@ class File extends MY_Controller {
 				}
 				$downloadheight = round($downloadheight/$this->config->item('dmcb_image_interval'))*$this->config->item('dmcb_image_interval');
 			}
-			if ($downloadwidth > $this->config->item('dmcb_max_image_width'))
+			if ($downloadwidth != NULL)
 			{
-				$downloadwidth = $this->config->item('dmcb_max_image_width');
+				if ($downloadwidth > $this->config->item('dmcb_max_image_width'))
+				{
+					$downloadwidth = $this->config->item('dmcb_max_image_width');
+				}
+				$downloadwidth = round($downloadwidth/$this->config->item('dmcb_image_interval'))*$this->config->item('dmcb_image_interval');
 			}
-			$downloadwidth = round($downloadwidth/$this->config->item('dmcb_image_interval'))*$this->config->item('dmcb_image_interval');
 
 			if (!file_exists($downloadpath)) // If file is in managed area we can check db for additional security options
 			{
@@ -139,6 +156,7 @@ class File extends MY_Controller {
 				// Grab the file
 				$file = instantiate_library('file', array($downloadfilename, $downloadextension, $attachedto, $attachedid), 'details');
 
+				// Check if file also exists in the database correctly
 				if (!isset($file->file['fileid']) || (isset($file->file['fileid']) && $attachedid == NULL && $attachedto != "site") || !file_exists($downloadpath))
 				{
 					$this->_message(
@@ -149,7 +167,9 @@ class File extends MY_Controller {
 				}
 				else
 				{
+					// The user is allowed to download the file until it's been proven that they aren't allowed
 					$allowed = TRUE;
+
 					// Get attached parents
 					if ($attachedto == "post")
 					{
@@ -239,17 +259,11 @@ class File extends MY_Controller {
 				{
 					// Attempt to grab image information
 					$info = @getimagesize($downloadpath);
-					$originalwidth = NULL;
-					$originalheight = NULL;
-					$originalratio = NULL;
 
 					// If the file is an image, we can extract out it's mime type and original dimensions
 					if (isset($info[0]))
 					{
 						header("Content-type: ".$info['mime']);
-						$originalwidth = $info[0];
-						$originalheight = $info[1];
-						$originalratio = $originalwidth/$originalheight;
 					}
 					else
 					{
@@ -260,42 +274,43 @@ class File extends MY_Controller {
 					// Caching information, perhaps make this smarter depending on the type of file?
 					header("Expires: ".gmdate("D, d M Y H:i:s", time() + 3600)." GMT");
 
-					// Crop or resize
-					if (isset($info[0]) && isset($downloadheight))
+					// Resize if an image
+					if (isset($info[0]))
 					{
-						// If the file has already been resized to those dimensions, don't run a resize again
-						if (file_exists($downloadpath.".".$downloadwidth.".".$downloadheight))
+						if (isset($downloadwidth) && isset($downloadheight))
 						{
-							header("Content-length: ".filesize($downloadpath.".".$downloadwidth.".".$downloadheight));
-							readfile($downloadpath.".".$downloadwidth.".".$downloadheight);
+							$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth.".".$downloadheight;
 						}
-						else
+						else if (isset($downloadwidth))
 						{
-							$this->_image_crop($downloadwidth, $downloadheight, $downloadpath, $downloadpath.".".$downloadwidth.".".$downloadheight);
-							header("Content-length: ".filesize($downloadpath.".".$downloadwidth.".".$downloadheight));
-							readfile($downloadpath.".".$downloadwidth.".".$downloadheight);
-						}
-					}
-					else if (isset($info[0]) && $originalwidth > $downloadwidth)
-					{
-						// If the file has already been resized to those dimensions, don't run a resize again
-						if (file_exists($downloadpath.".".$downloadwidth))
-						{
-							header("Content-length: ".filesize($downloadpath.".".$downloadwidth));
-							readfile($downloadpath.".".$downloadwidth);
-						}
-						else
-						{
-							$height = floor($downloadwidth/$originalratio);
+							$ratio = $info[0]/$info[1];
+							$height = floor($downloadwidth/$ratio);
 							if ($height > $this->config->item('dmcb_max_image_height'))
 							{
 								$height = $this->config->item('dmcb_max_image_height');
-								$downloadwidth = floor($originalratio*$height);
+								$downloadwidth = floor($ratio*$height);
 							}
-							$this->_image_resize($downloadwidth, $downloadpath, $downloadpath.".".$downloadwidth);
-							header("Content-length: ".filesize($downloadpath.".".$downloadwidth));
-							readfile($downloadpath.".".$downloadwidth);
+							$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth;
 						}
+						else
+						{
+							$ratio = $info[0]/$info[1];
+							$width = floor($downloadheight/$ratio);
+							if ($width > $this->config->item('dmcb_max_image_width'))
+							{
+								$width = $this->config->item('dmcb_max_image_width');
+								$downloadheight = floor($ratio*$width);
+							}
+							$downloadpath_with_dimensions = $downloadpath."..".$downloadheight;
+						}
+
+						// If the file hasn't already been resized to those dimensions, do a resize
+						if (!file_exists($downloadpath_with_dimensions))
+						{
+							$this->_image_resize($downloadwidth, $downloadheight, $downloadpath, $downloadpath_with_dimensions);
+						}
+						header("Content-length: ".filesize($downloadpath_with_dimensions));
+						readfile($downloadpath_with_dimensions);
 					}
 					else
 					{
@@ -315,7 +330,7 @@ class File extends MY_Controller {
 		}
 	}
 
-	function _image_crop($newwidth, $newheight, $source, $dest)
+	function _image_resize($newwidth = NULL, $newheight = NULL, $source, $dest)
 	{
 		$info = @getimagesize($source);
 		$type = substr(strrchr($info['mime'], '/'), 1);
@@ -346,100 +361,54 @@ class File extends MY_Controller {
 			$image_create_func = 'ImageCreateFromJPEG';
 			$image_save_func = 'ImageJPEG';
 		}
-
-	    $width = $info[0];
-	    $height = $info[1];
-
-		ini_set('memory_limit', '128M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 128M')
-	    $data = $image_create_func($source);
-	    $croppedimage = imagecreatetruecolor($newwidth, $newheight);
-
-		imagealphablending($croppedimage, false);
-		imagesavealpha($croppedimage,true);
-		$transparent = imagecolorallocatealpha($croppedimage, 255, 255, 255, 127);
-
-	    $widthm = $width/$newwidth;
-	    $heightm = $height/$newheight;
-
-	    if ($newwidth < $newheight)
-		{
-	        $adjusted_width = $width / $heightm;
-	        $half_width = $adjusted_width / 2;
-	        $intwidth = $half_width - ($newwidth/2);
-
-			imagefilledrectangle($croppedimage, 0, 0, $adjusted_width, $newheight, $transparent);
-	        imagecopyresampled($croppedimage,$data,-$intwidth,0,0,0,$adjusted_width,$newheight,$width,$height);
-	    }
-		else if (($newwidth >= $newheight))
-		{
-	        $adjusted_height = $height / $widthm;
-	        $half_height = $adjusted_height / 2;
-	        $intheight = $half_height - ($newheight/2);
-
-			imagefilledrectangle($croppedimage, 0, 0, $newwidth, $adjusted_height, $transparent);
-	        imagecopyresampled($croppedimage,$data,0,-$intheight,0,0,$newwidth,$adjusted_height,$width,$height);
-	    }
-		else
-		{
-			imagefilledrectangle($croppedimage, 0, 0, $newwidth, $newwidth, $transparent);
-	        imagecopyresampled($croppedimage,$data,0,0,0,0,$newwidth,$newwidth,$width,$height);
-	    }
-
-		if ($image_save_func == "ImageJPEG") $image_save_func($croppedimage,$dest,96);
-		else $image_save_func($croppedimage,$dest);
-		imagedestroy($data);
-		imagedestroy($croppedimage);
-	}
-
-	function _image_resize($newwidth, $source, $dest)
-	{
-		$info = @getimagesize($source);
-		$type = substr(strrchr($info['mime'], '/'), 1);
-
-		switch ($type)
-		{
-			case 'jpeg':
-			$image_create_func = 'ImageCreateFromJPEG';
-			$image_save_func = 'ImageJPEG';
-			break;
-
-			case 'png':
-			$image_create_func = 'ImageCreateFromPNG';
-			$image_save_func = 'ImagePNG';
-			break;
-
-			case 'bmp':
-			$image_create_func = 'ImageCreateFromBMP';
-			$image_save_func = 'ImageBMP';
-			break;
-
-			case 'gif':
-			$image_create_func = 'ImageCreateFromGIF';
-			$image_save_func = 'ImageGIF';
-			break;
-
-			default:
-			$image_create_func = 'ImageCreateFromJPEG';
-			$image_save_func = 'ImageJPEG';
-		}
-
-	    $width = $info[0];
-	    $height = $info[1];
 
 		ini_set('memory_limit', '128M'); //hack for bad hosts (also try in .htaccess, 'php_value memory_limit 128M')
 		$data = $image_create_func($source);
 
-		$ratio_orig = $width/$height;
-		$newheight = floor($newwidth/$ratio_orig);
+	    $width = $info[0];
+	    $height = $info[1];
+	    $ratio = $width/$height;
 
-		$resizedimage = imagecreatetruecolor($newwidth, $newheight);
+		$targetwidth = $newwidth;
+		$targetheight = $newheight;
 
+		$x_offset = 0;
+		$y_offset = 0;
+
+		if ($newheight == NULL)
+		{
+			$targetheight = floor($newwidth/$ratio);
+		}
+		else if ($newwidth == NULL)
+		{
+			$targetwidth = floor($newheight*$ratio);
+		}
+
+		$resizedimage = imagecreatetruecolor($targetwidth, $targetheight);
 		imagealphablending($resizedimage, false);
 		imagesavealpha($resizedimage,true);
 		$transparent = imagecolorallocatealpha($resizedimage, 255, 255, 255, 127);
 		imagefilledrectangle($resizedimage, 0, 0, $newwidth, $newheight, $transparent);
 
-		imagecopyresampled($resizedimage, $data, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+		if ($newheight != NULL && $newwidth != NULL) // We are specifying an exact size, so we will resize and crop
+		{
+			$widthscale = $newwidth/$width;
+			$heightscale = $newheight/$height;
+			if ($widthscale > $heightscale)
+			{
+				$targetwidth = $newwidth;
+				$targetheight = $height*$widthscale;
+				$y_offset = round(($newheight - $targetheight)/2);
+			}
+			else
+			{
+				$targetwidth = $width*$heightscale;
+				$targetheight = $newheight;
+				$x_offset = round(($newwidth - $targetwidth)/2);
+			}
+		}
+
+		imagecopyresampled($resizedimage, $data, $x_offset, $y_offset, 0, 0, $targetwidth, $targetheight, $width, $height);
 
 		if ($image_save_func == "ImageJPEG") $image_save_func($resizedimage,$dest,96);
 		else $image_save_func($resizedimage,$dest);
