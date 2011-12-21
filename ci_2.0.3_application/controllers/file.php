@@ -305,7 +305,7 @@ class File extends MY_Controller {
 						}
 
 						// If the file hasn't already been resized to those dimensions, do a resize
-						if (!file_exists($downloadpath_with_dimensions))
+						if (!file_exists($downloadpath_with_dimensions) || !filesize($downloadpath_with_dimensions))
 						{
 							$this->_image_resize($downloadwidth, $downloadheight, $downloadpath, $downloadpath_with_dimensions);
 						}
