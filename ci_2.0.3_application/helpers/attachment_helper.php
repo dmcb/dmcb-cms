@@ -12,7 +12,7 @@
  *              attribution.
  * @link		http://dmcbdesign.com
  */
- 
+
 // ------------------------------------------------------------------------
 
 /**
@@ -35,21 +35,18 @@ if ( ! function_exists('attached_id'))
 		if ($attachedto == "user")
 		{
 			$user = instantiate_library('user', $attachedid, 'urlname');
-			return $user->user['userid'];
+			if (isset($user->user['userid'])) return $user->user['userid'];
 		}
 		else if ($attachedto == "page")
 		{
 			$page = instantiate_library('page', $attachedid, 'urlname');
-			return $page->page['pageid'];
+			if (isset($page->page['pageid'])) return $page->page['pageid'];
 		}
 		else if ($attachedto == "post")
 		{
 			$post = instantiate_library('post', $attachedid, 'urlname');
-			return $post->post['postid'];
+			if (isset($post->post['postid'])) return $post->post['postid'];
 		}
-		else
-		{
-			return NULL;
-		}
+		return NULL;
 	}
 }
