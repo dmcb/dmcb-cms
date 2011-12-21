@@ -292,7 +292,7 @@ class File extends MY_Controller {
 							}
 							$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth;
 						}
-						else
+						else if (isset($downloadheight))
 						{
 							$ratio = $info[0]/$info[1];
 							$width = floor($downloadheight/$ratio);
@@ -302,6 +302,20 @@ class File extends MY_Controller {
 								$downloadheight = floor($ratio*$width);
 							}
 							$downloadpath_with_dimensions = $downloadpath."..".$downloadheight;
+						}
+						else
+						{
+							$downloadwidth = $info[0];
+							$downloadheight = $info[1];
+							if ($downloadwidth > $this->config->item('dmcb_max_image_width'))
+							{
+								$downloadwidth = $this->config->item('dmcb_max_image_width');
+							}
+							if ($downloadheight > $this->config->item('dmcb_max_image_height'))
+							{
+								$downloadheight = $this->config->item('dmcb_max_image_height');
+							}
+							$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth.".".$downloadheight;
 						}
 
 						// If the file hasn't already been resized to those dimensions, do a resize
