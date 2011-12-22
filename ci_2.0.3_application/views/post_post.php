@@ -1,19 +1,19 @@
 <?php
 	echo '<div class="title"><div class="innerwrapper"><h2>'.$post['title'].'</h2></div></div>';
-	
+
 	echo '<div class="information"><div class="innerwrapper">';
 	if (!$post['published'])
 	{
 		echo '<h5>Draft started on '.date("F jS, Y", strtotime($post['date'])).'</h5>';
 	}
 	else
-	{			
+	{
 		echo '<h5>Posted '.date("F jS, Y", strtotime($post['date']));
 
 		if (isset($author['userid']))
 		{
 			echo ' by ';
-			
+
 			if ($author['enabledprofile'])
 			{
 				echo '<a href="'.base_url().'profile/'.$author['urlname'].'">'.$author['displayname'].'</a>';
@@ -56,7 +56,7 @@
 				{
 					echo ' & ';
 				}
-				
+
 				if ($contributor['enabledprofile'])
 				{
 					echo '<a href="'.base_url().'profile/'.$contributor['urlname'].'">'.$contributor['displayname'].'</a>';
@@ -70,8 +70,8 @@
 			}
 		}
 		echo '</h5>';
-	}	
-	
+	}
+
 	if ($this->config->item('dmcb_show_neighbour_posts') == "true")
 	{
 		if (isset($previous_post['postid']))
@@ -83,20 +83,20 @@
 			echo '<h5>Next article: <a href="'.base_url().$next_post['urlname'].'">'.$next_post['title'].'</a></h5>';
 		}
 	}
-	
+
 	if ($post['originalurl'] != NULL)
 	{
 		echo '<h5>Originally posted at <a href="'.$post['originalurl'].'">'.$item['originalurl'].'</a></h5>';
 	}
-	
+
 	if (isset($admin_toolbar))
 	{
 		echo '<h6>';
-		echo $admin_toolbar; 
+		echo $admin_toolbar;
 		echo '</h6>';
 	}
 	echo '</div></div>';
-	
+
 	if (isset($post['event']))
 	{
 		echo '<div class="notice"><div class="innerwrapper">';

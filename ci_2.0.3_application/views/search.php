@@ -12,24 +12,24 @@
 				echo '<legend>Search '.$this->config->item('dmcb_title').'</legend>';
 			}
 			?>
-			
+
 			<div id="search" class="panel alwaysopen"><div>
 				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
 				<input type="hidden" name="buttonchoice" value="" class="hidden" />
-				
+
 				<input type="hidden" name="searchpage" value="<?php if (isset($search_page)) echo $search_page; else echo set_value('searchpage'); ?>" class="hidden" />
-				
+
 				<div class="forminput">
 					<label>Search for</label>
 					<input name="searchtext" type="text" class="text" value="<?php if (isset($search_text)) echo $search_text; else echo set_value('searchtext'); ?>"/>
 					<?php echo form_error('searchtext'); ?>
 				</div>
-				
+
 				<?php
 				if ($search_page == NULL)
 				{
 				?>
-				
+
 				<div class="forminput">
 					<label>Search type</label>
 					<select name="searchtype">
@@ -40,33 +40,33 @@
 						<option value="files" <?php if (isset($search_type) && $search_type == "files") echo 'selected="selected"'; echo set_select('searchtype', 'files'); ?>>Files</option>
 					</select>
 				</div>
-				
+
 				<?php
 				}
 				?>
-				
+
 				<div class="forminput">
 					<input type="submit" value="Search" name="search" class="button" onclick="dmcb.submitSetValue(this);" onfocus="dmcb.submitSetValue(this);" onblur="dmcb.submitRemoveValue(this);"/>
 				</div>
-			
+
 			</div></div>
 		</fieldset>
 	</form>
-	
+
 	<div class="spacer">&nbsp;</div>
-	
+
 	<?php
 	if (sizeof($usermatches) > 0)
 	{
-		echo '<table><tr class="data"><td><h3>User results</h3></td><td>';
-		
+		echo '<table><tr><td><h3>User results</h3></td><td>';
+
 		if (sizeof($pagematches) > 5 && $search_type != "users")
 		{
 			echo '<form action="'.base_url().'search" method="post" id="searchform">';
 			if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';
 			echo '<input type="hidden" name="searchtext" value="'.set_value('searchtext').'" class="hidden" />
 				<a href="javascript:dmcb.searchsubmit(\'searchform\',\'users\');">Show more user results...</a>
-				</form>';		
+				</form>';
 		}
 		echo '</td></tr>';
 
@@ -81,18 +81,18 @@
 		}
 		echo '</table><br/>';
 	}
-	
+
 	if (sizeof($pagematches) > 0)
 	{
-		echo '<table><tr class="data"><td><h3>Page results</h3></td><td>';
-		
+		echo '<table><tr><td><h3>Page results</h3></td><td>';
+
 		if (sizeof($pagematches) > 5 && $search_type != "pages")
 		{
 			echo '<form action="'.base_url().'search" method="post" id="searchform">';
 			if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';
 			echo '<input type="hidden" name="searchtext" value="'.set_value('searchtext').'" class="hidden" />
 				<a href="javascript:dmcb.searchsubmit(\'searchform\',\'pages\');">Show more page results...</a>
-				</form>';		
+				</form>';
 		}
 		echo '</td></tr>';
 
@@ -116,18 +116,18 @@
 		}
 		echo '</table><br/>';
 	}
-	
+
 	if (sizeof($postmatches) > 0)
 	{
-		echo '<table><tr class="data"><td><h3>Post results</h3></td><td>';
-		
+		echo '<table><tr><td><h3>Post results</h3></td><td>';
+
 		if (sizeof($postmatches) > 5 && $search_type != "posts")
 		{
 			echo '<form action="'.base_url().'search" method="post" id="searchform">';
 			if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';
 			echo '<input type="hidden" name="searchtext" value="'.set_value('searchtext').'" class="hidden" />
 				<a href="javascript:dmcb.searchsubmit(\'searchform\',\'posts\');">Show more post results...</a>
-				</form>';		
+				</form>';
 		}
 		echo '</td></tr>';
 
@@ -142,18 +142,18 @@
 		}
 		echo '</table><br/>';
 	}
-	
+
 	if (sizeof($filematches) > 0)
 	{
-		echo '<table><tr class="data"><td><h3>File results</h3></td><td>';
-		
+		echo '<table><tr><td><h3>File results</h3></td><td>';
+
 		if (sizeof($filematches) > 5 && $search_type != "files")
 		{
 			echo '<form action="'.base_url().'search" method="post" id="searchform">';
 			if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';
 			echo '<input type="hidden" name="searchtext" value="'.set_value('searchtext').'" class="hidden" />
 				<a href="javascript:dmcb.searchsubmit(\'searchform\',\'files\');">Show more file results...</a>
-				</form>';		
+				</form>';
 		}
 		echo '</td></tr>';
 
@@ -168,13 +168,13 @@
 		}
 		echo '</table><br/>';
 	}
-	
+
 	if (isset($this->pagination))
 	{
 		echo $this->pagination->create_links();
 	}
-	
-	if (isset($search_message)) 
+
+	if (isset($search_message))
 	{
 		echo '<p>'.$search_message.'</p>';
 	}
