@@ -5,12 +5,12 @@
 			<div class="panel alwaysopen"><div>
 				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
 				<input type="hidden" name="buttonchoice" value="" class="hidden" />
-				
+
 				<div class="formnotes full">
 					<p>Restrict the page being viewed only by the user roles you choose.<br/>If none are selected, all users may view the page.</p>
 					<p>For pages that link externally and menu place holders, this setting only affects the visibility of the page within the menu.</p>
 				</div>
-				
+
 				<?php
 					$i=0;
 					foreach ($roles as $role)
@@ -23,20 +23,32 @@
 						{
 							echo '<div class="forminput"><label>&nbsp;</label>';
 						}
-						$default = FALSE; 
-						if (isset($item['protection'][$role['roleid']]) && $item['protection'][$role['roleid']] == 1) 
+						$default = FALSE;
+						if (isset($item['protection'][$role['roleid']]) && $item['protection'][$role['roleid']] == 1)
 						{
 							$default = TRUE;
 						}
-						echo '<input name="'.$role['rolefield'].'" id="'.$role['rolefield'].'" type="checkbox" class="checkbox" value="1" '.set_checkbox($role['rolefield'], '1', $default).'/>';
+						echo '<input name="'.$role['rolefield'].'" ';
+						if (isset($parentroles[$role['roleid']]))
+						{
+							echo 'disabled ';
+						}
+						echo 'id="'.$role['rolefield'].'" type="checkbox" class="checkbox" value="1" '.set_checkbox($role['rolefield'], '1', $default).'/> ';
 						echo $role['role'].'s';
 						echo '</div>';
 						$i++;
+
+						if (isset($parentroles[$role['roleid']]))
+						{
+							echo '<div class="forminput"><span class="error">(can\'t give access to this role, already denied by parent page)</span></div>';
+						}
 					}
 				?>
-				
-				<br />
-				
+
+				<div class="formnotes full">
+					<p>This will update the accessibility of this page and all its children.</p>
+				</div>
+
 				<div class="forminput">
 					<input type="submit" value="Save permissions" name="save" class="button" onclick="dmcb.submitSetValue(this);" onfocus="dmcb.submitSetValue(this);" onblur="dmcb.submitRemoveValue(this);"/>
 				</div>

@@ -13,11 +13,11 @@ class Manage_pages extends MY_Controller {
 	function Manage_pages()
 	{
 		parent::__construct();
-		
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 	}
-	
+
 	function _remap()
 	{
 		if ($this->acl->allow('site', 'manage_pages', TRUE) || $this->_access_denied())
@@ -41,7 +41,10 @@ class Manage_pages extends MY_Controller {
 						array_push($roles, $role);
 					}
 				}
-				
+
+				// Grab parent
+				$parent = instantiate_library('page', $object->page['pageof']);
+
 				if ($this->form_validation->run())
 				{
 					// Limit page to roles chosen
@@ -50,16 +53,48 @@ class Manage_pages extends MY_Controller {
 					{
 						if (set_value($role['rolefield']) == "1")
 						{
-							$protection[$role['roleid']] = 1;
+							// Access to children must be equal or MORE restrictive than access to parent
+							if (isset($parent->page['protected']) && $parent->page['protected'])
+							{
+								foreach ($parent->page['protection'] as $key => $value)
+								{
+									// Check if parent also limits access to that role
+									// If so, it's okay for child to limit access to that role
+									if ($key == $role['roleid'])
+									{
+										$protection[$role['roleid']] = 1;
+									}
+								}
+							}
+							else
+							{
+								$protection[$role['roleid']] = 1;
+							}
 						}
 					}
-					$object->new_page['protection'] = $protection;
-					$object->save();
+
+					// If child is attempting to not restrict access at all, and parent is restricted, don't allow it
+					if (sizeof($protection) || !isset($parent->page) || !$parent->page['protected'])
+					{
+						$object->new_page['protection'] = $protection;
+						$object->save();
+					}
 					redirect('manage_pages');
 				}
 				else
 				{
-					$this->_initialize_page('page_permissions', 'Edit permissions', array('item' => $object->page, 'roles' => $roles));
+					$parentroles = array();
+					if (isset($parent->page['protected']) && $parent->page['protected'])
+					{
+						foreach($roles as $role)
+						{
+							if (!isset($parent->page['protection'][$role['roleid']]))
+							{
+								$parentroles[$role['roleid']] = 1;
+							}
+						}
+					}
+					$this->_initialize_page('page_permissions', 'Edit permissions', array('item' => $object->page, 'roles' => $roles, 'parentroles' => $parentroles));
 				}
 			}
 			else if ($this->uri->segment(2) == "delete")
@@ -121,21 +156,21 @@ class Manage_pages extends MY_Controller {
 				{
 					$this->focus = "addpage";
 				}
-					
+
 				$this->form_validation->set_rules('pageof', 'appears under', 'xss_clean|strip_tags');
 				$this->form_validation->set_rules('nestedurl', 'nested url', 'xss_clean|strip_tags');
 				$this->form_validation->set_rules('title', 'title', 'xss_clean|strip_tags|trim|htmlentities|required|min_length[2]|max_length[50]');
 				$this->form_validation->set_rules('urlname', 'url name', 'xss_clean|strip_tags|trim|strtolower|min_length[2]|max_length[55]|callback_pageurlname_check');
 				$this->form_validation->set_rules('link', 'link', 'xss_clean|strip_tags|trim|max_length[150]|callback_link_check');
-			
+
 				if ($this->form_validation->run()) // Otherwise if a form was submitted we are adding a page
 				{
-					if (!is_numeric(set_value('pageof'))) 
+					if (!is_numeric(set_value('pageof')))
 					{
 						$menu = set_value('pageof');
 						$pageof = NULL;
 					}
-					else 
+					else
 					{
 						$menu = $this->pages_model->get_menu(set_value('pageof'));
 						$pageof = set_value('pageof');
@@ -145,7 +180,7 @@ class Manage_pages extends MY_Controller {
 					$this->new_page->new_page['pageof'] = $pageof;
 					$this->new_page->new_page['title'] = html_entity_decode(set_value('title'), ENT_QUOTES);
 					$result = $this->new_page->save();
-					
+
 					$new_page = instantiate_library('page', $result);
 					if (set_value('link') != "")
 					{
@@ -165,12 +200,12 @@ class Manage_pages extends MY_Controller {
 					}
 					redirect('manage_pages');
 				}
-				
+
 				$this->load->model('pages_model');
 				$data['menutypes'] = $this->pages_model->get_all_menus();
 				$data['menusections'] = array();
-				
-				foreach ($data['menutypes']->result_array() as $menutype) 
+
+				foreach ($data['menutypes']->result_array() as $menutype)
 				{
 					$this->load->helper('menu_helper');
 					$menu_pages = array();
@@ -178,27 +213,27 @@ class Manage_pages extends MY_Controller {
 
 					array_push($data['menusections'], $menu_pages);
 				}
-				
+
 				$this->load->model('acls_model');
 				$data['userroles'] = $this->acls_model->get_roles();
 				$this->_initialize_page('manage_pages', 'Manage pages', $data);
 			}
 		}
 	}
-	
+
 	function link_check($str)
 	{
 		if ($str == "")
 		{
 			return TRUE;
 		}
-	
+
 		if (substr($str, 0, 1) != '/' && substr($str, 0, 7) != 'http://' && substr($str, 0, 8) != 'https://')
 		{
 			$this->form_validation->set_message('link_check', "The link must start with a slash '/' for links to pages within the site, or http:// or https:// for links to external sites.");
-			return FALSE;		
+			return FALSE;
 		}
-		
+
 		if (substr($str, 0, 1) == '/') // Link points internally to site, let's check that where they are pointing to exists
 		{
 			$link = substr($str, 1); // Strip off leading slash
@@ -209,26 +244,26 @@ class Manage_pages extends MY_Controller {
 				!isset($post->post['postid']))
 			{
 				$this->form_validation->set_message('link_check', "Your internal link points to an invalid location. Ensure you have no trailing slash.");
-				return FALSE;	
+				return FALSE;
 			}
 		}
 		return TRUE;
 	}
-	
+
 	function pageurlname_check($str)
 	{
 		if ($str == "")
 		{
 			return TRUE;
 		}
-	
+
 		//Grab page methods to ensure page url can't be a page function
 		$page_controller = fopen(APPPATH.'/controllers/page.php', 'r');
 		$page_controller_contents = fread($page_controller, filesize(APPPATH.'/controllers/page.php'));
 		fclose($page_controller);
 		preg_match_all("/\s+function (\w*)\(.*\)/", $page_controller_contents, $functions);
 		$page_controller_methods = implode("|",$functions[1]);
-		
+
 		if (!preg_match('/^[a-z0-9-_]+$/i', $str))
 		{
 			$this->form_validation->set_message('pageurlname_check', "The url name must be made of only letters, numbers, dashes, and underscores.");
@@ -250,14 +285,14 @@ class Manage_pages extends MY_Controller {
 			return FALSE;
 		}
 		else
-		{	
+		{
 			// If a nested URL is chosen and a parent page is selected, add that URL name to the name we are testing
 			if (set_value('nestedurl') && is_numeric(set_value('pageof')))
 			{
 				$object = instantiate_library('page', set_value('pageof'));
 				$str = $object->page['urlname'].'/'.$str;
 			}
-			
+
 			// Check for name collisions and return suggested new name
 			$this->load->library('page_lib','','test_page');
 			$this->test_page->page['pageid'] = '0';
