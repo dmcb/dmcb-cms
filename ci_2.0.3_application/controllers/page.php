@@ -516,32 +516,54 @@ class Page extends MY_Controller {
 	{
 		if ($this->acl->allow('page', 'addpage', TRUE, 'page', $this->page->page['pageid']) || $this->_access_denied())
 		{
-			$this->form_validation->set_rules('pagetitle', 'title', 'xss_clean|strip_tags|trim|htmlentities|required|min_length[2]|max_length[50]');
-			$this->form_validation->set_rules('pageurlname', 'url name', 'xss_clean|strip_tags|trim|strtolower|min_length[2]|max_length[55]|callback_childpageurlname_check');
-			$this->form_validation->set_rules('nestedurl', 'nested url', 'xss_clean|strip_tags');
-
-			if ($this->form_validation->run())
+			if ($this->uri->segment($this->base_segment+2) == "publish")
 			{
-				$this->load->library('page_lib',NULL,'new_page');
-				$this->new_page->new_page['menu'] = $this->page->page['menu'];
-				$this->new_page->new_page['pageof'] = $this->page->page['pageid'];
-				$this->new_page->new_page['title'] = html_entity_decode(set_value('pagetitle'), ENT_QUOTES);
-				$result = $this->new_page->save();
+				$object = instantiate_library('page', $this->uri->segment($this->base_segment+3));
+				$object->new_page['published'] = 1;
+				$object->save();
+				redirect($this->page->new_page['urlname'].'/addpage');
 
-				$new_page = instantiate_library('page', $result);
-				$new_page->new_page['urlname'] = set_value('pageurlname');
-				// If a nested URL is chosen
-				if (set_value('nestedurl'))
-				{
-					$new_page->new_page['urlname'] = $this->page->page['urlname'].'/'.set_value('pageurlname');
-				}
-				$new_page->save();
-
+			}
+			else if ($this->uri->segment($this->base_segment+2) == "unpublish")
+			{
+				$object = instantiate_library('page', $this->uri->segment($this->base_segment+3));
+				$object->new_page['published'] = 0;
+				$object->save();
 				redirect($this->page->new_page['urlname'].'/addpage');
 			}
 			else
 			{
-				$this->index();
+				$this->form_validation->set_rules('pagetitle', 'title', 'xss_clean|strip_tags|trim|htmlentities|required|min_length[2]|max_length[50]');
+				$this->form_validation->set_rules('pageurlname', 'url name', 'xss_clean|strip_tags|trim|strtolower|min_length[2]|max_length[55]|callback_childpageurlname_check');
+				$this->form_validation->set_rules('nestedurl', 'nested url', 'xss_clean|strip_tags');
+
+				if ($this->form_validation->run())
+				{
+					$this->load->library('page_lib',NULL,'new_page');
+					$this->new_page->new_page['menu'] = $this->page->page['menu'];
+					$this->new_page->new_page['pageof'] = $this->page->page['pageid'];
+					$this->new_page->new_page['title'] = html_entity_decode(set_value('pagetitle'), ENT_QUOTES);
+					$result = $this->new_page->save();
+
+					$new_page = instantiate_library('page', $result);
+					$new_page->new_page['urlname'] = set_value('pageurlname');
+
+					// Give child same protection as parent
+					$new_page->new_page['protection'] = $this->page->page['protection'];
+
+					// If a nested URL is chosen
+					if (set_value('nestedurl'))
+					{
+						$new_page->new_page['urlname'] = $this->page->page['urlname'].'/'.set_value('pageurlname');
+					}
+					$new_page->save();
+
+					redirect($this->page->new_page['urlname'].'/addpage');
+				}
+				else
+				{
+					$this->index();
+				}
 			}
 		}
 	}

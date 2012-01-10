@@ -36,9 +36,9 @@ class Page_lib {
 			$this->new_page = $this->page;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize page
 	 *
@@ -52,7 +52,7 @@ class Page_lib {
 		if (isset($this->page['pageid']))
 		{
 			$this->page['protection'] = array();
-			
+
 			if ($this->page['link'] != NULL && substr($this->page['link'], 0, 1) == "/") // If the page is an internal link, let's check it out
 			{
 				$this->CI->load->helper('mapper');
@@ -66,7 +66,7 @@ class Page_lib {
 					$this->page['protection'][$protection['roleid']] = 1;
 				}
 			}
-			
+
 			// If the user was protected by roles that don't exist any more, remove protected status
 			if (!sizeof($this->page['protection']))
 			{
@@ -78,9 +78,9 @@ class Page_lib {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Delete
 	 *
@@ -88,53 +88,53 @@ class Page_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function delete()
 	{
 		$this->CI->load->model(array('files_model', 'posts_model', 'acls_model', 'blocks_model', 'templates_model'));
-		
+
 		// Remove child posts
 		$posts = $this->CI->posts_model->get_page_posts_all($this->page['pageid']);
-		foreach ($posts->result_array() as $post) 
+		foreach ($posts->result_array() as $post)
 		{
 			$object = instantiate_library('post', $post['postid']);
 			$object->delete();
 		}
-		
+
 		// Remove attached files
 		$files = $this->CI->files_model->get_attached("page",$this->page['pageid']);
-		foreach ($files->result_array() as $file) 
+		foreach ($files->result_array() as $file)
 		{
 			$object = instantiate_library('file', $file['fileid']);
 			$object->delete();
 		}
-		
+
 		// Remove attached blocks
 		$blocks = $this->CI->blocks_model->get_page_blocks($this->page['pageid']);
-		foreach ($blocks->result_array() as $block) 
+		foreach ($blocks->result_array() as $block)
 		{
 			$object = instantiate_library('block', $block['blockinstanceid']);
 			$object->delete();
 		}
-		
+
 		// Remove attached templates
 		$templates = $this->CI->templates_model->get_attached($this->page['pageid']);
-		foreach ($templates->result_array() as $template) 
+		foreach ($templates->result_array() as $template)
 		{
 			$object = instantiate_library('template', $template['templateid']);
 			$object->delete();
 		}
-		
+
 		// Remove ACLs and security
 		$this->CI->acls_model->delete(NULL, 'page', $this->page['pageid']);
 		$this->CI->pages_model->remove_protection($this->page['pageid']);
-		
+
 		// Finally remove page
 		$this->CI->pages_model->delete($this->page['pageid']);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize page tree
 	 *
@@ -142,7 +142,7 @@ class Page_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function initialize_page_tree()
 	{
 		if (isset($this->page['pageid']) && !isset($this->page_tree))
@@ -152,9 +152,9 @@ class Page_lib {
 			$this->page_tree = array_combine($this->page_tree, $this->page_tree);
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Save
 	 *
@@ -162,18 +162,18 @@ class Page_lib {
 	 *
 	 * @access	public
 	 * @return	int    new pageid from page creation
-	 */	
+	 */
 	function save()
 	{
 		$this->CI->load->helper('string');
 		$this->CI->load->model(array('files_model', 'posts_model'));
-		
+
 		// If the page has a name that's the same as an old placeholder, clear placeholder
 		if (isset($this->new_page['urlname']))
-		{		
+		{
 			// Ensure integrity of URL name
 			$this->new_page['urlname'] = to_urlname($this->new_page['urlname'], FALSE);
-			
+
 			$this->CI->load->model('placeholders_model');
 			$placeholder = $this->CI->placeholders_model->get('page', $this->new_page['urlname']);
 			if ($placeholder != NULL)
@@ -181,7 +181,7 @@ class Page_lib {
 				$this->CI->placeholders_model->delete('page', $this->new_page['urlname']);
 			}
 		}
-		
+
 		// Check if the page wasn't initialized from an existing one
 		if ($this->page == NULL) // If it wasn't, create a new page
 		{
@@ -197,7 +197,6 @@ class Page_lib {
 				// Remove protection and re-add it if there was a change
 				if (serialize($this->page['protection']) != serialize($this->new_page['protection']))
 				{
-				
 					$this->CI->pages_model->remove_protection($this->page['pageid']);
 					foreach ($this->new_page['protection'] as $key => $value)
 					{
@@ -213,21 +212,21 @@ class Page_lib {
 					}
 					$this->_initialize_page();
 				}
-			
+
 				$pages = $this->CI->pages_model->get_children(NULL, $this->page['pageid']);
-				foreach ($pages->result_array() as $page) 
+				foreach ($pages->result_array() as $page)
 				{
 					$object = instantiate_library('page', $page['pageid']);
-					if ($this->new_page['needsubscription'] != $this->page['needsubscription'])
+					if ($this->new_page['needsubscription'] != $object->page['needsubscription'])
 					{
 						$object->new_page['needsubscription'] = $this->new_page['needsubscription'];
 					}
 					// If protection changes
-					if (serialize($this->page['protection']) != serialize($this->new_page['protection']))
+					if (serialize($this->page['protection']) != serialize($object->new_page['protection']))
 					{
 						$object->new_page['protection'] = $this->new_page['protection'];
 					}
-						if ($this->new_page['published'] != $this->page['published'])
+					if ($this->new_page['published'] != $object->page['published'])
 					{
 						$object->new_page['published'] = $this->new_page['published'];
 					}
@@ -237,14 +236,14 @@ class Page_lib {
 				foreach ($posts->result_array() as $post)
 				{
 					$files = $this->CI->files_model->get_attached("post",$post['postid']);
-					foreach ($files->result_array() as $file) 
+					foreach ($files->result_array() as $file)
 					{
 						$object = instantiate_library('file', $file['fileid']);
 						$object->manage();
 					}
 				}
 				$files = $this->CI->files_model->get_attached("page",$this->page['pageid']);
-				foreach ($files->result_array() as $file) 
+				foreach ($files->result_array() as $file)
 				{
 					$object = instantiate_library('file', $file['fileid']);
 					$object->manage();
@@ -280,26 +279,26 @@ class Page_lib {
 			if ($this->new_page['menu'] != $this->page['menu'])
 			{
 				$pages = $this->CI->pages_model->get_children(NULL, $this->page['pageid']);
-				foreach ($pages->result_array() as $page) 
+				foreach ($pages->result_array() as $page)
 				{
 					$object = instantiate_library('page', $page['pageid']);
 					$object->new_page['menu'] = $this->new_page['menu'];
 					$object->save();
-				}		
+				}
 			}
 			// If the page url name changes
 			if ($this->new_page['urlname'] != $this->page['urlname'])
 			{
 				// Ensure new url name doesn't collide with old one
 				$this->new_page['urlname'] = $this->suggest();
-				
+
 				// Add placeholder for URL name change if published
 				if ($this->new_page['published'] == 1)
 				{
 					$this->CI->load->model('placeholders_model');
 					$this->CI->placeholders_model->add("page", $this->page['urlname'], $this->new_page['urlname']);
 				}
-				
+
 				// Change the URL names of any nested URL pages
 				$nested_pages = $this->CI->pages_model->get_nested_pages($this->page['urlname']);
 				foreach ($nested_pages->result_array() as $nested_page)
@@ -308,7 +307,7 @@ class Page_lib {
 					$object->new_page['urlname'] = str_replace($this->page['urlname'], $this->new_page['urlname'], $object->new_page['urlname']);
 					$object->save();
 				}
-				
+
 				// Change the URL names of any child posts should their names be based off this page's URL
 				if ($this->new_page['pagepostname'])
 				{
@@ -320,11 +319,11 @@ class Page_lib {
 						$object->save();
 					}
 				}
-				
+
 				// Rename corresponding files folder
 				$this->CI->files_model->rename_folder("page", str_replace('/', '+', $this->page['urlname']), str_replace('/', '+', $this->new_page['urlname']));
 				$this->new_page['content'] = str_replace("/file/page/".$this->page['urlname']."/", "/file/page/".$this->new_page['urlname']."/", $this->new_page['content']);
-			
+
 				// Update any blocks that refer to this page's name
 				$this->CI->load->model('blocks_model');
 				$blockinstances = $this->CI->blocks_model->get_variable_blocks('page', $this->page['urlname']);
@@ -334,7 +333,7 @@ class Page_lib {
 					$object->new_block['values']['page'] = $this->new_page['urlname'];
 					$object->save();
 				}
-				
+
 				// Update any internal link pages that refer to this page
 				$object = instantiate_library('page', '/'.$this->page['urlname'], 'link');
 				if (isset($object->page['pageid']))
@@ -347,9 +346,9 @@ class Page_lib {
 			$this->page = $this->new_page;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Suggest
 	 *
@@ -358,14 +357,14 @@ class Page_lib {
 	 * @access	public
 	 * @param   string proposed_name
 	 * @return	string urlname that is available
-	 */	
+	 */
 	function suggest($proposed_name = NULL)
 	{
 		if ($proposed_name == NULL)
 		{
 			$proposed_name = $this->new_page['urlname'];
 		}
-		
+
 		$suggestion = $proposed_name;
 		$i=1;
 		$object = instantiate_library('page', $proposed_name, 'urlname');
