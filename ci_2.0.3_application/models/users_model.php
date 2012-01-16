@@ -33,7 +33,7 @@ class Users_model extends CI_Model {
 
 	function autocomplete($value)
 	{
-		return $this->db->query("SELECT displayname FROM users WHERE displayname LIKE '".$this->db->escape_like_str($value)."%' ORDER BY displayname DESC");
+		return $this->db->query("SELECT displayname FROM users WHERE displayname REGEXP '[[:<:]]".$this->db->escape_like_str($value)."' ORDER BY displayname ASC");
 	}
 
 	function delete($userid)

@@ -275,7 +275,7 @@ class File extends MY_Controller {
 					header("Expires: ".gmdate("D, d M Y H:i:s", time() + 3600)." GMT");
 
 					// Resize if an image
-					if (isset($info[0]))
+					if (isset($info[0]) && substr(strrchr($info['mime'], '/'), 1) != "bmp")
 					{
 						if (isset($downloadwidth) && isset($downloadheight))
 						{
@@ -362,19 +362,9 @@ class File extends MY_Controller {
 
 		switch ($type)
 		{
-			case 'jpeg':
-			$image_create_func = 'ImageCreateFromJPEG';
-			$image_save_func = 'ImageJPEG';
-			break;
-
 			case 'png':
 			$image_create_func = 'ImageCreateFromPNG';
 			$image_save_func = 'ImagePNG';
-			break;
-
-			case 'bmp':
-			$image_create_func = 'ImageCreateFromBMP';
-			$image_save_func = 'ImageBMP';
 			break;
 
 			case 'gif':
