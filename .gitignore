@@ -9,8 +9,9 @@ ci_*_application/config/database.php
 ci_*_application/logs/*
 !ci_*_application/logs/index.html
 ci_*_application/views/*/
-includes/
 files/*/*
 files_managed/*/*
+includes/*
+!includes/tinymce/
 /robots.txt
 /favicon.*
