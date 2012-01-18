@@ -12,6 +12,10 @@ ci_*_application/views/*/
 files/*/*
 files_managed/*/*
 includes/*
+!includes/calendardateselect/
+!includes/lightbox/
+!includes/prototype/
+!includes/scriptaculous/
 !includes/tinymce/
 /robots.txt
 /favicon.*
