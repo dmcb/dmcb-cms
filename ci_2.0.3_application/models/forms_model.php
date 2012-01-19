@@ -23,7 +23,7 @@ class Forms_model extends CI_Model {
 
 	function get_recent($email)
 	{
-		$query = $this->db->query("SELECT * FROM forms WHERE DATE_SUB(CURDATE(),INTERVAL 1 MINUTE) <= date AND email = ".$this->db->escape($email)." ORDER BY date DESC LIMIT 1");
+		$query = $this->db->query("SELECT form FROM forms WHERE date > now() - INTERVAL 1 MINUTE AND email = ".$this->db->escape($email)." LIMIT 1");
 		if ($query->num_rows() == 0)
 		{
 			return NULL;

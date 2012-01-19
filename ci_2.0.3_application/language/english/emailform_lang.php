@@ -2,7 +2,8 @@
 
 $lang['submission'] = 'A submission form was sent from %s.';
 $lang['submission_received'] = '%s received.';
-$lang['submission_sent'] = 'Your %1$s has been sent, you will receive a confirmation of your submission. We will respond as quickly as we can, thanks for getting in touch with %2$s.';
+$lang['submission_sent'] = 'Your %1$s has been sent. We will respond as quickly as we can, thank you for getting in touch with %2$s.';
+$lang['submission_sent_confirmation'] = 'Your %1$s has been sent, you will receive a confirmation of your submission. We will respond as quickly as we can, thank you for getting in touch with %2$s.';
 $lang['submission_sent_header'] = 'Submission sent';
 $lang['submission_sent_subject'] = 'Thanks!';
 
