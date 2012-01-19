@@ -8,7 +8,7 @@ ci_*_application/config/config.php
 ci_*_application/config/database.php
 ci_*_application/logs/*
 !ci_*_application/logs/index.html
-ci_*_application/site_specific_language/*
+ci_*_application/site_specific_language/*/
 ci_*_application/views/*/
 files/*/*
 files_managed/*/*
