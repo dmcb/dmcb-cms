@@ -185,7 +185,7 @@ if ( ! function_exists('generate_menu_html'))
 				$title = str_replace("%n", $CI->session->userdata('displayname'), $CI->config->item('dmcb_signoff_text'));
 				if ($CI->session->userdata('facebook')) // Add facebook icon to sign off menu item should you be logged on via facebook
 				{
-					$title = '<img src="'.base_url().'includes/images/facebook_connect_icon.png"/> '.$title;
+					$title = '<img src="'.base_url().'includes/images/facebook_connect_icon.png" alt="Facebook" /> '.$title;
 				}
 				$menu_html .= $CI->load->view($view, array('title' => $title, 'link' => base_url().'signoff', 'selected' => FALSE, 'children_html' => NULL, 'level' => $level), TRUE);
 			}
@@ -200,7 +200,7 @@ if ( ! function_exists('generate_menu_html'))
 					$title = $CI->config->item('dmcb_signon_text');
 					if ($CI->config->item('dmcb_signon_facebook') == "true") // Add facebook icon if facebook sign ons are supported
 					{
-						$title = '<img src="'.base_url().'includes/images/facebook_connect_icon.png"/> '.$title;
+						$title = '<img src="'.base_url().'includes/images/facebook_connect_icon.png" alt="Facebook" /> '.$title;
 					}
 					$menu_html .= $CI->load->view($view, array('title' => $title, 'link' => base_url().'signon', 'selected' => FALSE, 'children_html' => NULL, 'level' => $level), TRUE);
 				}
