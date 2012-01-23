@@ -12,7 +12,7 @@
  *              attribution.
  * @link		http://dmcbdesign.com
  */
- 
+
 // ------------------------------------------------------------------------
 
 /**
@@ -29,9 +29,9 @@ if ( ! function_exists('generate_profile_picture'))
 	function generate_profile_picture($size, $user, $display_name = NULL, $email = NULL)
 	{
 		$CI =& get_instance();
-		
+
 		$default_image = base_url().'includes/images/avatar.png';
-		
+
 		$square = FALSE;
 		if (!is_int($size) && !ctype_digit($size))
 		{
@@ -52,8 +52,8 @@ if ( ! function_exists('generate_profile_picture'))
 					$square = TRUE;
 				}
 			}
-		}		
-		
+		}
+
 		if ($user == NULL)
 		{
 			$result = '<img src="http://www.gravatar.com/avatar/'.md5($email).'?s='.$size.'&amp;d='.$default_image.'" alt="'.$display_name.'" class="avatar" />';
@@ -64,10 +64,14 @@ if ( ! function_exists('generate_profile_picture'))
 		}
 		else
 		{
-			$result = '<img src="'.$CI->config->slash_item('base_url').$user['avatar'].'/'.$size;
+			$result = '<img src="'.$CI->config->slash_item('base_url');
 			if ($square)
 			{
-				$result .= '/'.$size;
+				$result .= size_image($user['avatar'], $size, $size);
+			}
+			else
+			{
+				$result .= size_image($user['avatar'], $size);
 			}
 			$result .= '" alt="'.$user['displayname'].'" class="avatar" />';
 		}
@@ -76,10 +80,45 @@ if ( ! function_exists('generate_profile_picture'))
 		{
 			$result = '<a href="'.$CI->config->slash_item('base_url').'profile/'.$user['urlname'].'">'.$result.'</a>';
 		}
-		
+
 		return $result;
 	}
 }
+
+// ------------------------------------------------------------------------
+
+/**
+ * Size image
+ *
+ * Returns an image url path with sizing information
+ *
+ * @access      public
+ * @param       string
+ * @param       int
+ * @param       int
+ * @return      string   image URL
+ */
+ if ( ! function_exists('size_image'))
+ {
+ 	function size_image($urlpath, $width = NULL, $height = NULL)
+ 	{
+ 		$filepieces = explode(".",$urlpath);
+ 		if (sizeof($filepieces) > 1)
+ 		{
+			$downloadfilename = $filepieces[0];
+			$downloadextension = $filepieces[sizeof($filepieces)-1];
+
+			$urlpath = $downloadfilename.".".$width;
+			if (isset($height))
+			{
+				$urlpath .= ".".$height;
+			}
+			$urlpath .= ".".$downloadextension;
+ 		}
+
+		return $urlpath;
+ 	}
+ }
 
 // ------------------------------------------------------------------------
 
@@ -92,7 +131,7 @@ if ( ! function_exists('generate_profile_picture'))
  * @param	string
  * @return	string   image URL
  */
- if ( ! function_exists('stock_image'))
+if ( ! function_exists('stock_image'))
 {
 	function stock_image($id)
 	{
@@ -100,7 +139,7 @@ if ( ! function_exists('generate_profile_picture'))
 		$CI->load->model('files_model');
 		$stockimages = $CI->files_model->get_stockimages();
 		$count = $stockimages->num_rows();
-		
+
 		if ($count == 0)
 		{
 			return NULL;
@@ -114,4 +153,3 @@ if ( ! function_exists('generate_profile_picture'))
 		}
 	}
 }
- 
