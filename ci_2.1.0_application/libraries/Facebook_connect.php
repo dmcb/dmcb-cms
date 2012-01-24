@@ -78,8 +78,10 @@ class Facebook_connect
 							$this->CI->new_user->new_user['userid'] = 0;
 							$this->CI->new_user->new_user['email'] = $this->me['email'];
 							$this->CI->new_user->new_user['displayname'] = $this->me['name'];
+							$this->CI->new_user->new_user['facebook_uid'] = $this->uid; // Pass Facebook UID along so user knows it was created via Facebook
 							$result = $this->CI->new_user->save();
 
+							// Now actually set Facebook UID and remove activation code
 							$this->CI->new_user	= instantiate_library('user', $result['userid']);
 							$this->CI->new_user->new_user['facebook_uid'] = $this->uid;
 							$this->CI->new_user->new_user['code'] = "";
