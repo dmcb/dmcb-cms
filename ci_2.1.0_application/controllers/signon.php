@@ -13,11 +13,11 @@ class Signon extends MY_Controller {
 	function Signon()
 	{
 		parent::__construct();
-		
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 	}
-	
+
 	function _remap()
 	{
 		// Determine redirection in URL
@@ -31,7 +31,7 @@ class Signon extends MY_Controller {
 				$i++;
 			}
 		}
-	
+
 		// If Facebook connect is enabled, load it up
 		if ($this->config->item('dmcb_signon_facebook') == "true")
 		{
@@ -42,7 +42,7 @@ class Signon extends MY_Controller {
 			$data['loginUrl'] = $this->facebook_connect->loginUrl;
 			$data['logoutUrl'] = $this->facebook_connect->logoutUrl;
 		}
-		
+
 		// If the user is already signed on, send them on their way
 		if ($this->session->userdata('signedon'))
 		{
@@ -75,7 +75,7 @@ class Signon extends MY_Controller {
 			$this->form_validation->set_rules('password', 'password', 'xss_clean|trim|required|callback_login_check|md5');
 			$this->form_validation->set_rules('rememberme', 'rememberme', 'xss_clean|strip_tags');
 		}
-		
+
 		if ($this->form_validation->run())
 		{
 			if ($this->uri->segment(2) == "signup" && $this->config->item('dmcb_guest_signup')) // Creating a new account
@@ -85,7 +85,7 @@ class Signon extends MY_Controller {
 				$this->new_user->new_user['displayname'] = set_value('signup_display');
 				$this->new_user->new_user['password'] = set_value('signup_password');
 				$result = $this->new_user->save();
-				
+
 				$this->_message("Sign up", $result['message'], $result['subject']);
 			}
 			else if ($this->uri->segment(2) == "recover") // Recovering password
@@ -101,19 +101,19 @@ class Signon extends MY_Controller {
 				{
 					$data['subject'] = "Success!";
 					$data['message'] = "You have successfully reset your password at ".$this->config->item('dmcb_friendly_server').".  Please check your inbox for your new password.";
-				}	
-				else {	
+				}
+				else {
 					$data['subject'] = "Error";
 					$data['message'] = "Password reset failed, please contact support at <a href=\"mailto:support@".$this->config->item('dmcb_server')."\">support@".$this->config->item('dmcb_server')."</a>.";
-				}	
+				}
 				$this->_message("Recover", $data['message'], $data['subject']);
 			}
 			else // Otherwise we are doing a regular sign on
-			{	
+			{
 				$object = instantiate_library('user', set_value('email'), 'email');
 				$object->new_user['lastsignon'] = date('Y-m-d H:i:s');
 				$object->save();
-				
+
 				$session = array(
 					'userid' => $object->user['userid'],
 					'displayname' => $object->user['displayname'],
@@ -121,14 +121,14 @@ class Signon extends MY_Controller {
 					'rememberme' => set_value('rememberme'),
 					'signedon' => TRUE
 				);
-				$this->session->set_userdata($session);	
+				$this->session->set_userdata($session);
 
-				if ($data['redirection'] == NULL) 
+				if ($data['redirection'] == NULL)
 				{
 					redirect($this->config->item('dmcb_default_signedon_location'));
 				}
-				else 
-				{	
+				else
+				{
 					redirect($data['redirection']);
 				}
 			}
@@ -159,7 +159,7 @@ class Signon extends MY_Controller {
 			return FALSE;
 		}
 	}
-	
+
 	function recover_check($str)
 	{
 		$object = instantiate_library('user', $str, 'email');
@@ -173,7 +173,7 @@ class Signon extends MY_Controller {
 			return FALSE;
 		}
 	}
-	
+
 	function email_check($str)
 	{
 		$checkuser = instantiate_library('user', $str, 'email');
@@ -187,7 +187,7 @@ class Signon extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function code_check($str)
 	{
 		$object = instantiate_library('user', $str, 'email');
@@ -205,7 +205,7 @@ class Signon extends MY_Controller {
 			return FALSE;
 		}
 	}
-	
+
 	function banned_check($str)
 	{
 		$this->form_validation->set_message('banned_check', "Your account has been banned.  Contact support@".$this->config->item('dmcb_server')." to be reinstated.");

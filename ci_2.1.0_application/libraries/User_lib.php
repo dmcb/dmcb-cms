@@ -36,9 +36,9 @@ class User_lib {
 			$this->_initialize_info();
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize info
 	 *
@@ -60,22 +60,22 @@ class User_lib {
 			$this->user['enabledprofile'] = FALSE;
 			$this->new_user['enabledprofile'] = FALSE;
 		}
-		
+
 		$this->CI->load->model('files_model');
 		$this->user['avatar'] = NULL;
 		if (isset($this->user['profilepicture'])) // Grab avatar if one exists
 		{
 			// We are not instantiating file library because it will create an infinite loop as it tries to instantiate this user to generate file path
-			$object = $this->CI->files_model->get($this->user['profilepicture']); 
+			$object = $this->CI->files_model->get($this->user['profilepicture']);
 			if (isset($object['fileid']))
 			{
 				$this->user['avatar'] = 'file/user/'.$this->user['urlname'].'/'.$object['filename'].'.'.$object['extension'];
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Add blocked user
 	 *
@@ -84,7 +84,7 @@ class User_lib {
 	 * @access	public
 	 * @param   string  displayname
 	 * @return	void
-	 */	
+	 */
 	function add_blocked_user($displayname)
 	{
 		$object = instantiate_library('user', $displayname, 'displayname');
@@ -93,9 +93,9 @@ class User_lib {
 			$this->CI->users_model->add_blocked_user($this->user['userid'], $object->user['userid']);
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Add rss
 	 *
@@ -104,7 +104,7 @@ class User_lib {
 	 * @access	public
 	 * @param   string  rssfeed
 	 * @return	bool
-	 */	
+	 */
 	function add_rss($rssfeed)
 	{
 		if ($rssfeed != "")
@@ -114,7 +114,7 @@ class User_lib {
 	}
 
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Check unlocked
 	 *
@@ -122,7 +122,7 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	bool
-	 */	
+	 */
 	function check_activated()
 	{
 		if (!isset($this->user['code']) || $this->user['code'] == '')
@@ -131,9 +131,9 @@ class User_lib {
 		}
 		return FALSE;
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Check ban
 	 *
@@ -141,7 +141,7 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	bool
-	 */	
+	 */
 	function check_banned()
 	{
 		if (!isset($this->user['statusid']) || $this->user['statusid'] != $this->CI->users_model->get_status_lowest())
@@ -150,9 +150,9 @@ class User_lib {
 		}
 		return TRUE;
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Delete
 	 *
@@ -160,12 +160,12 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function delete()
 	{
 		$this->CI->load->model(array('files_model', 'acls_model'));
 		$files = $this->CI->files_model->get_attached("user",$this->user['userid']);
-		foreach ($files->result_array() as $file) 
+		foreach ($files->result_array() as $file)
 		{
 			$object = instantiate_library('file', $file['fileid']);
 			$object->delete();
@@ -173,9 +173,9 @@ class User_lib {
 		$this->CI->acls_model->delete($this->user['userid']);
 		$this->CI->users_model->delete($this->user['userid']);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Get blocked users
 	 *
@@ -183,14 +183,14 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function get_blocked_users()
 	{
 		return $this->CI->users_model->get_user_blocked_users($this->user['userid']);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Get posts
 	 *
@@ -198,15 +198,15 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function get_posts($num, $offsets)
 	{
 		$this->CI->load->model('posts_model');
 		return $this->CI->posts_model->get_user_posts($this->user['userid'], $num, $offset);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Get post count
 	 *
@@ -214,15 +214,15 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function get_posts_count()
 	{
 		$this->CI->load->model('posts_model');
 		return $this->CI->posts_model->get_user_posts_count($this->user['userid']);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Get rss
 	 *
@@ -230,14 +230,14 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function get_rss()
 	{
 		return $this->CI->users_model->get_user_rss($this->user['userid']);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Remove blocked users
 	 *
@@ -245,14 +245,14 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function remove_blocked_users()
 	{
 		$this->CI->users_model->remove_blocked_users($this->user['userid']);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Remove rss
 	 *
@@ -260,14 +260,14 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function remove_rss()
 	{
 		$this->CI->users_model->remove_rss($this->user['userid']);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Save
 	 *
@@ -275,16 +275,16 @@ class User_lib {
 	 *
 	 * @access	public
 	 * @return	array   information from user creation
-	 */	
+	 */
 	function save()
 	{
 		$this->CI->load->helper('string');
 		$result = array();
-		
+
 		$this->new_user['displayname'] = reduce_spacing($this->new_user['displayname']);
 		$this->new_user['displayname'] = $this->suggest();
 		$this->new_user['urlname'] = to_urlname($this->new_user['displayname']);
-		
+
 		// If the user has a name that's the same as an old placeholder, clear placeholder
 		$this->CI->load->model('placeholders_model');
 		$placeholder = $this->CI->placeholders_model->get('user', $this->new_user['urlname']);
@@ -292,7 +292,7 @@ class User_lib {
 		{
 			$this->CI->placeholders_model->delete('user', $this->new_user['urlname']);
 		}
-		
+
 		// Check if the user wasn't initialized from an existing one
 		if ($this->user == NULL) // If it wasn't, create a new user
 		{
@@ -313,7 +313,7 @@ class User_lib {
 				{
 					$this->new_user['code'] = "";
 				}
-				
+
 				$this->new_user['userid'] = $this->CI->users_model->add($this->new_user['email'], $this->new_user['displayname'], $this->new_user['urlname'], $this->new_user['password'], $this->new_user['code']);
 				$result['userid'] = $this->new_user['userid'];
 				$this->user = $this->new_user;
@@ -327,56 +327,60 @@ class User_lib {
 				{
 					$this->CI->acl->set($this->user['userid'], $this->new_user['roleid']);
 				}
-				
+
 				// Send activation emails
+				$this->CI->lang->load('user', 'english', FALSE, TRUE, APPPATH.'site_specific_');
+
 				if ($this->new_user['code'] == "") // User was created by an administrator
 				{
-					$message = "An administrator has created an account for you at ".$this->CI->config->item('dmcb_friendly_server').".\n".
-						"Your account email address is ".$this->new_user['email']." and your password is: ".$result['password']."\n\n".
-						"Please sign on and change your password immediately at ".base_url()."account/changepassword.";
-					
+					$message = sprintf($this->CI->lang->line('user_created_by_administrator_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
+						sprintf($this->CI->lang->line('user_created_by_administrator_email_2'), $this->new_user['email'], $result['password'])."\n\n".
+						sprintf($this->CI->lang->line('user_created_by_administrator_email_3'), base_url().'account/changepassword');
+
 					$this->CI->load->model('subscriptions_model');
 					if ($this->CI->acl->enabled('site', 'subscribe') && $this->CI->config->item('dmcb_post_subscriptions_trial_duration') > "0" && $this->new_user['roleid'] == 4)
 					{
 						$typeid = $this->CI->subscriptions_model->get_type_free();
 						$this->CI->subscriptions_model->set($result['userid'], date("Ymd",mktime(0,0,0,date("m"),date("d")+$this->CI->config->item('dmcb_post_subscriptions_trial_duration'),date("Y"))),$typeid);
-						$message .= "\n\nYour free ".$this->CI->config->item('dmcb_post_subscriptions_trial_duration')." day trial subscription starts now.\n";
+						$message .= "\n\n".sprintf($this->CI->lang->line('user_subscription_trial_start'), $this->CI->config->item('dmcb_post_subscriptions_trial_duration'))."\n";
 					}
-					
+
 					$this->CI->load->model('notifications_model');
 					if ($this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message))
 					{
-						$result['subject'] = "Success!";
-						$result['message'] = 'You have successfully added '.$this->new_user['displayname'].' to '.$this->CI->config->item('dmcb_friendly_server').'.  They have been sent an email containing their account information. Click <a href="'.base_url().'manage_users">here</a> to return to editing.';
-					}	
-					else {	
-						$result['subject'] = "Error";
-						$result['message'] = "The account was created but an email could not be sent for the new user, please contact support at <a href=\"mailto:support@".$this->CI->config->item('dmcb_server')."\">support@".$this->CI->config->item('dmcb_server')."</a>.";
+						$result['subject'] = $this->CI->lang->line('activation_sent_admin_subject');
+						$result['message'] = sprintf($this->CI->lang->line('activation_sent_admin'), $this->new_user['displayname'], $this->CI->config->item('dmcb_friendly_server')).' <a href="'.base_url().'manage_users">Return to editing</a>.';
+					}
+					else
+					{
+						$result['subject'] = $this->CI->lang->line('error_activation_failed_admin_subject');
+						$result['message'] = sprintf($this->CI->lang->line('error_activation_failed_admin'), "<a href=\"mailto:support@".$this->CI->config->item('dmcb_server')."\">support@".$this->CI->config->item('dmcb_server')."</a>");
 					}
 				}
 				else if (isset($this->new_user['facebook_uid'])) // User self-registered through Facebook
-				{						
-					$message = "You have created an account via Facebook at ".$this->CI->config->item('dmcb_friendly_server').".  ".
-						"Your account email address is ".$this->new_user['email']." and your temporary password (in the event you choose not to sign on via Facebook) is ".$result['password'].
-						".  Please sign on and change your password immediately at ".base_url()."account/changepassword.";
-						
+				{
+					$message = sprintf($this->CI->lang->line('user_created_by_facebook_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
+						sprintf($this->CI->lang->line('user_created_by_facebook_email_2'), $this->new_user['email'], $result['password'])."\n\n".
+						sprintf($this->CI->lang->line('user_created_by_facebook_email_3'), base_url()."account/changepassword.");
+
 					$this->CI->load->model('notifications_model');
 					$this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message);
 				}
 				else // User self-registered
 				{
-					$message = "You have created an account at ".$this->CI->config->item('dmcb_friendly_server').".\n\n".
-						"There's just one more step before you can sign on and get going, you must activate your account by going to to the following url:\n".
+					$message = sprintf($this->CI->lang->line('user_created_by_self_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
+						$this->CI->lang->line('user_created_by_self_email_2')."\n".
 						base_url()."activate/".$result['userid']."/".$result['code'];
-						
+
 					$this->CI->load->model('notifications_model');
-					if ($this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message)) {
-						$result['subject'] = "Success!";
-						$result['message'] = "You have successfully registered your account at ".$this->CI->config->item('dmcb_friendly_server').".  Please check your inbox for your account activation email.";
+					if ($this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message))
+					{
+						$result['subject'] = $this->CI->lang->line('activation_sent_self_subject');
+						$result['message'] = sprintf($this->CI->lang->line('activation_sent_self'), $this->CI->config->item('dmcb_friendly_server'));
 					}
-					else {	
-						$result['subject'] = "Error";
-						$result['message'] = "You have successfully registered your account at ".$this->CI->config->item('dmcb_friendly_server').".  However, an activation email was unable to be sent, please contact support at <a href=\"mailto:support@".$this->CI->config->item('dmcb_server')."\">support@".$this->CI->config->item('dmcb_server')."</a>.";
+					else {
+						$result['subject'] = $this->CI->lang->line('error_activation_failed_self_subject');
+						$result['message'] = sprintf($this->CI->lang->line('error_activation_failed_self'), $this->CI->config->item('dmcb_friendly_server'), "<a href=\"mailto:support@".$this->CI->config->item('dmcb_server')."\">support@".$this->CI->config->item('dmcb_server')."</a>");
 					}
 				}
 			}
@@ -397,11 +401,11 @@ class User_lib {
 				// Add placeholder for URL name change
 				$this->CI->load->model('placeholders_model');
 				$this->CI->placeholders_model->add("user", $this->user['urlname'], $this->new_user['urlname']);
-				
+
 				// Rename corresponding files folder
 				$this->CI->load->model('files_model');
 				$this->CI->files_model->rename_folder("user", $this->user['urlname'], $this->new_user['urlname']);
-				
+
 				// Update any blocks that refer to this user's name
 				$this->CI->load->model('blocks_model');
 				$blockinstances = $this->CI->blocks_model->get_variable_blocks('user', $this->user['urlname']);
@@ -415,12 +419,12 @@ class User_lib {
 			$this->CI->users_model->update($this->user['userid'], $this->new_user);
 			$this->user = $this->new_user;
 		}
-		
+
 		return $result;
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Suggest
 	 *
@@ -429,18 +433,18 @@ class User_lib {
 	 * @access	public
 	 * @param   string proposed_name
 	 * @return	string display name that is available
-	 */	
+	 */
 	function suggest($proposed_name = NULL)
 	{
 		if ($proposed_name == NULL)
 		{
 			$proposed_name = $this->new_user['displayname'];
 		}
-		
+
 		$suggestion = $proposed_name;
 		$i=1;
 		$object = instantiate_library('user', $proposed_name, 'displayname');
-		
+
 		// If this isn't a new user, make sure we allow the name if it's the name of the user we are editing
 		if (isset($this->user['userid']))
 		{
@@ -458,7 +462,7 @@ class User_lib {
 				$i++;
 				$suggestion = $proposed_name.'-'.$i;
 				$object = instantiate_library('user', $suggestion, 'displayname');
-			}		
+			}
 		}
 		return $suggestion;
 	}
