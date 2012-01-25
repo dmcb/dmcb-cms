@@ -39,4 +39,10 @@ class Wall extends MY_Controller {
 
 		$this->_initialize_page('wall', 'Wall', $data);
 	}
+
+	function content_check()
+	{
+		$this->form_validation->set_message('content_check', "You have already posted today, please try again tomorrow.");
+		return !$this->walls_model->check($_SERVER['REMOTE_ADDR']);
+	}
 }
