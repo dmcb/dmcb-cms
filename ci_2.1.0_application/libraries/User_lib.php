@@ -330,6 +330,7 @@ class User_lib {
 
 				// Send activation emails
 				$this->CI->lang->load('user', 'english', FALSE, TRUE, APPPATH.'site_specific_');
+				$this->CI->load->model('notifications_model');
 
 				if ($this->new_user['code'] == "") // User was created by an administrator
 				{
@@ -345,7 +346,6 @@ class User_lib {
 						$message .= "\n\n".sprintf($this->CI->lang->line('user_subscription_trial_start'), $this->CI->config->item('dmcb_post_subscriptions_trial_duration'))."\n";
 					}
 
-					$this->CI->load->model('notifications_model');
 					if ($this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message))
 					{
 						$result['subject'] = $this->CI->lang->line('activation_sent_admin_subject');
@@ -357,30 +357,38 @@ class User_lib {
 						$result['message'] = sprintf($this->CI->lang->line('error_activation_failed_admin'), "<a href=\"mailto:support@".$this->CI->config->item('dmcb_server')."\">support@".$this->CI->config->item('dmcb_server')."</a>");
 					}
 				}
-				else if (isset($this->new_user['facebook_uid'])) // User self-registered through Facebook
+				else // User self registered
 				{
-					$message = sprintf($this->CI->lang->line('user_created_by_facebook_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
-						sprintf($this->CI->lang->line('user_created_by_facebook_email_2'), $this->new_user['email'], $result['password'])."\n\n".
-						sprintf($this->CI->lang->line('user_created_by_facebook_email_3'), base_url()."account/changepassword.");
-
-					$this->CI->load->model('notifications_model');
-					$this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message);
-				}
-				else // User self-registered
-				{
-					$message = sprintf($this->CI->lang->line('user_created_by_self_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
-						$this->CI->lang->line('user_created_by_self_email_2')."\n".
-						base_url()."activate/".$result['userid']."/".$result['code'];
-
-					$this->CI->load->model('notifications_model');
-					if ($this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message))
+					if (isset($this->new_user['facebook_uid'])) // User self-registered through Facebook
 					{
-						$result['subject'] = $this->CI->lang->line('activation_sent_self_subject');
-						$result['message'] = sprintf($this->CI->lang->line('activation_sent_self'), $this->CI->config->item('dmcb_friendly_server'));
+						$message = sprintf($this->CI->lang->line('user_created_by_facebook_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
+							sprintf($this->CI->lang->line('user_created_by_facebook_email_2'), $this->new_user['email'], $result['password'])."\n\n".
+							sprintf($this->CI->lang->line('user_created_by_facebook_email_3'), base_url()."account/changepassword.");
+
+						$this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message);
 					}
-					else {
-						$result['subject'] = $this->CI->lang->line('error_activation_failed_self_subject');
-						$result['message'] = sprintf($this->CI->lang->line('error_activation_failed_self'), $this->CI->config->item('dmcb_friendly_server'), "<a href=\"mailto:support@".$this->CI->config->item('dmcb_server')."\">support@".$this->CI->config->item('dmcb_server')."</a>");
+					else // User self-registered
+					{
+						$message = sprintf($this->CI->lang->line('user_created_by_self_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
+							$this->CI->lang->line('user_created_by_self_email_2')."\n".
+							base_url()."activate/".$result['userid']."/".$result['code'];
+
+						if ($this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message))
+						{
+							$result['subject'] = $this->CI->lang->line('activation_sent_self_subject');
+							$result['message'] = sprintf($this->CI->lang->line('activation_sent_self'), $this->CI->config->item('dmcb_friendly_server'));
+						}
+						else {
+							$result['subject'] = $this->CI->lang->line('error_activation_failed_self_subject');
+							$result['message'] = sprintf($this->CI->lang->line('error_activation_failed_self'), $this->CI->config->item('dmcb_friendly_server'), "<a href=\"mailto:support@".$this->CI->config->item('dmcb_server')."\">support@".$this->CI->config->item('dmcb_server')."</a>");
+						}
+					}
+
+					if ($this->CI->config->item('dmcb_user_notification')) // Notify admin of user self-registration
+					{
+						$this->CI->notifications_model->send_to_server("web@".$this->CI->config->item('dmcb_server'),
+							sprintf($this->CI->lang->line('dmcb_notify_admin_of_registration_subject'), $this->CI->config->item('dmcb_title')),
+							sprintf($this->CI->lang->line('dmcb_notify_admin_of_registration'), $this->new_user['displayname'], $this->new_user['email'], $this->CI->config->item('dmcb_title')));
 					}
 				}
 			}

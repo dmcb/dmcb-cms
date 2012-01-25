@@ -13,6 +13,9 @@ $lang['user_created_by_self_email_2'] = 'There\'s just one more step before you 
 
 $lang['user_subscription_trial_start'] = 'Your free %s day trial subscription starts now.';
 
+$lang['dmcb_notify_admin_of_registration_subject'] = 'A new user has signed up to %s';
+$lang['dmcb_notify_admin_of_registration'] = 'A new user, %1$s (%2$s), has signed up to %3$s.';
+
 $lang['activation_sent_admin_subject'] = 'Success!';
 $lang['activation_sent_admin'] = 'You have successfully added %1$s to %2$s. They have been sent an email containing their account information.';
 $lang['activation_sent_self_subject'] = 'Success!';
