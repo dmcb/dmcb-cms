@@ -14,7 +14,7 @@ class Post extends MY_Controller {
 	{
 		parent::__construct();
 
-		$this->load->helper('pagination');
+		$this->load->helper('picture');
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 		$this->load->model(array('categories_model', 'comments_model', 'events_model', 'files_model', 'pingbacks_model', 'posts_model', 'users_model', 'views_model'));
@@ -534,7 +534,6 @@ class Post extends MY_Controller {
 		else
 		{
 			// Stock image code
-			$this->load->helper('picture');
 			$stockimage = stock_image($this->post->post['postid']);
 			if ($stockimage != NULL)
 			{
@@ -1145,8 +1144,7 @@ class Post extends MY_Controller {
 				{
 					$this->post->new_post['urlname'] = date("Ymd", strtotime($this->post->post['date'])).'/'.$this->post->new_post['urlname'];
 				}
-				//$this->load->helper('url');
-				//$this->post->new_post['content'] = html_entity_decode(auto_link(set_value('postcontent'), 'url'), ENT_QUOTES);
+
 				$this->post->new_post['content'] = html_entity_decode(set_value('postcontent'), ENT_QUOTES);
 				$this->post->save();
 

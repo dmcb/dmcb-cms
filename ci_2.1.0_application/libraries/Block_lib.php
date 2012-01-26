@@ -367,6 +367,7 @@ class Block_lib {
 	{
 		$this->CI->load->helper(array('pagination', 'picture'));
 		$this->CI->load->model(array('users_model'));
+
 		// Set defaults
 		if (!isset($this->block['values']['detail']))
 		{
@@ -427,6 +428,7 @@ class Block_lib {
 	{
 		$this->CI->load->helper(array('pagination', 'picture'));
 		$this->CI->load->model(array('users_model', 'comments_model'));
+
 		// Set defaults
 		if (!isset($this->block['values']['detail']))
 		{
@@ -1070,6 +1072,7 @@ class Block_lib {
 	 */
 	function _block_image()
 	{
+		$this->CI->load->helper('picture');
 		$this->CI->load->model('pages_model');
 
 		// Set defaults
@@ -1112,24 +1115,16 @@ class Block_lib {
 			}
 			else if ($this->block['values']['stock'] == "yes")
 			{
-				$this->CI->load->helper('picture');
 				$image = stock_image($page->page['pageid']);
-			}
-
-			// Add size parameters
-			$size = "";
-			if (isset($this->block['values']['maxwidth']))
-			{
-				$size .= "/".$this->block['values']['maxwidth'];
-			}
-			if (isset($this->block['values']['maxheight']))
-			{
-				$size .= "/".$this->block['values']['maxheight'];
+				$image = $image['urlpath'];
 			}
 
 			if (isset($image))
 			{
-				array_push($this->contents, array("view" => 'block_image_'.$this->block['values']['detail'], "data" => array("image" => base_url().$image, 'size' => $size)));
+				$width = isset($this->block['values']['maxwidth']) ? $this->block['values']['maxwidth'] : NULL;
+				$height = isset($this->block['values']['maxheight']) ? $this->block['values']['maxheight'] : NULL;
+				$image = size_image($image, $width, $height);
+				array_push($this->contents, array("view" => 'block_image_'.$this->block['values']['detail'], "data" => array("image" => base_url().$image)));
 			}
 		}
 	}
@@ -1446,7 +1441,6 @@ class Block_lib {
 				else
 				{
 					// Stock image code
-					$this->CI->load->helper('picture');
 					$stockimage = stock_image($object->post['postid']);
 					if ($stockimage != NULL)
 					{
@@ -1626,7 +1620,7 @@ class Block_lib {
 	/**
 	 * Twitter block
 	 *
-	 * Twitter block generates images from a flickr feed
+	 * Twitter block generates tweets from a feed
 	 * Expects:
 	 * Query - formatted '&from=\S+&tag=\S+|&from=\S+|&tag=\S+'
 	 * limit - optional value, formatted '\d+'

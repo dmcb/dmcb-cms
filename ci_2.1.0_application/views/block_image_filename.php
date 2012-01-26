@@ -1,1 +1,1 @@
-<?php echo $image; echo $size;?>
+<?php echo $image;?>

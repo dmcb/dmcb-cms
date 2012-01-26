@@ -14,6 +14,7 @@ class Page extends MY_Controller {
 	{
 		parent::__construct();
 
+		$this->load->helper('picture');
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 		$this->load->model(array('blocks_model', 'pages_model'));
@@ -251,7 +252,6 @@ class Page extends MY_Controller {
 				else
 				{
 					// Stock image code
-					$this->load->helper('picture');
 					$stockimage = stock_image($this->page->page['pageid']);
 					if ($stockimage != NULL)
 					{
@@ -964,8 +964,7 @@ class Page extends MY_Controller {
 					$object = instantiate_library('page', $this->page->page['pageof']);
 					$this->page->new_page['urlname'] = $object->page['urlname'].'/'.$this->page->new_page['urlname'];
 				}
-				//$this->load->helper('url');
-				//$this->page->new_page['content'] = html_entity_decode(auto_link(set_value('content'), 'url'), ENT_QUOTES);
+
 				$this->page->new_page['content'] = html_entity_decode(set_value('content'), ENT_QUOTES);
 				$this->page->save();
 
