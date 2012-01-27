@@ -6,8 +6,8 @@
 		if (isset($event['enddate']) && isset($event['endtime'])) echo ' @ '.date("g:ia", strtotime($event['endtime']));
 		else if (isset($event['endtime'])) echo ' to '.date("g:ia", strtotime($event['endtime']));
 		echo ': <a href="'.base_url().$event['urlname'].'">'.$event['title'].'</a>';
-		
-		if ($event['needsubscription'] == "1" && $this->acl->enabled('site', 'subscribe')) 
+
+		if ($event['needsubscription'] == "1" && $this->acl->enabled('site', 'subscribe'))
 		{
 			echo ' <span class="restricted">Subscription required</span>';
 		}

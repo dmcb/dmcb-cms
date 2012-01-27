@@ -61,25 +61,11 @@ class File extends MY_Controller {
 			$downloadwidth = NULL;
 			$downloadheight = NULL;
 
-			// Grab file name and width/height properties if given from URL, this is the OLD way, and it is to be removed
-			$lastsegmentoffset = 0;
-			if (ctype_digit($this->uri->segment($this->uri->total_segments()-1)) && ctype_digit($this->uri->segment($this->uri->total_segments()))) //check if last two segments are width and height numbers
-			{
-				$downloadwidth = $this->uri->segment($this->uri->total_segments()-1);
-				$downloadheight = $this->uri->segment($this->uri->total_segments());
-				$lastsegmentoffset = 2;
-			}
-			else if (ctype_digit($this->uri->segment($this->uri->total_segments()))) // Check if last segment is width number
-			{
-				$downloadwidth = $this->uri->segment($this->uri->total_segments());
-				$lastsegmentoffset = 1;
-			}
-
 			 // Assemble the download details from the URI segments
 			$nestedname = FALSE;
 			$attachedto = $this->uri->segment(2);
 			$attachedid = "";
-			for ($i=2; $i< $this->uri->total_segments()-$lastsegmentoffset; $i++)
+			for ($i=2; $i < $this->uri->total_segments(); $i++)
 			{
 				// Convert nested file path of page or post to a flat folder structure internally
 				if ($this->uri->segment($i-2) == "page" || $this->uri->segment($i-2) == "post") // If the file's a page or post, it could be nested
@@ -87,7 +73,7 @@ class File extends MY_Controller {
 					$nestedname = TRUE;
 				}
 
-				if ($nestedname && $i != $this->uri->total_segments()-$lastsegmentoffset) // If nested mode is on and the segment isn't the last, it's a nested page so convert to flat folder structure
+				if ($nestedname && $i != $this->uri->total_segments()) // If nested mode is on and the segment isn't the last, it's a nested page so convert to flat folder structure
 				{
 					$downloadpath .= "+".$this->uri->segment($i);
 				}
@@ -97,10 +83,10 @@ class File extends MY_Controller {
 				}
 
 				// Assemble the id of where the file is attached to
-				if ($i > 2 && $i < $this->uri->total_segments()-$lastsegmentoffset)
+				if ($i > 2 && $i < $this->uri->total_segments())
 				{
 					$attachedid .= $this->uri->segment($i);
-					if ($i < $this->uri->total_segments()-($lastsegmentoffset+1))
+					if ($i < $this->uri->total_segments()-1)
 					{
 						$attachedid .= "/";
 					}
@@ -108,7 +94,7 @@ class File extends MY_Controller {
 			}
 
 			// Final segment has to be the filename and file extension
-			$filepieces = explode(".",$this->uri->segment($this->uri->total_segments()-$lastsegmentoffset));
+			$filepieces = explode(".",$this->uri->segment($this->uri->total_segments()));
 			$downloadfilename = $filepieces[0];
 			$downloadextension = $filepieces[sizeof($filepieces)-1];
 			$downloadpath .= "/".$downloadfilename.".".$downloadextension;

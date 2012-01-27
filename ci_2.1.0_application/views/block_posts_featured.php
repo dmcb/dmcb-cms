@@ -4,7 +4,7 @@
 	<?php
 	if (isset($post['image']['urlpath']))
 	{
-		echo '<a href="'.base_url().$post['urlname'].'"><img src="'.base_url().$post['image']['urlpath'].'/640" alt="'.$post['title'].'" /></a>';
+		echo '<a href="'.base_url().$post['urlname'].'"><img src="'.base_url().size_image($post['image']['urlpath'],640).'" alt="'.$post['title'].'" /></a>';
 	}
 
 	$subscription = "";
