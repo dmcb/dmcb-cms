@@ -502,7 +502,7 @@ class Manage_users extends MY_Controller {
 						}
 						else
 						{
-							$log .= $user['displayname']." (".$user['email'].") was not sent an email. This user has opted out of the mailing list.\n";
+							$log .= $user['displayname']." (".$user['email'].") opted out of the mailing list, no email was sent\n";
 						}
 					}
 					$log .= "\nThe message was as follows:\n\n";
@@ -540,7 +540,7 @@ class Manage_users extends MY_Controller {
 					}
 					else
 					{
-						$message .= '<tr><td><span style="text-decoration: line-through;">'.$user['displayname'].' ('.$user['email'].')</span> User opted out of mailing list</td></tr>';
+						$message .= '<tr><td><span class="restricted">'.$user['displayname'].' ('.$user['email'].') opted out of the mailing list, no email was sent</span></td></tr>';
 					}
 				}
 				$message .= '</table><br/><p><a href="'.base_url().'manage_users">Return to managing users</a>';

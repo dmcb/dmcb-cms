@@ -12,7 +12,7 @@
 			}
 			else
 			{
-				echo '<span style="text-decoration: line-through;">'.$user['displayname'].' ('.$user['email'].')</span> User opted out of mailing list<br/>';
+				echo '<span class="restricted">'.$user['displayname'].' ('.$user['email'].') opted out of the mailing list, no email will be sent</span><br/>';
 			}
 		}
 	?>
