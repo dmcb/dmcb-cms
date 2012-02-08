@@ -37,7 +37,7 @@ class MY_Controller extends CI_Controller {
 	{
 		$this->_message(
 			'Access denied',
-			'You do not have proper access for this page.  If this is incorrect please contact support at <a href="mailto:support@'.$this->config->item('dmcb_server').'">support@'.$this->config->item('dmcb_server').'</a>'
+			'You do not have proper access for this page. If this is incorrect please contact support at <a href="mailto:'.$this->config->item('dmcb_email_support').'">'.$this->config->item('dmcb_email_support').'</a>'
 		);
 	}
 

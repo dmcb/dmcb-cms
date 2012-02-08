@@ -354,7 +354,7 @@ class User_lib {
 					else
 					{
 						$result['subject'] = $this->CI->lang->line('error_activation_failed_admin_subject');
-						$result['message'] = sprintf($this->CI->lang->line('error_activation_failed_admin'), "<a href=\"mailto:support@".$this->CI->config->item('dmcb_server')."\">support@".$this->CI->config->item('dmcb_server')."</a>");
+						$result['message'] = sprintf($this->CI->lang->line('error_activation_failed_admin'), "<a href=\"mailto:".$this->CI->config->item('dmcb_email_support')."\">".$this->CI->config->item('dmcb_email_support')."</a>");
 					}
 				}
 				else // User self registered
@@ -380,7 +380,7 @@ class User_lib {
 						}
 						else {
 							$result['subject'] = $this->CI->lang->line('error_activation_failed_self_subject');
-							$result['message'] = sprintf($this->CI->lang->line('error_activation_failed_self'), $this->CI->config->item('dmcb_friendly_server'), "<a href=\"mailto:support@".$this->CI->config->item('dmcb_server')."\">support@".$this->CI->config->item('dmcb_server')."</a>");
+							$result['message'] = sprintf($this->CI->lang->line('error_activation_failed_self'), $this->CI->config->item('dmcb_friendly_server'), "<a href=\"mailto:".$this->CI->config->item('dmcb_email_support')."\">".$this->CI->config->item('dmcb_email_support')."</a>");
 						}
 					}
 

@@ -107,7 +107,7 @@ class Notifications_model extends CI_Model {
 			$message = "Your ".$actionon." '".strip_tags($content)."', was ".$action.".";
 		}
 		
-		$message .= "\nIf you feel this message is in error, please contact support at support@".$this->config->item('dmcb_server');
+		$message .= "\nIf you feel this message is in error, please contact support at ".$this->config->item('dmcb_email_support');
 		if ($note != "")
 		{
 			$message .= "\n\nMessage from the ".$this->config->item('dmcb_title')." moderating team:\n'".$note."'";
@@ -153,7 +153,7 @@ class Notifications_model extends CI_Model {
 			$message = "Your account has been ".strtolower($action)." to ".$content.".";
 		}
 		
-		$message .= "\nIf you feel this message is in error, please contact support at support@".$this->config->item('dmcb_server');
+		$message .= "\nIf you feel this message is in error, please contact support at ".$this->config->item('dmcb_email_support');
 		if ($note != "")
 		{
 			$message .= "\n\nMessage from the ".$this->config->item('dmcb_title')." moderating team:\n'".$note."'";

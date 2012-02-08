@@ -147,7 +147,7 @@ class Manage_activity extends MY_Controller {
 					else 
 					{	
 						$data['subject'] = "Error";
-						$data['message'] = "The account was created but an email could not be sent for ".$user->user['displayname'].", please contact support at <a href=\"mailto:support@".$this->config->item('dmcb_server')."\">support@".$this->config->item('dmcb_server')."</a>.";
+						$data['message'] = "The account was created but an email could not be sent for ".$user->user['displayname'].", please contact support at <a href=\"mailto:".$this->config->item('dmcb_email_support')."\">".$this->config->item('dmcb_email_support')."</a>.";
 					}
 					$this->_message("Resend activation email", $data['message'], $data['subject']);
 				}

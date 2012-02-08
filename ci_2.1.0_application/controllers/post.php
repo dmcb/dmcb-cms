@@ -818,7 +818,7 @@ class Post extends MY_Controller {
 
 	function banned_check($str)
 	{
-		$this->form_validation->set_message('banned_check', "Your account has been banned.  Contact support@".$this->config->item('dmcb_server')." to be reinstated.");
+		$this->form_validation->set_message('banned_check', "Your account has been banned.  Contact ".$this->config->item('dmcb_email_support')." to be reinstated.");
 		$object = instantiate_library('user', $str, 'email');
 		return !$object->check_banned();
 	}

@@ -104,7 +104,7 @@ class Signon extends MY_Controller {
 				}
 				else {
 					$data['subject'] = "Error";
-					$data['message'] = "Password reset failed, please contact support at <a href=\"mailto:support@".$this->config->item('dmcb_server')."\">support@".$this->config->item('dmcb_server')."</a>.";
+					$data['message'] = "Password reset failed, please contact support at <a href=\"mailto:".$this->config->item('dmcb_email_support')."\">".$this->config->item('dmcb_email_support')."</a>.";
 				}
 				$this->_message("Recover", $data['message'], $data['subject']);
 			}
@@ -208,7 +208,7 @@ class Signon extends MY_Controller {
 
 	function banned_check($str)
 	{
-		$this->form_validation->set_message('banned_check', "Your account has been banned.  Contact support@".$this->config->item('dmcb_server')." to be reinstated.");
+		$this->form_validation->set_message('banned_check', "Your account has been banned.  Contact ".$this->config->item('dmcb_email_support')." to be reinstated.");
 		$object = instantiate_library('user', $str, 'email');
 		return !$object->check_banned();
 	}

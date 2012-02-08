@@ -85,7 +85,7 @@ class Emailform extends MY_Controller {
 			}
 			else
 			{
-				$data['message'] = sprintf($this->lang->line('error_submission_failed_bad_form'), "<a href=\"mailto:support@".$this->config->item('dmcb_server')."\">support@".$this->config->item('dmcb_server')."</a>");
+				$data['message'] = sprintf($this->lang->line('error_submission_failed_bad_form'), "<a href=\"".$this->config->item('dmcb_email_support')."\">".$this->config->item('dmcb_email_support')."</a>");
 			}
 		}
 		$this->_message($title, $data['message'], $data['subject']);
