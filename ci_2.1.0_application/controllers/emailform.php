@@ -54,8 +54,8 @@ class Emailform extends MY_Controller {
 				$this->forms_model->add($submission, $email, $_SERVER['REMOTE_ADDR']);
 				if (isset($destination) && valid_email($destination."@".$this->config->item('dmcb_server')))
 				{
-					$this->notifications_model->send_to_server($email, sprintf($this->lang->line('submission_received'), $_POST['form']), $submission, array(), $destination);
-					$this->notifications_model->send($email, $_POST['form']." received", sprintf($this->lang->line('submission_sent'), strtolower($_POST['form']), $this->config->item('dmcb_title'))."\n\n".base_url(), array(), $destination);
+					$this->notifications_model->send_to_server($email, sprintf($this->lang->line('submission_received'), $_POST['form']), $submission, array(), $destination."@".$this->config->item('dmcb_server'));
+					$this->notifications_model->send($email, $_POST['form']." received", sprintf($this->lang->line('submission_sent'), strtolower($_POST['form']), $this->config->item('dmcb_title'))."\n\n".base_url(), array(), $destination."@".$this->config->item('dmcb_server'));
 				}
 				else
 				{

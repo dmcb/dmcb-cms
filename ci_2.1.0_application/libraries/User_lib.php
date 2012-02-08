@@ -386,7 +386,7 @@ class User_lib {
 
 					if ($this->CI->config->item('dmcb_user_notification')) // Notify admin of user self-registration
 					{
-						$this->CI->notifications_model->send_to_server("web@".$this->CI->config->item('dmcb_server'),
+						$this->CI->notifications_model->send_to_server($this->CI->config->item('dmcb_email_administration'),
 							sprintf($this->CI->lang->line('dmcb_notify_admin_of_registration_subject'), $this->CI->config->item('dmcb_title')),
 							sprintf($this->CI->lang->line('dmcb_notify_admin_of_registration'), $this->new_user['displayname'], $this->new_user['email'], $this->CI->config->item('dmcb_title')));
 					}

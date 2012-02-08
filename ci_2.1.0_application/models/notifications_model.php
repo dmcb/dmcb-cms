@@ -162,12 +162,12 @@ class Notifications_model extends CI_Model {
 		return $this->send($user['email'], $subject, $message);
 	}
 	
-	function send($email, $subject, $message, $attachments = array(), $source = "web")
+	function send($email, $subject, $message, $attachments = array(), $source = $this->config->item('dmcb_email_administration'))
 	{
 		$this->email->clear(TRUE);
 	
 		$this->email->to($email);
-		$this->email->from($source."@".$this->config->item('dmcb_server'), $this->config->item('dmcb_friendly_server'));
+		$this->email->from($source, $this->config->item('dmcb_friendly_server'));
 		$this->email->subject($subject);
 		$this->email->message($message);
 		foreach ($attachments as $attachment)
@@ -181,11 +181,11 @@ class Notifications_model extends CI_Model {
 		return $this->email->send();
 	}
 	
-	function send_to_server($email, $subject, $message, $attachments = array(), $destination = "web")
+	function send_to_server($email, $subject, $message, $attachments = array(), $destination = $this->config->item('dmcb_email_administration'))
 	{
 		$this->email->clear(TRUE);
 	
-		$this->email->to($destination."@".$this->config->item('dmcb_server'));
+		$this->email->to($destination);
 		$this->email->from($email);
 		$this->email->subject($subject);
 		$this->email->message($message);

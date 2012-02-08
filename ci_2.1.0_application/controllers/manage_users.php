@@ -514,7 +514,7 @@ class Manage_users extends MY_Controller {
 						$message .= "\n\n".
 							"If you no longer wish to receive messages from ".$this->config->item('dmcb_friendly_server').", you can change your mail settings at the link below:\n".
 							base_url()."account/messagesettings\n\n";
-						$this->notifications_model->send($user['email'], $subject, $message, $attachments);
+						$this->notifications_model->send($user['email'], $subject, $message, $attachments, $this->config->item('dmcb_email_mailinglist'));
 					}
 				}
 
