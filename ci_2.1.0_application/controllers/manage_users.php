@@ -486,9 +486,6 @@ class Manage_users extends MY_Controller {
 				$subject = html_entity_decode(set_value('emailsubject'), ENT_QUOTES);
 				$message = html_entity_decode(set_value('emailmessage'), ENT_QUOTES);
 
-				// Send a copy to the server
-				$this->notifications_model->send_to_server('web@'.$this->config->item('dmcb_server'), $subject, $message, $attachments);
-
 				// Send a copy to sender if specified
 				if ($personalcopy)
 				{
@@ -514,6 +511,9 @@ class Manage_users extends MY_Controller {
 				{
 					if ($user['mailinglist'])
 					{
+						$message .= "\n\n".
+							"If you no longer wish to receive messages from ".$this->config->item('dmcb_friendly_server').", you can change your mail settings at the link below:\n".
+							base_url()."account/messagesettings\n\n";
 						$this->notifications_model->send($user['email'], $subject, $message, $attachments);
 					}
 				}

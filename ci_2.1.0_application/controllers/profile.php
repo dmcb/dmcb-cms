@@ -13,7 +13,7 @@ class Profile extends MY_Controller {
 	function Profile()
 	{
 		parent::__construct();
-		
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 	}
@@ -63,7 +63,7 @@ class Profile extends MY_Controller {
 							$this->blocked = TRUE;
 						}
 					}
-				
+
 					// Get held comments
 					$this->load->model('comments_model');
 					$this->heldcomments = $this->comments_model->get_user_heldback($this->user->user['userid']);
@@ -82,23 +82,23 @@ class Profile extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function index()
 	{
 		// Profile data
 		$this->load->helper('picture');
-		
+
 		// If user was reached via search, highlight the searched word
 		if ($this->uri->segment(3) == "search" && $this->session->flashdata('search_term'))
 		{
 			// Keep search highlighting going (in the event user uses back button to go back to search results)
 			$this->session->keep_flashdata('search_term');
-			
+
 			$this->user->user['profile'] = preg_replace('/('.$this->session->flashdata('search_term').')(?![^<]*>)(?![\S]*%)/i', $this->load->view('content_highlight', array('content' => '$1'), TRUE), $this->user->user['profile']);
 		}
-		
+
 		$data['user'] = $this->user->user;
-			
+
 		// Grab posts
 		if ($this->acl->enabled('profile', 'addpost'))
 		{
@@ -111,7 +111,7 @@ class Profile extends MY_Controller {
 			$this->posts_block->block['feedback'] = 1;
 			$data['posts'] = $this->posts_block->output();
 		}
-		
+
 		// Grab tweets
 		if ($this->acl->enabled('profile', 'twitter') && $this->user->user['twitter'] != "" && $this->user->user['twitter'] != NULL)
 		{
@@ -123,7 +123,7 @@ class Profile extends MY_Controller {
 			$this->posts_block->block['feedback'] = 0;
 			$data['tweets'] = $this->tweets_block->output();
 		}
-		
+
 		// Enable messaging
 		if ($this->acl->allow('profile', 'message', FALSE, 'user', $this->user->user['userid']) && $this->user->user['getmessages'] == 1 && !$this->blocked)
 		{
@@ -137,20 +137,20 @@ class Profile extends MY_Controller {
 		{
 			$data['messages'] = $this->load->view('form_profile_messageteaser', array('user' => $this->user->user), TRUE);
 		}
-		
+
 		// User profile editing
 		if ($this->acl->allow('profile', 'edit', FALSE, 'user', $this->user->user['userid']))
 		{
-			$data['packages_upload'] = $this->load->view('packages_upload', 
+			$data['packages_upload'] = $this->load->view('packages_upload',
 				array(
-					'upload_url' => 'user/'.$this->user->user['urlname'], 
+					'upload_url' => 'user/'.$this->user->user['urlname'],
 					'upload_size' => $this->config->item('dmcb_profile_upload_size'),
-					'upload_types' => $this->config->item('dmcb_profile_upload_types'), 
+					'upload_types' => $this->config->item('dmcb_profile_upload_types'),
 					'upload_description' => $this->config->item('dmcb_profile_upload_description')
 				), TRUE);
 			$data['edit_name'] = $this->load->view('form_profile_editname', array('user' => $this->user->user), TRUE);
 			$data['edit_profile'] = $this->load->view('form_profile_editprofile', array('user' => $this->user->user), TRUE);
-			
+
 			// Grab profile picture attachments
 			$this->load->model('files_model');
 			$files = array();
@@ -161,25 +161,25 @@ class Profile extends MY_Controller {
 				array_push($files, $object->file);
 			}
 			$data['attachments'] = $this->load->view('form_profile_attachments', array('upload_url' => 'user/'.$this->user->user['urlname'], 'files' => $files, 'user' => $this->user->user), TRUE);
-			
+
 			// Load up held back comments
 			if ($this->heldcomments->num_rows() > 0 && $this->acl->enabled('post', 'addcomment'))
 			{
 				$data['edit_heldbackcomments'] = $this->load->view('form_profile_heldcomments', array('heldcomments' => $this->heldcomments), TRUE);
 			}
 		}
-		
+
 		// User twitter settings
 		if ($this->acl->allow('profile', 'twitter', FALSE, 'user', $this->user->user['userid']))
 		{
 			$data['edit_settings'] = $this->load->view('form_profile_editsettings', array('user' => $this->user->user), TRUE);
 		}
-		
+
 		// User post editing
 		if ($this->acl->allow('profile', 'addpost', FALSE, 'user', $this->user->user['userid']))
 		{
 			$data['add_post'] = $this->load->view('form_profile_addpost', NULL, TRUE);
-			
+
 			// Load up drafts
 			$this->load->model('posts_model');
 			$drafts = array();
@@ -193,7 +193,7 @@ class Profile extends MY_Controller {
 			{
 				$data['edit_drafts'] = $this->load->view('form_profile_editdrafts', array('drafts' => $drafts), TRUE);
 			}
-			
+
 			// Load up held back posts
 			$heldposts = array();
 			$heldpostids = $this->posts_model->get_user_heldback($this->user->user['userid']);
@@ -210,14 +210,14 @@ class Profile extends MY_Controller {
 
 		$this->_initialize_page('profile', $this->user->user['displayname'], $data);
 	}
-	
+
 	function addpost()
 	{
 		if ($this->acl->allow('profile', 'addpost', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('posttitle', 'title', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[100]');
 			$this->form_validation->set_rules('posturlname', 'url name', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[35]|callback_posturlname_check');
-			
+
 			if ($this->form_validation->run())
 			{
 				$this->load->library('post_lib','','new_post');
@@ -237,7 +237,7 @@ class Profile extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function posturlname_check($str)
 	{
 		if (!preg_match('/^[a-z0-9-_]+$/i', $str))
@@ -254,7 +254,7 @@ class Profile extends MY_Controller {
 		{
 			// Profile posts of format YYYYMMDD/POSTNAME
 			$str = date("Ymd").'/'.$str;
-			
+
 			// Check for name collisions and return suggested new name
 			$this->load->library('post_lib','','test_post');
 			$this->test_post->post['postid'] = '0';
@@ -275,7 +275,7 @@ class Profile extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function attachments()
 	{
 		if ($this->acl->allow('profile', 'edit', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
@@ -305,7 +305,7 @@ class Profile extends MY_Controller {
 			else if ($this->uri->segment(4) == "rename")
 			{
 				$this->form_validation->set_rules('filename', 'file name', 'xss_clean|strip_tags|trim|required|max_length[100]|callback_filename_check');
-				
+
 				if ($this->form_validation->run())
 				{
 					$this->attachment->new_file['filename'] = set_value('filename');
@@ -323,7 +323,7 @@ class Profile extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function filename_check($str)
 	{
 		$object = instantiate_library('file', array($str, $this->attachment->file['extension'], $this->attachment->file['attachedto'], $this->attachment->file['attachedid']), 'details');
@@ -345,13 +345,13 @@ class Profile extends MY_Controller {
 		else
 			return TRUE;
 	}
-	
+
 	function editname()
 	{
 		if ($this->acl->allow('profile', 'edit', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('displayname', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_check');
-			
+
 			if ($this->form_validation->run())
 			{
 				$this->user->new_user['displayname'] = set_value('displayname');
@@ -364,7 +364,7 @@ class Profile extends MY_Controller {
 			{
 				$this->index();
 			}
-		}	
+		}
 	}
 
 	function displayname_check($str)
@@ -385,13 +385,13 @@ class Profile extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function editprofile()
 	{
 		if ($this->acl->allow('profile', 'edit', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('profile', 'profile', 'xss_clean|strip_tags|trim|max_length[15000]');
-			
+
 			if ($this->form_validation->run())
 			{
 				$profile = str_replace("\n","<br/>",set_value('profile'));
@@ -405,13 +405,13 @@ class Profile extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function editsettings()
 	{
 		if ($this->acl->allow('profile', 'twitter', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('twitter', 'twitter account name', 'xss_clean|strip_tags|trim|alpha_dash|max_length[30]');
-			
+
 			if ($this->form_validation->run())
 			{
 				$this->user->new_user['twitter'] = set_value('twitter');
@@ -424,7 +424,7 @@ class Profile extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function heldcomments()
 	{
 		if ($this->acl->allow('profile', 'edit', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
@@ -439,14 +439,14 @@ class Profile extends MY_Controller {
 				$this->form_validation->set_rules($field, 'comment', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[15000]');
 				$commentid = substr($field, 7, strlen($field));
 				$comment = $this->comments_model->get($commentid);
-				
+
 				if ($this->user->user['userid'] == $comment['userid'])
 				{
 					if ($this->form_validation->run())
 					{
 						$comment = str_replace("\n","<br/>",set_value($field));
 						$this->comments_model->update($commentid, $comment);
-						
+
 						redirect('profile/'.$this->user->user['urlname'].'/heldcomments');
 					}
 					else
@@ -464,11 +464,11 @@ class Profile extends MY_Controller {
 				$field = substr($_POST['buttonchoice'], 0, strlen($_POST['buttonchoice'])-6);
 				$commentid = substr($field, 7, strlen($field));
 				$comment = $this->comments_model->get($commentid);
-				
+
 				if ($this->user->user['userid'] == $comment['userid'])
 				{
 					$this->comments_model->delete($commentid, $comment);
-					
+
 					redirect('profile/'.$this->user->user['urlname'].'/heldcomments');
 				}
 				else
@@ -478,28 +478,28 @@ class Profile extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function message()
 	{
 		if ($this->acl->allow('profile', 'message', TRUE, 'user', $this->user->user['userid']) && $this->user->user['getmessages'] == 1 && !$this->blocked)
 		{
 			$this->form_validation->set_rules('content', 'message', 'xss_clean|strip_tags|trim|required|min_length[10]|max_length[1000]');
-			
+
 			if ($this->form_validation->run())
 			{
 				$subject = $this->session->userdata('displayname')." has sent you a message via ".$this->config->item('dmcb_title');
-				$message = 
+				$message =
 					$this->session->userdata('displayname')." has sent you a message:\n\n".
 					html_entity_decode(set_value('content'), ENT_QUOTES)."\n\n\n\n".
 					"To view ".$this->session->userdata('displayname')."'s profile and send a message back, follow this link:\n".
 					base_url()."profile/".$this->session->userdata('urlname')."/message\n\n".
-					"If you no longer wish to receive messages, you can change your mail settings at the link below:\n".
-					base_url()."account/messagesettings\n\n";					
-			
+					"If you no longer wish to receive messages from ".$this->config->item('dmcb_friendly_server').", you can change your mail settings at the link below:\n".
+					base_url()."account/messagesettings\n\n";
+
 				$this->load->model('notifications_model');
 				$this->notifications_model->send($this->user->user['email'], $subject, $message);
 				$this->_message(
-					'Message sent', 
+					'Message sent',
 					'You have sent a message to '.$this->user->user['displayname'].'. Click <a href="'.base_url().'profile/'.$this->user->user['urlname'].'">here</a> to return to their profile.',
 					'Success'
 				);
@@ -512,7 +512,7 @@ class Profile extends MY_Controller {
 		else if ($this->session->userdata('signedon') && $this->session->userdata('userid') == $this->user->user['userid'])
 		{
 			$this->_message(
-				'Send message', 
+				'Send message',
 				'You want to send a message to yourself?  You so crazy!',
 				'Error'
 			);
@@ -520,7 +520,7 @@ class Profile extends MY_Controller {
 		else if ($this->session->userdata('signedon'))
 		{
 			$this->_message(
-				'Send message', 
+				'Send message',
 				$this->user->user['displayname'].' does not want to receive messages, sorry.',
 				'Error'
 			);
