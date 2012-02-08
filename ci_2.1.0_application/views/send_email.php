@@ -6,11 +6,19 @@
 		foreach ($maillist as $user)
 		{
 			$userids .= $user['userid'].';';
-			echo $user['displayname'].' ('.$user['email'].')<br/>';
+			if ($user['mailinglist'])
+			{
+				echo '<span>'.$user['displayname'].' ('.$user['email'].')</span><br/>';
+			}
+			else
+			{
+				echo '<span style="text-decoration: line-through;">'.$user['displayname'].' ('.$user['email'].')</span> User opted out of mailing list<br/>';
+			}
 		}
 	?>
-	<a href="<?=base_url().'manage_users/mailinglist';?>">Assemble a different list</a><br/><br/>
 	</p>
+	<br/>
+	<p><a href="<?=base_url().'manage_users/mailinglist';?>">Assemble a different list</a></p>
 
 	<div class="spacer">&nbsp;</div>
 

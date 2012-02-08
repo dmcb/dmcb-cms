@@ -496,7 +496,14 @@ class Manage_users extends MY_Controller {
 					$log = "You sent a message to the following users:\n\n";
 					foreach ($this->data['maillist'] as $user)
 					{
-						$log .= $user['displayname']." (".$user['email'].")\n";
+						if ($user['mailinglist'])
+						{
+							$log .= $user['displayname']." (".$user['email'].")\n";
+						}
+						else
+						{
+							$log .= $user['displayname']." (".$user['email'].") was not sent an email. This user has opted out of the mailing list.\n";
+						}
 					}
 					$log .= "\nThe message was as follows:\n\n";
 					$this->notifications_model->send($sender->user['email'], $subject, $log.$message, $attachments);
@@ -505,7 +512,10 @@ class Manage_users extends MY_Controller {
 				// Send to all users individually
 				foreach ($this->data['maillist'] as $user)
 				{
-					$this->notifications_model->send($user['email'], $subject, $message, $attachments);
+					if ($user['mailinglist'])
+					{
+						$this->notifications_model->send($user['email'], $subject, $message, $attachments);
+					}
 				}
 
 				// Indicate the post is done so a refresh doesn't spam the maillist again
@@ -524,7 +534,14 @@ class Manage_users extends MY_Controller {
 				$message = "You have sent out an update to the following email addresses:</p><br/><table>";
 				foreach ($this->data['maillist'] as $user)
 				{
-					$message .= '<tr><td>'.$user['displayname'].' ('.$user['email'].')</td></tr>';
+					if ($user['mailinglist'])
+					{
+						$message .= '<tr><td>'.$user['displayname'].' ('.$user['email'].')</td></tr>';
+					}
+					else
+					{
+						$message .= '<tr><td><span style="text-decoration: line-through;">'.$user['displayname'].' ('.$user['email'].')</span> User opted out of mailing list</td></tr>';
+					}
 				}
 				$message .= '</table><br/><p><a href="'.base_url().'manage_users">Return to managing users</a>';
 				$this->_message("Send email", $message, "Success!");
