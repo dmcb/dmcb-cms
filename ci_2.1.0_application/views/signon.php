@@ -43,7 +43,7 @@
 	if ($signoff_message != NULL) echo '<h4>'.$signoff_message.'</h4><br/>';
 	?>
 
-	<form action="<?=base_url();?>signon/<?=$redirection;?>" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?=base_url();?>signon/authenticate<?=$redirection;?>" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend>Sign on</legend>
 
