@@ -15,9 +15,9 @@ class Users_model extends CI_Model {
         parent::__construct();
     }
 
-	function add($email, $displayname, $urlname, $password, $code)
+	function add($email, $displayname, $urlname, $password, $code, $mailinglist_code)
 	{
-		$this->db->query("INSERT into users (email, displayname, urlname, password, code, registered, datemodified, mailinglist, getmessages) VALUES (".$this->db->escape($email).",".$this->db->escape($displayname).",".$this->db->escape($urlname).",".$this->db->escape($password).",".$this->db->escape($code).", NOW(), NOW(), 1, 1)");
+		$this->db->query("INSERT into users (email, displayname, urlname, password, code, registered, datemodified, mailinglist, mailinglist_code, getmessages) VALUES (".$this->db->escape($email).",".$this->db->escape($displayname).",".$this->db->escape($urlname).",".$this->db->escape($password).",".$this->db->escape($code).", NOW(), NOW(), 1, ".$this->db->escape($mailinglist_code).", 1)");
 		return $this->db->insert_id();
 	}
 
@@ -283,6 +283,7 @@ class Users_model extends CI_Model {
 			password = ".$this->db->escape($user['password']).",
 			code = ".$this->db->escape($user['code']).",
 			mailinglist = ".$this->db->escape($user['mailinglist']).",
+			mailinglist_code = ".$this->db->escape($user['mailinglist_code']).",
 			getmessages = ".$this->db->escape($user['getmessages']).",
 			profilepicture = ".$this->db->escape($user['profilepicture']).",
 			statusid = ".$this->db->escape($user['statusid']).",

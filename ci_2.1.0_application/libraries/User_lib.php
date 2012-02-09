@@ -314,7 +314,7 @@ class User_lib {
 					$this->new_user['code'] = "";
 				}
 
-				$this->new_user['userid'] = $this->CI->users_model->add($this->new_user['email'], $this->new_user['displayname'], $this->new_user['urlname'], $this->new_user['password'], $this->new_user['code']);
+				$this->new_user['userid'] = $this->CI->users_model->add($this->new_user['email'], $this->new_user['displayname'], $this->new_user['urlname'], $this->new_user['password'], $this->new_user['code'], md5(random_string()));
 				$result['userid'] = $this->new_user['userid'];
 				$this->user = $this->new_user;
 				if (!isset($this->new_user['roleid'])) // If a role isn't set, set the user as a member
@@ -422,6 +422,18 @@ class User_lib {
 					$object = instantiate_library('block', $blockinstance['blockinstanceid']);
 					$object->new_block['values']['user'] = $this->new_user['urlname'];
 					$object->save();
+				}
+			}
+			if ($this->new_user['mailinglist'] != $this->user['mailinglist'])
+			{
+				// If they subscribe to the mailing list, give them a code to one-click unsubscribe with
+				if ($this->new_user['mailinglist'] == "1")
+				{
+					$this->new_user['mailinglist_code'] = md5(random_string());
+				}
+				else
+				{
+					$this->new_user['mailinglist_code'] = "";
 				}
 			}
 			$this->CI->users_model->update($this->user['userid'], $this->new_user);

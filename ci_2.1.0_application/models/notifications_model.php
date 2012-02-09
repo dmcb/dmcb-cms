@@ -13,10 +13,10 @@ class Notifications_model extends CI_Model {
     function Notifications_model()
     {
         parent::__construct();
-		
+
 		$this->load->library('email');
     }
-	
+
 	function add($adminid, $action, $actionon, $actiononid, $user, $scope, $scopeid, $content, $note, $alert_user = FALSE)
 	{
 		$scope_sql = "NULL";
@@ -34,9 +34,9 @@ class Notifications_model extends CI_Model {
 		{
 			$content_sql = $this->db->escape($content);
 		}
-	
+
 		$this->db->query("INSERT into notifications (adminid, action, actionon, actiononid, parentid, scope, scopeid, content, note, date) VALUES (".$this->db->escape($adminid).",".$this->db->escape($action).",".$this->db->escape($actionon).",".$this->db->escape($actiononid).",".$this->db->escape($user['userid']).",".$scope_sql.",".$scopeid_sql.",".$content_sql.",".$this->db->escape($note).", NOW())");
-		
+
 		// If the notification is internally added and a message is not to be sent, don't send one to the end user
 		if ($alert_user)
 		{
@@ -50,12 +50,12 @@ class Notifications_model extends CI_Model {
 			}
 		}
 	}
-	
+
 	function get($userid)
 	{
 		return $this->db->query("SELECT * FROM notifications WHERE parentid = ".$this->db->escape($userid)." AND action != 'edited' ORDER BY date DESC LIMIT 30");
 	}
-	
+
 	function get_plus_minus($userid)
 	{
 		// Gets a numeric score based on goodthings - badthings since the last user status or role change
@@ -77,14 +77,14 @@ class Notifications_model extends CI_Model {
 		$badthings = $badrow['COUNT(*)'];
 		$goodrow = $goodquery->row_array();
 		$goodthings = $goodrow['COUNT(*)'];
-		
+
 		return $goodthings - $badthings;
 	}
-	
+
 	function notify_content($user, $action, $actionon, $content, $note)
 	{
 		$subject = "About your ".$actionon." on ".$this->config->item('dmcb_title');
-		
+
 		if ($action == "held back")
 		{
 			$message .= "Your ".$actionon." '".strip_tags($content)."', was ".$action." from public view. Please go to the following link to edit your ".$actionon." and resubmit it:\n".
@@ -106,7 +106,7 @@ class Notifications_model extends CI_Model {
 		{
 			$message = "Your ".$actionon." '".strip_tags($content)."', was ".$action.".";
 		}
-		
+
 		$message .= "\nIf you feel this message is in error, please contact support at ".$this->config->item('dmcb_email_support');
 		if ($note != "")
 		{
@@ -115,11 +115,11 @@ class Notifications_model extends CI_Model {
 
 		return $this->send($user['email'], $subject, $message);
 	}
-	
+
 	function notify_user($user, $action, $actionon, $scope, $scopeid, $content, $note)
 	{
 		$subject = "Your account at ".$this->config->item('dmcb_title')." has changed";
-		
+
 		if ($action == "set")
 		{
 			if ($scope != NULL)
@@ -152,7 +152,7 @@ class Notifications_model extends CI_Model {
 		{
 			$message = "Your account has been ".strtolower($action)." to ".$content.".";
 		}
-		
+
 		$message .= "\nIf you feel this message is in error, please contact support at ".$this->config->item('dmcb_email_support');
 		if ($note != "")
 		{
@@ -161,11 +161,16 @@ class Notifications_model extends CI_Model {
 
 		return $this->send($user['email'], $subject, $message);
 	}
-	
-	function send($email, $subject, $message, $attachments = array(), $source = $this->config->item('dmcb_email_administration'))
+
+	function send($email, $subject, $message, $attachments = array(), $source = NULL)
 	{
+		if (!isset($source))
+		{
+			$source = $this->config->item('dmcb_email_administration');
+		}
+
 		$this->email->clear(TRUE);
-	
+
 		$this->email->to($email);
 		$this->email->from($source, $this->config->item('dmcb_friendly_server'));
 		$this->email->subject($subject);
@@ -180,11 +185,16 @@ class Notifications_model extends CI_Model {
 
 		return $this->email->send();
 	}
-	
-	function send_to_server($email, $subject, $message, $attachments = array(), $destination = $this->config->item('dmcb_email_administration'))
+
+	function send_to_server($email, $subject, $message, $attachments = array(), $destination = NULL)
 	{
+		if (!isset($destination))
+		{
+			$destination = $this->config->item('dmcb_email_administration');
+		}
+
 		$this->email->clear(TRUE);
-	
+
 		$this->email->to($destination);
 		$this->email->from($email);
 		$this->email->subject($subject);
@@ -197,6 +207,6 @@ class Notifications_model extends CI_Model {
 			}
 		}
 
-		return $this->email->send();	
+		return $this->email->send();
 	}
 }
