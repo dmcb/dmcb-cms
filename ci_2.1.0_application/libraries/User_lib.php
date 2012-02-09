@@ -370,7 +370,7 @@ class User_lib {
 					else // User self-registered
 					{
 						$message = sprintf($this->CI->lang->line('user_created_by_self_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
-							$this->CI->lang->line('user_created_by_self_email_2')."\n".
+							$this->CI->lang->line('user_created_by_self_email_activation')."\n".
 							base_url()."activate/".$result['userid']."/".$result['code'];
 
 						if ($this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message))

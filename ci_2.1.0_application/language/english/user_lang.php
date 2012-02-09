@@ -9,7 +9,7 @@ $lang['user_created_by_facebook_email_2'] = 'Your account email address is %1$s 
 $lang['user_created_by_facebook_email_3'] = 'Please sign on and change your password immediately at %s';
 
 $lang['user_created_by_self_email'] = 'You have created an account at %s';
-$lang['user_created_by_self_email_2'] = 'There\'s just one more step before you can sign on and get going, you must activate your account by visiting the following url:';
+$lang['user_created_by_self_email_activation'] = 'Before you can sign on you must activate your account by visiting the following url:';
 
 $lang['user_subscription_trial_start'] = 'Your free %s day trial subscription starts now.';
 

@@ -139,8 +139,11 @@ class Signon extends MY_Controller {
 		}
 		else
 		{
-			$code = $object->user['userid']."/".$object->user['code'];
-			$message = "You have created an account at ".$this->config->item('dmcb_friendly_server').".\n\nBefore you can log in you must activate your account by going to the following URL, ".base_url()."activate/".$code;
+			$this->lang->load('user', 'english', FALSE, TRUE, APPPATH.'site_specific_');
+			$message = sprintf($this->lang->line('user_created_by_self_email'), $this->config->item('dmcb_friendly_server'))."\n\n".
+				$this->lang->line('user_created_by_self_email_activation')."\n".
+				base_url()."activate/".$object->user['userid']."/".$object->user['code'];
+
 			$this->load->model('notifications_model');
 			$this->notifications_model->send($str, $this->config->item('dmcb_friendly_server').' account', $message);
 			$this->form_validation->set_message('code_check', "You have not activated your account.  An activation email is being resent.");
