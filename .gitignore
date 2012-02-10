@@ -20,6 +20,7 @@ includes/adxmenu/*/*.css
 includes/cufon/*/fonts/
 !includes/lightbox/
 !includes/prototype/
+!includes/scripts/
 !includes/scriptaculous/
 !includes/swfupload/
 includes/swfupload/*/*.gif
