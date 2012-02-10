@@ -21,11 +21,11 @@ class Signon extends MY_Controller {
 	function _remap()
 	{
 		$this->data = array();
-		
+
 		// Determine redirection in URL
 		$this->data['redirection'] = NULL;
 		$this->data['signoff_message'] = $this->session->flashdata('signoff_message');;
-		if ($this->uri->segment(2) == "authenticate" || $this->uri->segment(2) == "signup" || $this->uri->segment(2) == "recover")
+		if ($this->uri->segment(2) == "authenticate" || $this->uri->segment(2) == "mailinglist" || $this->uri->segment(2) == "signup" || $this->uri->segment(2) == "recover")
 		{
 			$i = 3;
 		}
@@ -37,17 +37,6 @@ class Signon extends MY_Controller {
 		while ($this->uri->segment($i) != NULL) {
 			$this->data['redirection'] .= "/".$this->uri->segment($i);
 			$i++;
-		}
-
-		// If Facebook connect is enabled, load it up
-		if ($this->config->item('dmcb_signon_facebook') == "true")
-		{
-			$this->load->library('facebook_connect');
-			$this->data['session'] = $this->facebook_connect->session;
-			$this->data['me'] = $this->facebook_connect->me;
-			$this->data['uid'] = $this->facebook_connect->uid;
-			$this->data['loginUrl'] = $this->facebook_connect->loginUrl;
-			$this->data['logoutUrl'] = $this->facebook_connect->logoutUrl;
 		}
 
 		// If the user is already signed on, send them on their way
@@ -74,11 +63,29 @@ class Signon extends MY_Controller {
 			$this->index();
 		}
 	}
-	
+
 	function index()
 	{
+		$this->data['authenticate'] = $this->load->view('form_signon_authenticate', array('redirection' => $this->data['redirection']), TRUE);
+		$this->data['recover'] = $this->load->view('form_signon_recover', NULL, TRUE);
+
+		// If Facebook connect is enabled, load it up
+		if ($this->config->item('dmcb_signon_facebook') == "true")
+		{
+			$this->load->library('facebook_connect');
+			$this->facebook['session'] = $this->facebook_connect->session;
+			$this->facebook['me'] = $this->facebook_connect->me;
+			$this->facebook['uid'] = $this->facebook_connect->uid;
+			$this->facebook['loginUrl'] = $this->facebook_connect->loginUrl;
+			$this->facebook['logoutUrl'] = $this->facebook_connect->logoutUrl;
+
+			$this->data['facebook'] = $this->load->view('signon_facebook', $this->facebook, TRUE);
+		}
+
+		// If users can self register, load up the form
 		if ($this->config->item('dmcb_guest_signup'))
 		{
+			$this->data['signup'] = $this->load->view('form_signon_signup', NULL, TRUE);
 			$this->_initialize_page('signon', 'Sign on / Sign up', $this->data);
 		}
 		else
@@ -86,7 +93,7 @@ class Signon extends MY_Controller {
 			$this->_initialize_page('signon', 'Sign on', $this->data);
 		}
 	}
-	
+
 	function authenticate()
 	{
 		$this->form_validation->set_rules('email', 'email', 'xss_clean|strip_tags|trim|required|max_length[50]|valid_email|callback_code_check|callback_banned_check');
@@ -129,7 +136,7 @@ class Signon extends MY_Controller {
 		$object = instantiate_library('user', $str, 'email');
 		return !$object->check_banned();
 	}
-	
+
 	function code_check($str)
 	{
 		$object = instantiate_library('user', $str, 'email');
@@ -150,7 +157,7 @@ class Signon extends MY_Controller {
 			return FALSE;
 		}
 	}
-	
+
 	function login_check($str)
 	{
 		$object = instantiate_library('user', set_value('email'), 'email');
@@ -164,7 +171,7 @@ class Signon extends MY_Controller {
 			return FALSE;
 		}
 	}
-	
+
 	function signup()
 	{
 		if ($this->config->item('dmcb_guest_signup'))
@@ -173,7 +180,7 @@ class Signon extends MY_Controller {
 			$this->form_validation->set_rules('signup_display', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_check');
 			$this->form_validation->set_rules('signup_password', 'password', 'xss_clean|trim|required|min_length[6]|max_length[15]|matches[signup_password_confirm]|md5');
 			$this->form_validation->set_rules('signup_password_confirm', 'confirm password', 'xss_clean|trim|required|min_length[6]|max_length[15]|md5');
-		
+
 			if ($this->form_validation->run())
 			{
 				$this->load->library('user_lib',NULL,'new_user');
@@ -190,7 +197,7 @@ class Signon extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function email_check($str)
 	{
 		$checkuser = instantiate_library('user', $str, 'email');
@@ -204,16 +211,32 @@ class Signon extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function mailinglist()
 	{
-	
+		if ($this->config->item('dmcb_guest_signup'))
+		{
+			$this->form_validation->set_rules('signup_email', 'email address', 'xss_clean|strip_tags|trim|required|max_length[50]|valid_email|callback_email_check');
+
+			if ($this->form_validation->run())
+			{
+				$this->load->library('user_lib',NULL,'new_user');
+				$this->new_user->new_user['email'] = set_value('signup_email');
+				$result = $this->new_user->save();
+
+				$this->_message("Sign up", $result['message'], $result['subject']);
+			}
+			else
+			{
+				$this->index();
+			}
+		}
 	}
-	
+
 	function recover()
 	{
 		$this->form_validation->set_rules('emailforgot', 'email address', 'trim|required|max_length[50]|valid_email|callback_recover_check');
-		
+
 		if ($this->form_validation->run())
 		{
 			$object = instantiate_library('user', set_value('emailforgot'), 'email');

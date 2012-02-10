@@ -278,26 +278,32 @@ class User_lib {
 	 */
 	function save()
 	{
-		$this->CI->load->helper('string');
+		$this->CI->load->helper(array('string', 'email'));
 		$result = array();
 
-		$this->new_user['displayname'] = reduce_spacing($this->new_user['displayname']);
-		$this->new_user['displayname'] = $this->suggest();
-		$this->new_user['urlname'] = to_urlname($this->new_user['displayname']);
-
-		// If the user has a name that's the same as an old placeholder, clear placeholder
-		$this->CI->load->model('placeholders_model');
-		$placeholder = $this->CI->placeholders_model->get('user', $this->new_user['urlname']);
-		if ($placeholder != NULL)
+		// Minimum requirements for creating or updating a user
+		if (isset($this->new_user['email']) && valid_email($this->new_user['email']))
 		{
-			$this->CI->placeholders_model->delete('user', $this->new_user['urlname']);
-		}
+			if (!isset($this->new_user['displayname']))
+			{
+				$user_bits = explode("@", $this->new_user['email']);
+				$this->new_user['displayname'] = $user_bits[0];
+			}
 
-		// Check if the user wasn't initialized from an existing one
-		if ($this->user == NULL) // If it wasn't, create a new user
-		{
-			// Minimum requirements for creating a user
-			if (isset($this->new_user['email']) && isset($this->new_user['displayname']))
+			$this->new_user['displayname'] = reduce_spacing($this->new_user['displayname']);
+			$this->new_user['displayname'] = $this->suggest();
+			$this->new_user['urlname'] = to_urlname($this->new_user['displayname']);
+
+			// If the user has a name that's the same as an old placeholder, clear placeholder
+			$this->CI->load->model('placeholders_model');
+			$placeholder = $this->CI->placeholders_model->get('user', $this->new_user['urlname']);
+			if ($placeholder != NULL)
+			{
+				$this->CI->placeholders_model->delete('user', $this->new_user['urlname']);
+			}
+
+			// Check if the user wasn't initialized from an existing one
+			if ($this->user == NULL) // If it wasn't, create a new user
 			{
 				if (!isset($this->new_user['password'])) // If a password isn't set, create one and return it
 				{
@@ -392,52 +398,52 @@ class User_lib {
 					}
 				}
 			}
-		}
-		else // If it was, update the existing user
-		{
-			if ($this->new_user['profile'] != $this->user['profile'])
+			else // If it was, update the existing user
 			{
-				$this->new_user['datemodified'] = date('YmdHis');
-			}
-			if ($this->new_user['email'] != $this->user['email'])
-			{
-				$this->CI->load->helper('string');
-				$this->new_user['code'] = md5(random_string());
-			}
-			if ($this->new_user['displayname'] != $this->user['displayname'])
-			{
-				// Add placeholder for URL name change
-				$this->CI->load->model('placeholders_model');
-				$this->CI->placeholders_model->add("user", $this->user['urlname'], $this->new_user['urlname']);
+				if ($this->new_user['profile'] != $this->user['profile'])
+				{
+					$this->new_user['datemodified'] = date('YmdHis');
+				}
+				if ($this->new_user['email'] != $this->user['email'])
+				{
+					$this->CI->load->helper('string');
+					$this->new_user['code'] = md5(random_string());
+				}
+				if ($this->new_user['displayname'] != $this->user['displayname'])
+				{
+					// Add placeholder for URL name change
+					$this->CI->load->model('placeholders_model');
+					$this->CI->placeholders_model->add("user", $this->user['urlname'], $this->new_user['urlname']);
 
-				// Rename corresponding files folder
-				$this->CI->load->model('files_model');
-				$this->CI->files_model->rename_folder("user", $this->user['urlname'], $this->new_user['urlname']);
+					// Rename corresponding files folder
+					$this->CI->load->model('files_model');
+					$this->CI->files_model->rename_folder("user", $this->user['urlname'], $this->new_user['urlname']);
 
-				// Update any blocks that refer to this user's name
-				$this->CI->load->model('blocks_model');
-				$blockinstances = $this->CI->blocks_model->get_variable_blocks('user', $this->user['urlname']);
-				foreach ($blockinstances->result_array() as $blockinstance)
-				{
-					$object = instantiate_library('block', $blockinstance['blockinstanceid']);
-					$object->new_block['values']['user'] = $this->new_user['urlname'];
-					$object->save();
+					// Update any blocks that refer to this user's name
+					$this->CI->load->model('blocks_model');
+					$blockinstances = $this->CI->blocks_model->get_variable_blocks('user', $this->user['urlname']);
+					foreach ($blockinstances->result_array() as $blockinstance)
+					{
+						$object = instantiate_library('block', $blockinstance['blockinstanceid']);
+						$object->new_block['values']['user'] = $this->new_user['urlname'];
+						$object->save();
+					}
 				}
+				if ($this->new_user['mailinglist'] != $this->user['mailinglist'])
+				{
+					// If they subscribe to the mailing list, give them a code to one-click unsubscribe with
+					if ($this->new_user['mailinglist'] == "1")
+					{
+						$this->new_user['mailinglist_code'] = md5(random_string());
+					}
+					else
+					{
+						$this->new_user['mailinglist_code'] = "";
+					}
+				}
+				$this->CI->users_model->update($this->user['userid'], $this->new_user);
+				$this->user = $this->new_user;
 			}
-			if ($this->new_user['mailinglist'] != $this->user['mailinglist'])
-			{
-				// If they subscribe to the mailing list, give them a code to one-click unsubscribe with
-				if ($this->new_user['mailinglist'] == "1")
-				{
-					$this->new_user['mailinglist_code'] = md5(random_string());
-				}
-				else
-				{
-					$this->new_user['mailinglist_code'] = "";
-				}
-			}
-			$this->CI->users_model->update($this->user['userid'], $this->new_user);
-			$this->user = $this->new_user;
 		}
 
 		return $result;
