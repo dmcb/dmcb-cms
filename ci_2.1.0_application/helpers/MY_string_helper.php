@@ -30,7 +30,7 @@ if ( ! function_exists('random_string'))
 	function random_string($length = 8)
 	{
 		$result = "";
-		$pool = "0123456789bcdfghjkmnpqrstvwxyz"; 
+		$pool = "0123456789bcdfghjkmnpqrstvwxyz";
 		for ($i = 0; $i < $length; $i++)
 		{
 			$char = substr($pool, mt_rand(0, strlen($pool)-1), 1);
@@ -76,23 +76,26 @@ if ( ! function_exists('reduce_spacing'))
  */
 if ( ! function_exists('to_urlname'))
 {
-	function to_urlname($value, $removeslash = TRUE)
+	function to_urlname($value, $removeslash = TRUE, $removespace = TRUE)
 	{
 		// Remove all double spacing
 		$value = reduce_spacing($value);
 
 		// Convert remaining spacing to dashes
 		$value = strtolower(preg_replace("/\s/","-",$value));
-		
+
 		// Remove anything not a letter, number, dash, or underscore
-		if ($removeslash)
+		$filter = 'a-z0-9-_';
+
+		if (!$removeslash)
 		{
-			$value = preg_replace('/[^a-z0-9-_]+/i',"", $value);
+			$filter .= '\/';
 		}
-		else
+		if (!$removespace)
 		{
-			$value = preg_replace('/[^a-z0-9-_\/]+/i',"", $value);
+			$filter .= ' ';
 		}
-		return strtolower($value);
+
+		return preg_replace('/[^'.$filter.']+/i',"", $value);
 	}
 }

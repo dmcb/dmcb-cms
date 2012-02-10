@@ -290,7 +290,6 @@ class User_lib {
 				$this->new_user['displayname'] = $user_bits[0];
 			}
 
-			$this->new_user['displayname'] = reduce_spacing($this->new_user['displayname']);
 			$this->new_user['displayname'] = $this->suggest();
 			$this->new_user['urlname'] = to_urlname($this->new_user['displayname']);
 
@@ -467,7 +466,7 @@ class User_lib {
 			$proposed_name = $this->new_user['displayname'];
 		}
 
-		$suggestion = $proposed_name;
+		$suggestion = to_urlname($proposed_name, TRUE, FALSE);
 		$i=1;
 		$object = instantiate_library('user', $proposed_name, 'displayname');
 

@@ -228,7 +228,7 @@ class Signon extends MY_Controller {
 			}
 			else
 			{
-				$this->index();
+				$this->_initialize_page('signon_mailinglist', 'Mailing list', $this->data);
 			}
 		}
 	}
