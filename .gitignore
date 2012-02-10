@@ -13,10 +13,17 @@ ci_*_application/views/*/
 files/*/*
 files_managed/*/*
 includes/*
+!includes/adxmenu/
+includes/adxmenu/*/*.css
 !includes/calendardateselect/
+!includes/cufon/
+includes/cufon/*/fonts/
 !includes/lightbox/
 !includes/prototype/
 !includes/scriptaculous/
+!includes/swfupload/
+includes/swfupload/*/*.gif
+includes/swfupload/*/*.css
 !includes/tinymce/
 /robots.txt
 /favicon.*
