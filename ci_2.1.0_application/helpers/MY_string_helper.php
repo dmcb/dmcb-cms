@@ -65,6 +65,31 @@ if ( ! function_exists('reduce_spacing'))
 // ------------------------------------------------------------------------
 
 /**
+ * To friendly name
+ *
+ * Generate friendly name
+ *
+ * @access	public
+ * @param   string  string to parse
+ * @return	string
+ */
+if ( ! function_exists('to_friendlyname'))
+{
+	function to_friendlyname($value)
+	{
+		// Remove all double spacing
+		$value = reduce_spacing($value);
+
+		// Remove anything not a letter, number, dash, or underscore
+		$filter = 'a-z0-9-_ ';
+
+		return preg_replace('/[^'.$filter.']+/i',"", $value);
+	}
+}
+
+// ------------------------------------------------------------------------
+
+/**
  * To url name
  *
  * Generate url friendly name
@@ -76,13 +101,16 @@ if ( ! function_exists('reduce_spacing'))
  */
 if ( ! function_exists('to_urlname'))
 {
-	function to_urlname($value, $removeslash = TRUE, $removespace = TRUE)
+	function to_urlname($value, $removeslash = TRUE)
 	{
 		// Remove all double spacing
 		$value = reduce_spacing($value);
 
 		// Convert remaining spacing to dashes
-		$value = strtolower(preg_replace("/\s/","-",$value));
+		$value = preg_replace("/\s/","-",$value);
+
+		// Lowercase
+		$value = strtolower($value);
 
 		// Remove anything not a letter, number, dash, or underscore
 		$filter = 'a-z0-9-_';
@@ -90,10 +118,6 @@ if ( ! function_exists('to_urlname'))
 		if (!$removeslash)
 		{
 			$filter .= '\/';
-		}
-		if (!$removespace)
-		{
-			$filter .= ' ';
 		}
 
 		return preg_replace('/[^'.$filter.']+/i',"", $value);

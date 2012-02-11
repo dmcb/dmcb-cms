@@ -466,7 +466,7 @@ class User_lib {
 			$proposed_name = $this->new_user['displayname'];
 		}
 
-		$suggestion = to_urlname($proposed_name, TRUE, FALSE);
+		$suggestion = to_friendlyname($proposed_name);
 		$i=1;
 		$object = instantiate_library('user', $proposed_name, 'displayname');
 
