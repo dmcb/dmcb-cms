@@ -152,7 +152,7 @@ class MY_Controller extends CI_Controller {
 		$data['title'] = $title;
 		$data['page'] = $page;
 
-		// Wrap it (allows dynamically built pages to have different view information encapsulating it
+		// Wrap it (allows dynamically built pages to have different view information encapsulating it)
 		$view = $this->load->view($page, $data, TRUE);
 		if ($dynamic)
 		{
@@ -162,7 +162,9 @@ class MY_Controller extends CI_Controller {
 		{
 			$wrapped_view = $this->load->view('page_wrapper_static', array('view' => $view, 'title' => $title), TRUE);
 		}
-		$this->load->view($this->template, array('view' => $wrapped_view));
+
+		$site_content = $this->load->view($this->template.'_content', array('view' => $wrapped_view), TRUE);
+		$this->load->view($this->template, array('site_content' => $site_content));
 	}
 
 	// Render rss feed
