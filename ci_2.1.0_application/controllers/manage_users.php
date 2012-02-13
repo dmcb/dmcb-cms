@@ -511,10 +511,10 @@ class Manage_users extends MY_Controller {
 				{
 					if ($user['mailinglist'])
 					{
-						$message .= "\n\n".
-							"If you no longer wish to receive messages from ".$this->config->item('dmcb_friendly_server').", you unsubscribe at the link below:\n".
+						$unsubscribe_message = "\n\n".
+							"If you no longer wish to receive messages from ".$this->config->item('dmcb_friendly_server').", you can unsubscribe at the link below:\n".
 							base_url()."unlist/".$user['userid']."/".$user['mailinglist_code']."\n\n";
-						$this->notifications_model->send($user['email'], $subject, $message, $attachments, $this->config->item('dmcb_email_mailinglist'));
+						$this->notifications_model->send($user['email'], $subject, $message.$unsubscribe_message, $attachments, $this->config->item('dmcb_email_mailinglist'));
 					}
 				}
 
