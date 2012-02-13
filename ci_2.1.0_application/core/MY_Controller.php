@@ -89,7 +89,7 @@ class MY_Controller extends CI_Controller {
 		// Add ping back header
 		header("X-Pingback: ".base_url()."pingback");
 
-		// Add menus
+		// Add menus from site configuration
 		$this->load->helper('menu_helper');
 		$data['menu'] = array();
 		$i=1;
@@ -116,6 +116,24 @@ class MY_Controller extends CI_Controller {
 
 			$data['menu'][$i] = generate_menu_html($view, $menu, $pageid, $levels, $back_button);
 			$i++;
+		}
+
+		/* Add in global variables that can be set by controllers, pages and blocks:
+		packages
+		focus
+		css
+		cssfiles
+		javascript
+		jsfiles
+		*/
+
+		// Load up packages requested for this view
+		if (isset($this->packages))
+		{
+			foreach ($this->packages as $package -> $properties)
+			{
+				$this->load->view('package_'.$package, $properties, TRUE);
+			}
 		}
 
 		// Set a default focus of null, if a controller didn't set a focus (used for the javascript panels)
@@ -151,9 +169,9 @@ class MY_Controller extends CI_Controller {
 		// Specify page and title and load view
 		$data['title'] = $title;
 		$data['page'] = $page;
-
-		// Wrap it (allows dynamically built pages to have different view information encapsulating it)
 		$view = $this->load->view($page, $data, TRUE);
+
+		// Wrap the view (allows dynamically built pages to have different view information encapsulating it)
 		if ($dynamic)
 		{
 			$wrapped_view = $this->load->view('page_wrapper_dynamic', array('view' =>  $view, 'title' => $title), TRUE);
