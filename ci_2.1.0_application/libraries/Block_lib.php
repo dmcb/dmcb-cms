@@ -7,7 +7,7 @@
  *
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -141,24 +141,22 @@ class Block_lib {
 	 */
 	function output($page_tree = NULL)
 	{
-		// Get block view contents
-		$this->_generate();
 		$output = "";
 
-		// If there were no errors, do a couple of final checks
-		if ($this->error == NULL)
+		// Don't render block if it's function isn't enabled and it isn't an internally defined block
+		if (isset($this->block['parent']) && !$this->block['parent']['enabled'])
 		{
-			// Don't render block if it's function isn't enabled and it isn't an internally defined block
-			if (isset($this->block['parent']) && !$this->block['parent']['enabled'])
-			{
-				$this->error = "Block type isn't enabled";
-			}
-
-			// Don't render block if a page tree is specified, and this block isn't attached to any of it or the site
-			if (isset($page_tree) && $this->block['pageid'] != '0' && !isset($page_tree[$this->block['pageid']]))
-			{
-				$this->error = "Block exists but is not usable on this page";
-			}
+			$this->error = "Block type isn't enabled";
+		}
+		// Don't render block if a page tree is specified, and this block isn't attached to any of it or the site
+		else if (isset($page_tree) && $this->block['pageid'] != '0' && !isset($page_tree[$this->block['pageid']]))
+		{
+			$this->error = "Block exists but is not usable on this page";
+		}
+		// Block is allowed to be used, generate it
+		else
+		{
+			$this->_generate();
 		}
 
 		// If error message was generated, render it instead of data
