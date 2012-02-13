@@ -33,7 +33,7 @@ class Unlist extends MY_Controller {
 		else
 		{
 			$data['subject'] = 'Error';
-			$data['message'] = 'Incorrect code.';
+			$data['message'] = 'Incorrect code. There was likely a problem with your unsubscribe link. Please visit the following link to set your mailing list settings: <a href="'.base_url().'account/messagesettings">'.base_url().'account/messagesettings</a>.';
 		}
 		$this->_message("Unlist account", $data['message'], $data['subject']);
 	}
