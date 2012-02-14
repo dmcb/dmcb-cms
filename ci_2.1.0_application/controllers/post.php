@@ -480,25 +480,11 @@ class Post extends MY_Controller {
 		{
 			if ($this->post->post['css'] != NULL)
 			{
-				if (isset($this->css))
-				{
-					$this->css .= $this->post->post['css'];
-				}
-				else
-				{
-					$this->css = $this->post->post['css'];
-				}
+				$this->css['post'] = array('weight' => '5', 'css' => $this->post->post['css']);
 			}
 			if ($this->post->post['javascript'] != NULL)
 			{
-				if (isset($this->javascript))
-				{
-					$this->javascript .= $this->post->post['javascript'];
-				}
-				else
-				{
-					$this->javascript = $this->post->post['javascript'];
-				}
+				$this->javascript['post'] = array('weight' => '5', 'javascript' => $this->post->post['javascript']);
 			}
 			if ($this->acl->allow('post', 'theme', FALSE, 'post', $this->post->post['postid']))
 			{

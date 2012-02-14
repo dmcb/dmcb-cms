@@ -127,22 +127,22 @@ class MY_Controller extends CI_Controller {
 		jsfiles
 		*/
 
+		// Sort weighted array of packages
+		function _weighted_sort($a, $b)
+		{
+			if ($a['weight'] == $b['weight']) return 0;
+			return ($a['weight'] < $b['weight']) ? -1 : 1;
+		}
+
 		// Load up packages requested for this view
-		$packages = "";
+		$data['packages'] = "";
 		if (isset($this->packages))
 		{
-			// Sort weighted array of packages 
-			function _weighted_sort($a, $b)
-			{
-				if ($a['weight'] == $b['weight']) return 0;
-				return ($a['weight'] < $b['weight']) ? -1 : 1;	
-			}
 			uasort($this->packages, '_weighted_sort');
-			
 			foreach ($this->packages as $key => $value)
 			{
 				if (!isset($value['properties'])) $value['properties'] = NULL;
-				$packages .= $this->load->view('package_'.$key, $value['properties'], TRUE)."\n";
+				$data['packages'] .= $this->load->view('package_'.$key, $value['properties'], TRUE)."\n";
 			}
 		}
 
@@ -157,9 +157,14 @@ class MY_Controller extends CI_Controller {
 		}
 
 		// Endow outputted page with any custom CSS added
+		$data['css'] = "";
 		if (isset($this->css))
 		{
-			$data['css'] = $this->css;
+			uasort($this->css, '_weighted_sort');
+			foreach ($this->css as $key => $value)
+			{
+				$data['css'] .= $value['css']."\n";
+			}
 		}
 		if (isset($this->cssfiles))
 		{
@@ -167,9 +172,14 @@ class MY_Controller extends CI_Controller {
 		}
 
 		// Endow outputted page with any custom Javascript added
+		$data['javascript'] = "";
 		if (isset($this->javascript))
 		{
-			$data['javascript'] = $this->javascript;
+			uasort($this->javascript, '_weighted_sort');
+			foreach ($this->javascript as $key => $value)
+			{
+				$data['javascript'] .= $value['javascript']."\n";
+			}
 		}
 		if (isset($this->jsfiles))
 		{
@@ -192,7 +202,7 @@ class MY_Controller extends CI_Controller {
 		}
 
 		$site_content = $this->load->view($this->template.'_content', array('view' => $wrapped_view), TRUE);
-		$this->load->view($this->template, array('packages' => $packages, 'site_content' => $site_content));
+		$this->load->view($this->template, array('site_content' => $site_content));
 	}
 
 	// Render rss feed
