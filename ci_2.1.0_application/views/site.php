@@ -11,7 +11,8 @@
 
 	<link rel="image_src" href="<?=base_url();?>includes/images/facebook.jpg" />
 	<link rel="pingback" href="<?=base_url();?>pingback" />
-	<?php if (isset($rss)) echo $rss; ?>
+
+<?php if (isset($rss)) echo $rss; ?>
 
 	<!-- prototype -->
 	<script type="text/javascript" src="<?=base_url();?>includes/prototype/1.6.1/prototype.js"></script>
@@ -97,9 +98,8 @@
 		-->
 	</script>
 
-	<?php if (isset($packages_tinymce_blocks)) echo $packages_tinymce_blocks; ?>
-	<?php if (isset($packages_editing)) echo $packages_editing; ?>
-	<?php if (isset($packages_upload)) echo $packages_upload; ?>
+<?php if (isset($packages)) echo $packages; ?>
+
 </head>
 <body>
 

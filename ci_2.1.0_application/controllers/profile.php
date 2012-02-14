@@ -141,13 +141,13 @@ class Profile extends MY_Controller {
 		// User profile editing
 		if ($this->acl->allow('profile', 'edit', FALSE, 'user', $this->user->user['userid']))
 		{
-			$data['packages_upload'] = $this->load->view('packages_upload',
+			$this->packages['swfupload'] = array('weight' => '5', 'properties' =>
 				array(
 					'upload_url' => 'user/'.$this->user->user['urlname'],
 					'upload_size' => $this->config->item('dmcb_profile_upload_size'),
 					'upload_types' => $this->config->item('dmcb_profile_upload_types'),
 					'upload_description' => $this->config->item('dmcb_profile_upload_description')
-				), TRUE);
+				));
 			$data['edit_name'] = $this->load->view('form_profile_editname', array('user' => $this->user->user), TRUE);
 			$data['edit_profile'] = $this->load->view('form_profile_editprofile', array('user' => $this->user->user), TRUE);
 

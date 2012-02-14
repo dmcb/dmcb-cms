@@ -306,7 +306,7 @@ class Page extends MY_Controller {
 			// Enable editing
 			if ($this->acl->allow('page', 'edit', FALSE, 'page', $this->page->page['pageid']))
 			{
-				$data['packages_editing'] = $this->load->view('packages_editing', NULL, TRUE);
+				$this->packages['tinymce'] = array('weight' => '3');
 
 				// Block instances
 				if ($this->acl->enabled('page', 'blocks'))
@@ -338,7 +338,7 @@ class Page extends MY_Controller {
 					}
 					if (sizeof($all_blocks) > 0)
 					{
-						$data['packages_tinymce_blocks'] = $this->load->view('packages_tinymce_blocks', array('blocks' => $all_blocks), TRUE);
+						$this->packages['tinymce_blocks'] = array('weight' => '2', 'properties' => array('blocks' => $all_blocks));
 					}
 
 					// Sort all blocks for editing
@@ -439,13 +439,13 @@ class Page extends MY_Controller {
 			// Enable attachment editing
 			if ($this->acl->allow('page', 'attachments', FALSE, 'page', $this->page->page['pageid']))
 			{
-				$data['packages_upload'] = $this->load->view('packages_upload',
+				$this->packages['swfupload'] = array('weight' => '5', 'properties' =>
 					array(
 						'upload_url' => 'page/'.$this->page->page['urlname'],
 						'upload_size' => $this->config->item('dmcb_site_upload_size'),
 						'upload_types' => $this->config->item('dmcb_site_upload_types'),
 						'upload_description' => $this->config->item('dmcb_site_upload_description')
-					), TRUE);
+					));
 
 				// Grab attachments
 				$this->load->model('files_model');

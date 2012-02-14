@@ -79,7 +79,7 @@ class Template extends MY_Controller {
 	function index()
 	{
 		// Add editing packages to page
-		$data['packages_editing'] = $this->load->view('packages_editing', NULL, TRUE);
+		$this->packages['tinymce'] = array('weight' => '3');
 
 		// Tack on blocks java script array
 		$this->load->model('blocks_model');
@@ -107,7 +107,7 @@ class Template extends MY_Controller {
 
 		if (sizeof($all_blocks) > 0)
 		{
-			$data['packages_tinymce_blocks'] = $this->load->view('packages_tinymce_blocks', array('blocks' => $all_blocks), TRUE);
+			$this->packages['tinymce_blocks'] = array('weight' => '2', 'properties' => array('blocks' => $all_blocks));
 		}
 
 		$data['template'] = $this->template->template;

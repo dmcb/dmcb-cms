@@ -13,7 +13,7 @@ class Block extends MY_Controller {
 	function Block()
 	{
 		parent::__construct();
-		
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 	}
@@ -33,7 +33,7 @@ class Block extends MY_Controller {
 		else if ($this->block->block['pageid'] == 0 && !$this->acl->allow('site', 'manage_content', TRUE))
 		{
 			// User doesn't have rights to edit site-wide blocks
-			$this->_access_denied();		
+			$this->_access_denied();
 		}
 		else
 		{
@@ -49,12 +49,12 @@ class Block extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function index()
 	{
 		// Add editing packages to page
-		$data['packages_editing'] = $this->load->view('packages_editing', NULL, TRUE);	
-			
+		$this->packages['tinymce'] = array('weight' => '3');
+
 		// Tack on blocks java script array
 		$this->load->model('blocks_model');
 		$all_blocks = array();
@@ -78,33 +78,33 @@ class Block extends MY_Controller {
 			$object = instantiate_library('block', $blockid['blockinstanceid']);
 			array_push($all_blocks, $object->block);
 		}
-		
+
 		if (sizeof($all_blocks) > 0)
 		{
-			$data['packages_tinymce_blocks'] = $this->load->view('packages_tinymce_blocks', array('blocks' => $all_blocks), TRUE);
+			$this->packages['tinymce_blocks'] = array('weight' => '2', 'properties' => array('blocks' => $all_blocks));
 		}
 
 		$data['block'] = $this->block->block;
-		
+
 		$this->_initialize_page('block', 'Edit block '.$this->block->block['title'], $data);
 	}
-	
+
 	function edit()
 	{
 		// Set fields and dynamically generate all variable fields
 		$this->form_validation->set_rules('blocktitle',' title', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[20]|callback_blocktitle_check');
 		$this->form_validation->set_rules('feedback',' title', 'xss_clean');
-		
+
 		foreach ($this->block->block['variables']->result_array() as $variable)
 		{
 			$variablename = $variable['variablename'];
 			$rulestring = "trim|max_length[2000]";
-			
+
 			if ($variable['pattern'] != "+") // Any non-text box field should do xss_clean
 			{
 				$rulestring .= "|xss_clean|strip_tags";
 			}
-			
+
 			// If there are custom rules defined, use them, otherwise use default
 			if (isset($variable['rules']))
 			{
@@ -115,14 +115,14 @@ class Block extends MY_Controller {
 				$rulestring .= "|callback_blockvalue_check";
 			}
 			$this->form_validation->set_rules($variablename, $variablename, $rulestring);
-			
+
 			// If the variable allows for a selection choice OR a specific text input, add a specify field
 			if ($variable['pattern'] != "*" && strstr($variable['pattern'], '*'))
 			{
 				$this->form_validation->set_rules($variablename.'_specify', $variablename.'_specify', $rulestring);
 			}
 		}
-			
+
 		if ($this->form_validation->run())
 		{
 			if ($_POST['buttonchoice'] == "delete")
@@ -130,7 +130,7 @@ class Block extends MY_Controller {
 				$this->block->delete();
 			}
 			else
-			{			
+			{
 				$this->block->new_block['title'] = set_value('blocktitle');
 				$this->block->new_block['feedback'] = set_value('feedback');
 				$this->block->new_block['values'] = array();
@@ -149,7 +149,7 @@ class Block extends MY_Controller {
 				}
 				$this->block->save();
 			}
-			
+
 			if ($this->block->block['pageid'] != 0)
 			{
 				$page = instantiate_library('page', $this->block->block['pageid']);
@@ -165,7 +165,7 @@ class Block extends MY_Controller {
 			$this->index();
 		}
 	}
-	
+
 	function blockvalue_check($str)
 	{
 		if ($str == "")
@@ -187,7 +187,7 @@ class Block extends MY_Controller {
 			return TRUE;
 		}
 	}
-	
+
 	function blocktitle_check($str)
 	{
 		$object = instantiate_library('block', $str, 'title');

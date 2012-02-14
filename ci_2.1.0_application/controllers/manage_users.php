@@ -70,14 +70,13 @@ class Manage_users extends MY_Controller {
 			}
 
 			// Add editing packages (specifically for calendar option and email attachments)
-			$data['packages_editing'] = $this->load->view('packages_editing', NULL, TRUE);
-			$this->data['packages_upload'] = $this->load->view('packages_upload',
+			$this->packages['swfupload'] = array('weight' => '5', 'properties' => 
 				array(
 					'upload_url' => 'email',
 					'upload_size' => $this->config->item('dmcb_site_upload_size'),
 					'upload_types' => $this->config->item('dmcb_site_upload_types'),
 					'upload_description' => $this->config->item('dmcb_site_upload_description')
-				), TRUE);
+				));
 
 			$method = $this->uri->segment(2);
 			if ($method == "adduser" || $method == "email" || $method == "mailinglist" || $method == "password" || $method == "report" || $method == "subscription")

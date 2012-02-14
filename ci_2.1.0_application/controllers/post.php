@@ -438,7 +438,7 @@ class Post extends MY_Controller {
 		// Enable editing
 		if ($this->acl->allow('post', 'edit', FALSE, 'post', $this->post->post['postid']))
 		{
-			$data['packages_editing'] = $this->load->view('packages_editing', NULL, TRUE);
+			$this->packages['tinymce'] = array('weight' => '3');
 
 			// Set editor type from template
 			$simple_editor = FALSE;
@@ -452,13 +452,13 @@ class Post extends MY_Controller {
 		// Enable attachment editing
 		if ($this->acl->allow('post', 'attachments', FALSE, 'post', $this->post->post['postid']))
 		{
-			$data['packages_upload'] = $this->load->view('packages_upload',
+			$this->packages['swfupload'] = array('weight' => '5', 'properties' =>
 				array(
 					'upload_url' => 'post/'.$this->post->post['urlname'],
 					'upload_size' => $this->config->item('dmcb_site_upload_size'),
 					'upload_types' => $this->config->item('dmcb_site_upload_types'),
 					'upload_description' => $this->config->item('dmcb_site_upload_description')
-				), TRUE);
+				));
 
 			// Grab stock images, if we have multiple, we will let the user choose if they want to set any as the post image
 			$stockimages = array();
@@ -509,6 +509,8 @@ class Post extends MY_Controller {
 		// Enable events
 		if ($this->acl->allow('post', 'event', FALSE, 'post', $this->post->post['postid']))
 		{
+			$this->packages['calendardateselect'] = array('weight' => '1');
+
 			$data['edit_event'] = $this->load->view('form_post_editevent', array('post' => $this->post->post), TRUE);
 		}
 

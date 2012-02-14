@@ -128,11 +128,21 @@ class MY_Controller extends CI_Controller {
 		*/
 
 		// Load up packages requested for this view
+		$packages = "";
 		if (isset($this->packages))
 		{
-			foreach ($this->packages as $package -> $properties)
+			// Sort weighted array of packages 
+			function _weighted_sort($a, $b)
 			{
-				$this->load->view('package_'.$package, $properties, TRUE);
+				if ($a['weight'] == $b['weight']) return 0;
+				return ($a['weight'] < $b['weight']) ? -1 : 1;	
+			}
+			uasort($this->packages, '_weighted_sort');
+			
+			foreach ($this->packages as $key => $value)
+			{
+				if (!isset($value['properties'])) $value['properties'] = NULL;
+				$packages .= $this->load->view('package_'.$key, $value['properties'], TRUE)."\n";
 			}
 		}
 
@@ -182,7 +192,7 @@ class MY_Controller extends CI_Controller {
 		}
 
 		$site_content = $this->load->view($this->template.'_content', array('view' => $wrapped_view), TRUE);
-		$this->load->view($this->template, array('site_content' => $site_content));
+		$this->load->view($this->template, array('packages' => $packages, 'site_content' => $site_content));
 	}
 
 	// Render rss feed
