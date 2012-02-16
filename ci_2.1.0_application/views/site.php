@@ -49,7 +49,6 @@
 				Effect.InitializePage('<?=$focus;?>');
 			}
 		);
-		document.write('<style type="text/css">div.panel { width: 0; height: 0; }</style>');
 		-->
 	</script>
 
