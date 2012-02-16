@@ -14,35 +14,7 @@
 
 <?php if (isset($rss)) echo $rss; ?>
 
-	<!-- prototype -->
-	<script type="text/javascript" src="<?=base_url();?>includes/prototype/1.6.1/prototype.js"></script>
-
-	<!-- scriptaculous -->
-	<script type="text/javascript" src="<?=base_url();?>includes/scriptaculous/1.8.3/scriptaculous.js?load=effects,builder,controls"></script>
-
-	<!-- lightbox -->
-	<script type="text/javascript" src="<?=base_url();?>includes/lightbox/2.04/lightbox.js"></script>
-	<style type="text/css">@import "<?=base_url();?>includes/lightbox/2.04/css/lightbox.css";</style>
-
-	<!-- Horinaja -->
-	<script type="text/javascript" src="<?=base_url();?>includes/horinaja/class.horinaja.scriptaculous.js"></script>
-	<style type="text/css">@import "<?=base_url();?>includes/horinaja/horinaja.css";</style>
-	<script type="text/javascript">
-		<!--
-		document.write('<style type="text/css">.horinaja ul li {display: block;}</style>');
-		-->
-	</script>
-
-	<!-- adxmenu -->
-	<style type="text/css">@import "<?=base_url();?>includes/adxmenu/4.0/adxmenu.css";</style>
-	<!--[if lte IE 6]>
-		<script type="text/javascript" src="<?=base_url();?>includes/adxmenu/4.0/adxmenu.js"></script>
-	<![endif]-->
-
-	<!-- supersleight -->
-	<!--[if lte IE 6]>
-	<script type="text/javascript" src="<?=base_url();?>includes/supersleight/supersleight-min.js"></script>
-	<![endif]-->
+<?php if (isset($prepackages)) echo $prepackages; ?>
 
 	<!-- dmcb styles-->
 	<style type="text/css">
@@ -58,23 +30,6 @@
 		?>
 		<?php if (isset($css)) echo $css; ?>
 	</style>
-
-	<!--[if IE 6]>
-	<style type="text/css">
-		@import "<?=base_url();?>includes/styles/ie6.css";
-	</style>
-	<![endif]-->
-
-	<!-- cufon (needs to be after styles load up) -->
-	<script src="<?=base_url();?>includes/cufon/1.09/cufon-yui.js" type="text/javascript"></script>
-	<script src="<?=base_url();?>includes/cufon/1.09/fonts/Love_Ya_Like_A_Sister_400.font.js" type="text/javascript"></script>
-	<script type="text/javascript">
-			Cufon.replace('h1');
-			Cufon.replace('h2');
-			Cufon.replace('h3');
-			Cufon.replace('legend', { hover: true });
-			Cufon.replace('ul.menu a:not(ul.menu ul li a)');
-	</script>
 
 	<!-- dmcb scripts -->
 	<script type="text/javascript" src="<?=base_url();?>includes/scripts/functions.js"></script>
@@ -104,9 +59,6 @@
 <body>
 
 	<?php echo $site_content; ?>
-
-	<!-- cufon -->
-	<script type="text/javascript"> Cufon.now(); </script>
 
 	<!-- google analytics -->
 	<script type="text/javascript">

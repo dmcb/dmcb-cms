@@ -135,14 +135,32 @@ class MY_Controller extends CI_Controller {
 		}
 
 		// Load up packages requested for this view
+		$data['prepackages'] = "";
 		$data['packages'] = "";
+
+		if (isset($this->packages) && $this->config->item('dmcb_packages'))
+		{
+			$this->packages = array_merge($this->config->item('dmcb_packages'), $this->packages);
+		}
+		else if ($this->config->item('dmcb_packages'))
+		{
+			$this->packages = $this->config->item('dmcb_packages');
+		}
+
 		if (isset($this->packages))
 		{
 			uasort($this->packages, '_weighted_sort');
 			foreach ($this->packages as $key => $value)
 			{
 				if (!isset($value['properties'])) $value['properties'] = NULL;
-				$data['packages'] .= $this->load->view('package_'.$key, $value['properties'], TRUE)."\n";
+				if ($value['weight'] < 0)
+				{
+					$data['prepackages'] .= $this->load->view('package_'.$key, $value['properties'], TRUE)."\n";
+				}
+				else
+				{
+					$data['packages'] .= $this->load->view('package_'.$key, $value['properties'], TRUE)."\n";
+				}
 			}
 		}
 
