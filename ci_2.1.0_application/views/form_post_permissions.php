@@ -46,13 +46,15 @@
 				<?php echo form_error('displayname'); ?>
 			</div>
 
-			<script type="text/javascript">
-				new Ajax.Autocompleter('displayname','autocomplete','<?php echo base_url();?>autocomplete/user', {
-					<?php if ($this->config->item('csrf_protection')) echo "parameters: '".$this->security->get_csrf_token_name()."=".$this->security->get_csrf_hash()."',";?>
+			<?php
+			if ($this->config->item('csrf_protection')) $csrf = "parameters: '".$this->security->get_csrf_token_name()."=".$this->security->get_csrf_hash()."',";
+			$this->javascript['autocomplete'] = array('weight' => 1, 'javascript' => "
+				new Ajax.Autocompleter('displayname','autocomplete','".base_url()."autocomplete/user', {
+					".$csrf."
 					minChars: 2,
 					frequency: 0.1
-				});
-			</script>
+				});");
+			?>
 
 			<div class="formnotes">
 				<p>If you are adding a new user to the site, in addition to their display name, enter their email address below. Otherwise ignore the email field and enter an existing user's display name.</p>
