@@ -19,8 +19,8 @@ class Autocomplete extends MY_Controller {
 	{
 		$this->load->model('users_model');
 
-		$value = $this->input->post('displayname');
-		$choices = $this->users_model->autocomplete($value);
+		$value = $this->input->post(NULL, TRUE);
+		$choices = $this->users_model->autocomplete(array_shift($value));
 
 		if ($choices->num_rows() > 0)
 		{
