@@ -20,6 +20,13 @@ class MY_Controller extends CI_Controller {
     {
         parent::__construct();
 
+		// Define global variables that can be set by controllers, pages and blocks:
+		$this->packages = array();
+		$this->focus = "null";
+		$this->css = array();
+		$this->cssfiles = array();
+		$this->javascript = array();
+
 		// Switch to mobile theme if developed
 		$this->load->library('user_agent');
         if ($this->agent->is_mobile() && $this->config->item('dmcb_mobile_template') == "true")
@@ -118,15 +125,6 @@ class MY_Controller extends CI_Controller {
 			$i++;
 		}
 
-		/* Add in global variables that can be set by controllers, pages and blocks:
-		packages
-		focus
-		css
-		cssfiles
-		javascript
-		jsfiles
-		*/
-
 		// Sort weighted array of packages
 		function _weighted_sort($a, $b)
 		{
@@ -164,15 +162,8 @@ class MY_Controller extends CI_Controller {
 			}
 		}
 
-		// Set a default focus of null, if a controller didn't set a focus (used for the javascript panels)
-		if (!isset($this->focus))
-		{
-			$data['focus'] = "null";
-		}
-		else
-		{
-			$data['focus'] = $this->focus;
-		}
+		// Set a default focus (used for the javascript panels)
+		$data['focus'] = $this->focus;
 
 		// Endow outputted page with any custom CSS added
 		$data['css'] = "";
@@ -190,7 +181,7 @@ class MY_Controller extends CI_Controller {
 		}
 
 		// Endow outputted page with any custom Javascript added
-		$data['javascript'] = "";
+		$data['javascript'] = "Effect.InitializePage('".$this->focus."');\n";
 		if (isset($this->javascript))
 		{
 			uasort($this->javascript, '_weighted_sort');

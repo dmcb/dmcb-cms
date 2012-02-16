@@ -20,35 +20,33 @@
 	<style type="text/css">
 		@import "<?=base_url();?>includes/styles/elements.css";
 		@import "<?=base_url();?>includes/styles/layout.css";
-		<?php if (isset($cssfiles))
-		{
-			foreach($cssfiles as $cssfile)
-			{
-				echo '@import "'.base_url().substr($cssfile,1).'";';
-			}
-		}
-		?>
-		<?php if (isset($css)) echo $css; ?>
+<?php if (isset($cssfiles))
+{
+	foreach($cssfiles as $cssfile)
+	{
+		echo '@import "'.base_url().substr($cssfile,1).'";';
+	}
+}
+?>
+<?php if (isset($css)) echo $css; ?>
 	</style>
 
 	<!-- dmcb scripts -->
 	<script type="text/javascript" src="<?=base_url();?>includes/scripts/functions.js"></script>
 	<script type="text/javascript" src="<?=base_url();?>includes/scripts/panels.js"></script>
-	<?php if (isset($jsfiles))
+<?php if (isset($jsfiles))
+{
+	foreach($jsfiles as $jsfile)
 	{
-		foreach($jsfiles as $jsfile)
-		{
-			echo '<script type="text/javascript" src="'.base_url().substr($jsfile,1).'"></script>';
-		}
+		echo '<script type="text/javascript" src="'.base_url().substr($jsfile,1).'"></script>';
 	}
-	?>
+}
+?>
 	<script type="text/javascript">
 		<!--
-		<?php if (isset($javascript)) echo $javascript;?>
-		dmcb.addLoadEvent(function () {
-				Effect.InitializePage('<?=$focus;?>');
-			}
-		);
+			dmcb.addLoadEvent(function () {
+				<?php if (isset($javascript)) echo $javascript;?>
+			});
 		-->
 	</script>
 
