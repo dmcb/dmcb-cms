@@ -20,6 +20,13 @@ class MY_Controller extends CI_Controller {
     {
         parent::__construct();
 
+		// Make sure the DB is up to date
+        $this->load->library('migration');
+		if (!$this->migration->current())
+		{
+			show_error($this->migration->error_string());
+		}
+
 		// Define global variables that can be set by controllers, pages and blocks:
 		$this->packages = array();
 		$this->focus = "null";
