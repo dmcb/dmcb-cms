@@ -217,18 +217,34 @@ class Signon extends MY_Controller {
 		if ($this->config->item('dmcb_guest_signup'))
 		{
 			$this->form_validation->set_rules('signup_email', 'email address', 'xss_clean|strip_tags|trim|required|max_length[50]|valid_email|callback_email_check');
+			$this->form_validation->set_rules('ajax', 'ajax', 'xss_clean');
 
 			if ($this->form_validation->run())
 			{
 				$this->load->library('user_lib',NULL,'new_user');
 				$this->new_user->new_user['email'] = set_value('signup_email');
+				$this->new_user->new_user['mailinglist'] = TRUE;
 				$result = $this->new_user->save();
 
-				$this->_message("Sign up", $result['message'], $result['subject']);
+				if (set_value('ajax'))
+				{
+					echo $result['message'];
+				}
+				else
+				{
+					$this->_message("Sign up", $result['message'], $result['subject']);
+				}
 			}
 			else
 			{
-				$this->_initialize_page('signon_mailinglist', 'Mailing list', $this->data);
+				if (set_value('ajax'))
+				{
+					echo form_error('signup_email');
+				}
+				else
+				{
+					$this->_initialize_page('signon_mailinglist', 'Mailing list', $this->data);
+				}
 			}
 		}
 	}

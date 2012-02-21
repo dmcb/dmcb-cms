@@ -372,11 +372,29 @@ class User_lib {
 
 						$this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message);
 					}
+					else if (isset($this->new_user['mailinglist']) && $this->new_user['mailinglist']) // User self-registered a mailing list subscription
+					{
+						$message = sprintf($this->CI->lang->line('user_created_by_self_mailinglist_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
+							$this->CI->lang->line('user_created_by_self_mailinglist_email_activation')."\n".
+							base_url()."activate/".$result['userid']."/".$result['code']."\n\n".
+							sprintf($this->CI->lang->line('user_created_by_self_mailinglist_email_error'), $this->CI->config->item('dmcb_email_support'));
+
+						if ($this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message))
+						{
+							$result['subject'] = $this->CI->lang->line('activation_sent_self_mailinglist_subject');
+							$result['message'] = sprintf($this->CI->lang->line('activation_sent_self_mailinglist'), $this->CI->config->item('dmcb_friendly_server'));
+						}
+						else {
+							$result['subject'] = $this->CI->lang->line('error_activation_sent_self_mailinglist_subject');
+							$result['message'] = sprintf($this->CI->lang->line('error_activation_sent_self_mailinglist'), $this->CI->config->item('dmcb_friendly_server'), "<a href=\"mailto:".$this->CI->config->item('dmcb_email_support')."\">".$this->CI->config->item('dmcb_email_support')."</a>");
+						}
+					}
 					else // User self-registered
 					{
 						$message = sprintf($this->CI->lang->line('user_created_by_self_email'), $this->CI->config->item('dmcb_friendly_server'))."\n\n".
 							$this->CI->lang->line('user_created_by_self_email_activation')."\n".
-							base_url()."activate/".$result['userid']."/".$result['code'];
+							base_url()."activate/".$result['userid']."/".$result['code']."\n\n".
+							sprintf($this->CI->lang->line('user_created_by_self_mailinglist_email_error'), $this->CI->config->item('dmcb_email_support'));
 
 						if ($this->CI->notifications_model->send($this->new_user['email'], $this->CI->config->item('dmcb_friendly_server').' account', $message))
 						{

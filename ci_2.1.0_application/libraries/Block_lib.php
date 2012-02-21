@@ -1616,6 +1616,25 @@ class Block_lib {
 	// --------------------------------------------------------------------
 
 	/**
+	 * Signup for mailing list block
+	 *
+	 * Creates ajax form for mailing list signups
+	 *
+	 * @access	private
+	 * @return	void
+	 */
+	function _block_signup_mailinglist()
+	{
+		if (!$this->CI->session->userdata('signedon'))
+		{
+			array_push($this->contents, array("view" => "block_".$this->block['function'], "data" => NULL));
+		}
+	}
+
+
+	// --------------------------------------------------------------------
+
+	/**
 	 * Twitter block
 	 *
 	 * Twitter block generates tweets from a feed
