@@ -1,7 +1,6 @@
 # Ignore all site-specific files
 
 backup/
-bin/*.pl
 cgi-bin/
 ci_*_application/cache
 ci_*_application/config/config.php

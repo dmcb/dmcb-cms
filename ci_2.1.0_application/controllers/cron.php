@@ -30,25 +30,36 @@ class Cron extends MY_Controller {
 
 		if (!$crons_to_run->num_rows())
 		{
-			echo "No crons to run.";
+			echo "No crons to run.\n";
 		}
 
 		foreach ($crons_to_run->result_array() as $cron)
 		{
 			echo "Running cron ".$cron['cron'].".\n";
 
-			if ($cron == "count_views")
+			if ($cron['cron'] == "count_views")
 			{
-
-
+				$this->load->model('views_model');
+				echo $this->views_model->archive();
 			}
-			else if ($cron == "site_backup")
+			else if ($cron['cron'] == "site_backup")
 			{
-				system('mysqldump --opt -h '.$this->db['default']['hostname'].
-					' -u '.$this->db['default']['username'].
-					' -p '.$this->db['default']['password'].
-					' '.$this->db['default']['urbanitedb'].
-					' > backup/'.$this->db['default']['urbanitedb'].'.sql');
+				system('mysqldump -h '.$this->db->hostname.' -u'.$this->db->username.' -p'.$this->db->password.' --databases '.$this->db->database.' > backup/'.$this->db->database.'.sql', $return_value);
+				echo "mysqldump return value: ".$return_value."\n";
+				system("tar --exclude 'backup/*.tar.gz' -czf backup/".date("Ymd").".".$this->config->item('dmcb_server').".tar.gz .", $return_value);
+				echo "tar return value: ".$return_value."\n";
+
+				if ($backup_folder = opendir('backup'))
+				{
+					while (false !== ($file = readdir($backup_folder)))
+					{
+						if ($file != "." && $file != ".." && $file != ".htaccess" && time() - filemtime('backup/'.$file) > 2419200) {
+							echo "Removing backup archive older than 4 weeks: backup/".$file."\n";
+							unlink('backup/'.$file);
+						}
+					}
+					closedir($backup_folder);
+				}
 			}
 
 			$this->crons_model->run($cron['cron']);
