@@ -110,7 +110,7 @@ class MY_Controller extends CI_Controller {
 		while ($this->config->item('dmcb_menu_'.$i))
 		{
 			$menu_definition = $this->config->item('dmcb_menu_'.$i);
-			$view = $menu_definition[0];
+			$menu_pages = $menu_definition[0];
 			$menu = $menu_definition[1];
 			$current = $menu_definition[2];
 			if ($current == "neighbours" && isset($data['page']['pageid']) && $data['page']['menu'] == $menu)
@@ -128,9 +128,14 @@ class MY_Controller extends CI_Controller {
 			$levels = $menu_definition[3];
 			$back_button = $menu_definition[4];
 
-			$data['menu'][$i] = generate_menu_html($view, $menu, $pageid, $levels, $back_button);
+			$data['menu'][$i] = generate_menu_html($menu_pages, $menu, $pageid, $levels, $back_button);
 			$i++;
 		}
+
+		// Specify page and title and load view
+		$data['title'] = $title;
+		$data['page'] = $page;
+		$data['view'] = $this->load->view($page, $data, TRUE);
 
 		// Sort weighted array of packages
 		function _weighted_sort($a, $b)
@@ -202,23 +207,18 @@ class MY_Controller extends CI_Controller {
 			$data['jsfiles'] = $this->jsfiles;
 		}
 
-		// Specify page and title and load view
-		$data['title'] = $title;
-		$data['page'] = $page;
-		$view = $this->load->view($page, $data, TRUE);
-
 		// Wrap the view (allows dynamically built pages to have different view information encapsulating it)
 		if ($dynamic)
 		{
-			$wrapped_view = $this->load->view('page_wrapper_dynamic', array('view' =>  $view, 'title' => $title), TRUE);
+			$data['view'] = $this->load->view('page_wrapper_dynamic', $data, TRUE);
 		}
 		else
 		{
-			$wrapped_view = $this->load->view('page_wrapper_static', array('view' => $view, 'title' => $title), TRUE);
+			$data['view'] = $this->load->view('page_wrapper_static', $data, TRUE);
 		}
 
-		$site_content = $this->load->view($this->template.'_content', array('view' => $wrapped_view), TRUE);
-		$this->load->view($this->template, array('site_content' => $site_content));
+		$data['site_content'] = $this->load->view($this->template.'_content', $data, TRUE);
+		$this->load->view($this->template, $data);
 	}
 
 	// Render rss feed
