@@ -41,7 +41,7 @@ class Posts_model extends CI_Model {
 
 	function autocomplete($value)
 	{
-		return $this->db->query("SELECT urlname AS result FROM posts WHERE urlname REGEXP '[[:<:]]".$this->db->escape_like_str($value)."' ORDER BY urlname ASC");
+		return $this->db->query("SELECT urlname AS result FROM posts WHERE urlname REGEXP '[[:<:]]/?".$this->db->escape_like_str($value)."' ORDER BY urlname ASC");
 	}
 
 	function delete($postid)
