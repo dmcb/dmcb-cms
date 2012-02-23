@@ -51,6 +51,11 @@ class Categories_model extends CI_Model {
 		$this->db->query("UPDATE categories SET heldback='0', name = ".$this->db->escape($name).", urlname = ".$this->db->escape($urlname)." WHERE categoryid = ".$this->db->escape($categoryid));
 	}
 	
+	function autocomplete($value)
+	{
+		return $this->db->query("SELECT name AS result FROM categories WHERE name REGEXP '[[:<:]]".$this->db->escape_like_str($value)."' ORDER BY name ASC");
+	}
+	
 	function delete($categoryid)
 	{
 		$this->db->query("DELETE FROM categories WHERE categoryid = ".$this->db->escape($categoryid));

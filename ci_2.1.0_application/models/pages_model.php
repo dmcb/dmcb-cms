@@ -27,6 +27,11 @@ class Pages_model extends CI_Model {
 		$this->db->query("INSERT INTO pages_protection (pageid, roleid) VALUES (".$this->db->escape($pageid).", ".$this->db->escape($roleid).")");
 	}
 	
+	function autocomplete($value)
+	{
+		return $this->db->query("SELECT urlname AS result FROM pages WHERE urlname REGEXP '[[:<:]]".$this->db->escape_like_str($value)."' ORDER BY urlname ASC");
+	}
+	
 	function delete($pageid)
 	{
 		$this->db->query("DELETE FROM pages WHERE pageid=".$this->db->escape($pageid));
