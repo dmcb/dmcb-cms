@@ -18,19 +18,26 @@ class Autocomplete extends MY_Controller {
 	function _remap()
 	{
 		// Get input
-		$value = array_shift($this->input->post(NULL, TRUE));
+		$post_value = array_shift($this->input->post(NULL, TRUE));
 
-		$method = $this->uri->segment(2);
-		$choices = $this->$method($value);
+		// Get last input from semi-colon seperated list
+		$pieces = explode(";", $post_value);
+		$value = $pieces[sizeof($pieces)-1];
 
-		if ($choices->num_rows() > 0)
+		if (strlen($value) > 1)
 		{
-			echo '<ul>';
-			foreach ($choices->result_array() as $choice)
+			$method = $this->uri->segment(2);
+			$choices = $this->$method($value);
+
+			if ($choices->num_rows() > 0)
 			{
-				echo '<li>'.$choice['result'].'</li>';
+				echo '<ul>';
+				foreach ($choices->result_array() as $choice)
+				{
+					echo '<li>'.$choice['result'].'</li>';
+				}
+				echo '</ul>';
 			}
-			echo '</ul>';
 		}
 	}
 

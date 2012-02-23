@@ -34,7 +34,6 @@
 					foreach ($block['variables']->result_array() as $variable)
 					{
 						$variablename = $variable['variablename'];
-						$variablenamespecify = $variable['variablename'].'_specify';
 						echo '<div class="forminput">';
 						echo '<label>'.ucfirst(str_replace('_', ' ', $variablename)).'</label>';
 
@@ -60,18 +59,18 @@
 							echo '</select>';
 							if (strstr($variable['pattern'], '*')) // If variable choices has a *, add a specify field
 							{
+								$variablename = $variable['variablename'].'_specify';
 								echo ' or specify ';
-								echo '<input name="'.$variablenamespecify.'" type="text" class="text sameline" maxlength="100" value="';
+								echo '<input name="'.$variablename.'" id="'.$variablename.'" type="text" class="text sameline" maxlength="100" value="';
 								if (!$chosen && isset($block['values'][$variablename]))
 								{
-									echo set_value($variablenamespecify, $block['values'][$variablename]);
+									echo set_value($variablename, $block['values'][$variablename]);
 								}
 								else
 								{
-									echo set_value($variablenamespecify);
+									echo set_value($variablename);
 								}
 								echo '"/>';
-								echo form_error($variablenamespecify);
 							}
 						}
 						else if ($variable['pattern'] == "+") // Variable choice is designed for a text box
@@ -86,11 +85,10 @@
 								echo set_value($variablename);
 							}
 							echo '</textarea>';
-							echo form_error($variablename);
 						}
 						else // Variable choice is a *, so it's only a specify field
 						{
-							echo '<input name="'.$variablename.'" type="text" class="text" maxlength="100" value="';
+							echo '<input name="'.$variablename.'" id="'.$variablename.'" type="text" class="text" maxlength="100" value="';
 							if (!$chosen && isset($block['values'][$variablename]))
 							{
 								echo set_value($variablename, $block['values'][$variablename]);
@@ -100,8 +98,22 @@
 								echo set_value($variablename);
 							}
 							echo '"/>';
-							echo form_error($variablename);
 						}
+
+						if (strstr($variable['pattern'], '*') && ($variable['variablename'] == "category" || $variable['variablename'] == "page" || $variable['variablename'] == "post" || $variable['variablename'] == "user"))
+						{
+							if ($this->config->item('csrf_protection')) $csrf = "parameters: '".$this->security->get_csrf_token_name()."=".$this->security->get_csrf_hash()."',";
+							$this->javascript['autocomplete_'.$variablename] = array('weight' => 1, 'javascript' => "
+				new Ajax.Autocompleter('".$variablename."','autocomplete_".$variablename."','".base_url()."autocomplete/".$variable['variablename']."', {
+					".$csrf."
+					minChars: 2,
+					frequency: 0.1,
+					tokens: ';'
+				});");
+							echo '<div class="autocomplete" id="autocomplete_'.$variablename.'" style="display: none; position:relative;"></div>';
+						}
+
+						echo form_error($variablename);
 						echo '</div>';
 					}
 				?>
