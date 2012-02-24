@@ -164,7 +164,7 @@ class Posts_model extends CI_Model {
 			$usernames = explode(";",$users);
 			for ($i=0; $i<sizeof($usernames); $i++)
 			{
-				$sql_page .= "users.urlname = ".$this->db->escape($usernames[$i]);
+				$sql_page .= "users.displayname = ".$this->db->escape($usernames[$i]);
 				if ($i != sizeof($usernames)-1)
 				{
 					$sql_page .= " OR ";
@@ -174,7 +174,7 @@ class Posts_model extends CI_Model {
 			$sql_page .= ")) OR (posts.postid = posts_contributors.postid AND posts_contributors.userid = users.userid AND (";
 			for ($i=0; $i<sizeof($usernames); $i++)
 			{
-				$sql_page .= "users.urlname = ".$this->db->escape($usernames[$i]);
+				$sql_page .= "users.displayname = ".$this->db->escape($usernames[$i]);
 				if ($i != sizeof($usernames)-1)
 				{
 					$sql_page .= " OR ";
@@ -248,7 +248,7 @@ class Posts_model extends CI_Model {
 			$usernames = explode(";",$users);
 			for ($i=0; $i<sizeof($usernames); $i++)
 			{
-				$sql_page .= "users.urlname = ".$this->db->escape($usernames[$i]);
+				$sql_page .= "users.displayname = ".$this->db->escape($usernames[$i]);
 				if ($i != sizeof($usernames)-1)
 				{
 					$sql_page .= " OR ";
@@ -258,7 +258,7 @@ class Posts_model extends CI_Model {
 			$sql_page .= ")) OR (posts.postid = posts_contributors.postid AND posts_contributors.userid = users.userid AND (";
 			for ($i=0; $i<sizeof($usernames); $i++)
 			{
-				$sql_page .= "users.urlname = ".$this->db->escape($usernames[$i]);
+				$sql_page .= "users.displayname = ".$this->db->escape($usernames[$i]);
 				if ($i != sizeof($usernames)-1)
 				{
 					$sql_page .= " OR ";

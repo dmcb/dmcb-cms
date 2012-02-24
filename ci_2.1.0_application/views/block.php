@@ -62,9 +62,9 @@
 								$variablename = $variable['variablename'].'_specify';
 								echo ' or specify ';
 								echo '<input name="'.$variablename.'" id="'.$variablename.'" type="text" class="text sameline" maxlength="100" value="';
-								if (!$chosen && isset($block['values'][$variablename]))
+								if (!$chosen && isset($block['values'][$variable['variablename']]))
 								{
-									echo set_value($variablename, $block['values'][$variablename]);
+									echo set_value($variablename, $block['values'][$variable['variablename']]);
 								}
 								else
 								{
@@ -102,13 +102,14 @@
 
 						if (strstr($variable['pattern'], '*') && ($variable['variablename'] == "category" || $variable['variablename'] == "page" || $variable['variablename'] == "post" || $variable['variablename'] == "user"))
 						{
-							if ($this->config->item('csrf_protection')) $csrf = "parameters: '".$this->security->get_csrf_token_name()."=".$this->security->get_csrf_hash()."',";
+							$tokens = $variable['list'] ? "tokens: ';'," : "";
+							$csrf = $this->config->item('csrf_protection') ? "parameters: '".$this->security->get_csrf_token_name()."=".$this->security->get_csrf_hash()."'," : "";
 							$this->javascript['autocomplete_'.$variablename] = array('weight' => 1, 'javascript' => "
 				new Ajax.Autocompleter('".$variablename."','autocomplete_".$variablename."','".base_url()."autocomplete/".$variable['variablename']."', {
 					".$csrf."
+					".$tokens."
 					minChars: 2,
-					frequency: 0.1,
-					tokens: ';'
+					frequency: 0.1
 				});");
 							echo '<div class="autocomplete" id="autocomplete_'.$variablename.'" style="display: none; position:relative;"></div>';
 						}

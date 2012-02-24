@@ -1352,7 +1352,7 @@ class Block_lib {
 				$i++;
 				if ($segment == "category" && $i+1 <= $this->CI->uri->total_segments())
 				{
-					$categoryid = $this->CI->categories_model->get_by_urlname($this->CI->uri->segment($i+1));
+					$categoryid = $this->CI->categories_model->get_by_name($this->CI->uri->segment($i+1));
 				}
 			}
 		}

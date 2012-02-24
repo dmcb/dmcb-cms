@@ -18,11 +18,7 @@ class Autocomplete extends MY_Controller {
 	function _remap()
 	{
 		// Get input
-		$post_value = array_shift($this->input->post(NULL, TRUE));
-
-		// Get last input from semi-colon seperated list
-		$pieces = explode(";", $post_value);
-		$value = $pieces[sizeof($pieces)-1];
+		$value = array_shift($this->input->post(NULL, TRUE));
 
 		if (strlen($value) > 1)
 		{

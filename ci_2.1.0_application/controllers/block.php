@@ -112,13 +112,37 @@ class Block extends MY_Controller {
 			}
 			else
 			{
-				$rulestring .= "|callback_blockvalue_check";
+				$list = $variable['list'] ? ";" : "";
+				if ($variable['variablename'] == "post" || $variable['variablename'] == "page")
+				{
+					$list .= "\/";
+				}
+
+				$rulestring .= "|callback_blockvalue_check[$list]";
 			}
 			$this->form_validation->set_rules($variablename, $variablename, $rulestring);
 
 			// If the variable allows for a selection choice OR a specific text input, add a specify field
 			if ($variable['pattern'] != "*" && strstr($variable['pattern'], '*'))
 			{
+				// Specifying specific pages/posts/users/etc requires more diligence
+				if ($variable['variablename'] == "page")
+				{
+					$rulestring .= "|callback_page_check";
+				}
+				else if ($variable['variablename'] == "post")
+				{
+					$rulestring .= "|callback_post_check";
+				}
+				else if ($variable['variablename'] == "user")
+				{
+					$rulestring .= "|callback_user_check";
+				}
+				else if ($variable['variablename'] == "category")
+				{
+					$rulestring .= "|callback_category_check";
+				}
+
 				$this->form_validation->set_rules($variablename.'_specify', $variablename.'_specify', $rulestring);
 			}
 		}
@@ -166,20 +190,26 @@ class Block extends MY_Controller {
 		}
 	}
 
-	function blockvalue_check($str)
+	function blockvalue_check($str, $list)
 	{
 		if ($str == "")
 		{
 			return TRUE;
 		}
-		if (!preg_match('/^[a-z0-9-_;]+$/i', $str))
+
+		if (strpos($list, ";") !== FALSE && !preg_match('/^[a-z0-9-_ '.$list.']+$/i', $str))
 		{
 			$this->form_validation->set_message('blockvalue_check', "The value must be made of only letters, numbers, dashes, underscores and semi-colons to seperate multiple entries.");
 			return FALSE;
 		}
+		else if (!preg_match('/^[a-z0-9-_ '.$list.']+$/i', $str))
+		{
+			$this->form_validation->set_message('blockvalue_check', "The value must be made of only letters, numbers, dashes, and underscores.");
+			return FALSE;
+		}
 		else if (preg_match('/^\_+|^\-+|^;+|\-+$|\_+$|;+$/i', $str))
 		{
-			$this->form_validation->set_message('blockvalue_check', "The value cannot start or end with dashes, underscores or semi-colons.");
+			$this->form_validation->set_message('blockvalue_check', "The value must start and end with alphanumeric characters.");
 			return FALSE;
 		}
 		else
@@ -205,5 +235,77 @@ class Block extends MY_Controller {
 		{
 			return TRUE;
 		}
+	}
+
+	function category_check($str)
+	{
+		$this->load->model('categories_model');
+		$categories = explode(";", $str);
+		foreach ($categories as $category)
+		{
+			if ($category != "")
+			{
+				if ($this->categories_model->get_by_name($category) == NULL)
+				{
+					$this->form_validation->set_message('category_check', "Category ".$category." doesn't exist.");
+					return FALSE;
+				}
+			}
+		}
+		return TRUE;
+	}
+
+	function page_check($str)
+	{
+		$pages = explode(";", $str);
+		foreach ($pages as $page)
+		{
+			if ($page != "")
+			{
+				$object = instantiate_library('page', $page, 'urlname');
+				if (!isset($object->page['pageid']))
+				{
+					$this->form_validation->set_message('page_check', "Page ".$page." doesn't exist.");
+					return FALSE;
+				}
+			}
+		}
+		return TRUE;
+	}
+
+	function post_check($str)
+	{
+		$posts = explode(";", $str);
+		foreach ($posts as $post)
+		{
+			if ($post != "")
+			{
+				$object = instantiate_library('post', $post, 'urlname');
+				if (!isset($object->post['postid']))
+				{
+					$this->form_validation->set_message('post_check', "Post ".$post." doesn't exist.");
+					return FALSE;
+				}
+			}
+		}
+		return TRUE;
+	}
+
+	function user_check($str)
+	{
+		$users = explode(";", $str);
+		foreach ($users as $user)
+		{
+			if ($user != "")
+			{
+				$object = instantiate_library('user', $user, 'displayname');
+				if (!isset($object->user['userid']))
+				{
+					$this->form_validation->set_message('user_check', "User ".$user." doesn't exist.");
+					return FALSE;
+				}
+			}
+		}
+		return TRUE;
 	}
 }

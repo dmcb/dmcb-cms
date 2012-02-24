@@ -14,7 +14,7 @@ class Events_model extends CI_Model {
     {
         parent::__construct();
     }
-	
+
 	function add($postid, $location, $address, $date, $time, $enddate, $endtime)
 	{
 		if ($location == "") $location = NULL;
@@ -29,7 +29,7 @@ class Events_model extends CI_Model {
 	{
 		$this->db->query("DELETE FROM posts_events WHERE postid=".$this->db->escape($postid));
 	}
-	
+
 	function get($postid)
 	{
 		$query = $this->db->query("SELECT * FROM posts_events WHERE postid = ".$this->db->escape($postid));
@@ -39,10 +39,10 @@ class Events_model extends CI_Model {
 		}
 		else
 		{
-			return $query->row_array(); 
+			return $query->row_array();
 		}
 	}
-	
+
 	function get_published($num, $offset, $timeline, $pages, $featured)
 	{
 		$sql_from = "posts_events, posts";
@@ -51,7 +51,7 @@ class Events_model extends CI_Model {
 		{
 			$sql_upcoming = ">=";
 		}
-		
+
 		$sql_page = "AND ";
 		if ($pages == "all")
 		{
@@ -79,12 +79,12 @@ class Events_model extends CI_Model {
 
 		$sql_featured = "AND posts.featured != -1";
 		if (isset($featured))
-		{	
+		{
 			$sql_featured = "AND posts.featured = ".$this->db->escape($featured);
 		}
 		return $this->db->query("SELECT *, posts_events.date AS date, posts.date AS publisheddate FROM $sql_from WHERE (posts_events.date $sql_upcoming NOW() OR (posts_events.enddate IS NOT NULL AND posts_events.enddate $sql_upcoming NOW())) AND posts_events.postid = posts.postid AND posts.published = '1' $sql_featured $sql_page ORDER BY posts_events.date,posts_events.time ASC LIMIT $offset, $num");
 	}
-	
+
 	function get_published_count($timeline, $pages, $featured)
 	{
 		$sql_from = "posts_events, posts";
@@ -93,7 +93,7 @@ class Events_model extends CI_Model {
 		{
 			$sql_upcoming = ">=";
 		}
-		
+
 		$sql_page = "AND ";
 		if ($pages == "all")
 		{
@@ -121,10 +121,10 @@ class Events_model extends CI_Model {
 
 		$sql_featured = "AND posts.featured != -1";
 		if (isset($featured))
-		{	
+		{
 			$sql_featured = "AND posts.featured = ".$this->db->escape($featured);
 		}
-		
+
 		$query = $this->db->query("SELECT count(*) as total FROM $sql_from WHERE (posts_events.date $sql_upcoming NOW() OR (posts_events.enddate IS NOT NULL AND posts_events.enddate $sql_upcoming NOW())) AND posts_events.postid = posts.postid AND posts.published = '1' $sql_featured $sql_page");
 		$row = $query->row_array();
 		return $row['total'];
