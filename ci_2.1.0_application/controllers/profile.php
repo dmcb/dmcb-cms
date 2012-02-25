@@ -105,7 +105,7 @@ class Profile extends MY_Controller {
 			$this->page_urlname = NULL;
 			$this->load->library('block_lib', NULL, 'posts_block');
 			$this->posts_block->block['function'] = "posts";
-			$this->posts_block->block['values'] = array('detail' => 'small_listing', 'user' => $this->user->user['urlname'], 'limit' => '10');
+			$this->posts_block->block['values'] = array('detail' => 'small_listing', 'user' => $this->user->user['displayname'], 'limit' => '10');
 			$this->posts_block->block['pagination'] = 1;
 			$this->posts_block->block['rss'] = 1;
 			$this->posts_block->block['feedback'] = 1;
