@@ -11,7 +11,7 @@
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
  * @link		http://dmcbdesign.com
- */ 
+ */
 class Acl {
 
 	/**
@@ -26,9 +26,9 @@ class Acl {
 		$this->CI =& get_instance();
 		$this->CI->load->model('acls_model');
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Access
 	 *
@@ -87,12 +87,12 @@ class Acl {
 				}
 			}
 		}
-		
+
 		return FALSE;
 	}
 
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Allow
 	 *
@@ -137,8 +137,7 @@ class Acl {
 				}
 				else if ($attachedto == "user") // If we're testing a user, we can check if the user in question is the user
 				{
-					$object = instantiate_library('user', $attachedid);
-					if (isset($object->user['userid']) && $object->user['userid'] == $this->CI->session->userdata('userid'))
+					if ($attachedid == $this->CI->session->userdata('userid'))
 					{
 						$roleid = $this->CI->acls_model->get_roleid('owner');
 						if ($this->CI->acls_model->get_privelege($roleid, $controller, $function))
@@ -195,9 +194,9 @@ class Acl {
 		}
 		return FALSE;
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Enabled
 	 *
@@ -222,9 +221,9 @@ class Acl {
 			return $this->CI->acls_model->get_privelege($roleid, $controller, $function);
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Set
 	 *
