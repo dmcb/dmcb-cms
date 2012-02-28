@@ -36,29 +36,29 @@ class Account extends MY_Controller {
 				$rolestable[$role['roleid']] = $role['role'];
 			}
 
-			// Get any special site priveleges for the user
-			$data['priveleges'] = array();
+			// Get any special site privileges for the user
+			$data['privileges'] = array();
 			$site_role = $this->acls_model->get($this->user->user['userid'], 'site');
 			if ($site_role != NULL && $this->acls_model->get_role_name($site_role) != "member")
 			{
-				array_push($data['priveleges'], array('on' => 'site', 'role' => $rolestable[$site_role]));
+				array_push($data['privileges'], array('on' => 'site', 'role' => $rolestable[$site_role]));
 			}
-			$page_priveleges = $this->acls_model->get_all($this->user->user['userid'], 'page');
-			foreach ($page_priveleges->result_array() as $page_privelege)
+			$page_privileges = $this->acls_model->get_all($this->user->user['userid'], 'page');
+			foreach ($page_privileges->result_array() as $page_privilege)
 			{
-				$object = instantiate_library('page', $page_privelege['attachedid']);
+				$object = instantiate_library('page', $page_privilege['attachedid']);
 				if (isset($object->page['pageid']))
 				{
-					array_push($data['priveleges'], array('on' => 'page', 'role' => $rolestable[$page_privelege['roleid']], 'page' => $object->page));
+					array_push($data['privileges'], array('on' => 'page', 'role' => $rolestable[$page_privilege['roleid']], 'page' => $object->page));
 				}
 			}
-			$post_priveleges = $this->acls_model->get_all($this->user->user['userid'], 'post');
-			foreach ($post_priveleges->result_array() as $post_privelege)
+			$post_privileges = $this->acls_model->get_all($this->user->user['userid'], 'post');
+			foreach ($post_privileges->result_array() as $post_privilege)
 			{
-				$object = instantiate_library('post', $post_privelege['attachedid']);
+				$object = instantiate_library('post', $post_privilege['attachedid']);
 				if (isset($object->post['postid']))
 				{
-					array_push($data['priveleges'], array('on' => 'post', 'role' => $rolestable[$post_privelege['roleid']], 'post' => $object->post));
+					array_push($data['privileges'], array('on' => 'post', 'role' => $rolestable[$post_privilege['roleid']], 'post' => $object->post));
 				}
 			}
 
@@ -102,6 +102,17 @@ class Account extends MY_Controller {
 					$block['displayname'] = $this->blockuser->user['displayname'];
 					array_push($data['blocked'], $block);
 				}
+			}
+
+			$data['user'] = $this->user->user;
+
+			$data['change_password'] = $this->load->view('form_account_changepassword', $data, TRUE);
+			$data['update_email'] = $this->load->view('form_account_updateemail', $data, TRUE);
+			$data['message_settings'] = $this->load->view('form_account_messagesettings', $data, TRUE);
+
+			if ($this->config->item('dmcb_signon_facebook') == "true")
+			{
+				$data['facebook'] = $this->load->view('form_account_facebook', $data, TRUE);
 			}
 
 			if ($this->form_validation->run())
@@ -161,17 +172,6 @@ class Account extends MY_Controller {
 					$this->user->new_user['facebook_uid'] = NULL;
 					$this->user->save();
 				}
-				$data['user'] = $this->user->user;
-
-				$data['change_password'] = $this->load->view('form_account_changepassword', $data, TRUE);
-				$data['update_email'] = $this->load->view('form_account_updateemail', $data, TRUE);
-
-				if ($this->config->item('dmcb_signon_facebook') == "true")
-				{
-					$data['facebook'] = $this->load->view('form_account_facebook', $data, TRUE);
-				}
-
-				$data['message_settings'] = $this->load->view('form_account_messagesettings', $data, TRUE);
 
 				$this->_initialize_page('account', 'Account', $data);
 			}

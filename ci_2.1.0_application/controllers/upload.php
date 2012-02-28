@@ -165,7 +165,7 @@ class Upload extends MY_Controller {
 			{
 				// However, we will only parse the file if the user has an established session
 				// We couldn't check earlier in this code for the session because when swfupload does it's first pass, it's through the flash/ajax applet, and that doesn't handle sessions and can't grab CI session
-				/* Which means, now that we are back to the CI form submission, if there's no valid session here and they don't have attachments privelege,
+				/* Which means, now that we are back to the CI form submission, if there's no valid session here and they don't have attachments privilege,
 				   we will delete the file that was attempted to be uploaded and return an error */
 
 				$allowed_to_upload = FALSE;

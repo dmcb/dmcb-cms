@@ -1,18 +1,18 @@
 <div class="leftcolumn">
 	<?php
-	if (sizeof($priveleges) > 0)
+	if (sizeof($privileges) > 0)
 	{
 		echo '<h2>Your privileges</h2><ul>';
-		foreach ($priveleges as $privelege)
+		foreach ($privileges as $privilege)
 		{
 			echo '<li>';
-			if ($privelege['on'] == "site")
+			if ($privilege['on'] == "site")
 			{
-				echo 'Site-wide '.$privelege['role'];
+				echo 'Site-wide '.$privilege['role'];
 			}
 			else
 			{
-				echo ucfirst($privelege['role']).' on <a href="'.base_url().$privelege[$privelege['on']]['urlname'].'">'.$privelege[$privelege['on']]['title'].'</a>';
+				echo ucfirst($privilege['role']).' on <a href="'.base_url().$privilege[$privilege['on']]['urlname'].'">'.$privilege[$privilege['on']]['title'].'</a>';
 			}
 			echo '</li>';
 		}

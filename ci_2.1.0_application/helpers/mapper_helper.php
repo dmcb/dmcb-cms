@@ -6,13 +6,13 @@
  *
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
  * @link		http://dmcbdesign.com
  */
- 
+
 // ------------------------------------------------------------------------
 
 /**
@@ -22,21 +22,21 @@
  *
  * @access	public
  * @param	string   link
- * @return	array    array of roleids that are priveleged
+ * @return	array    array of roleids that are privileged
  */
- 
+
 if ( ! function_exists('link_security'))
 {
 	function link_security($link)
-	{	
+	{
 		$CI =& get_instance();
 		$CI->load->model('pages_model');
-		
+
 		$protection = array();
-		
+
 		// Strip '/' off link
 		$link = substr($link, 1);
-		
+
 		$controllers = array(
 			'profile' => array('controller' => 'profile', 'function' => 'view'),
 			'manage_activity' => array('controller' => 'site', 'function' => 'manage_activity'),
@@ -47,7 +47,7 @@ if ( ! function_exists('link_security'))
 			'search' => array('controller' => 'site', 'function' => 'search'),
 			'subscription' => array('controller' => 'site', 'function' => 'susbcribe')
 		);
-		
+
 		if ($link == "account" || $link == "signoff") // Account + Signoff links are available to any role that isn't a guest
 		{
 			$CI->load->model('acls_model');
@@ -58,13 +58,13 @@ if ( ! function_exists('link_security'))
 			}
 		}
 		else if (isset($controllers[$link])) // If is an internal link to a controller, grab controller's security
-		{ 
+		{
 			$CI->load->model('acls_model');
-			$permissions = $CI->acls_model->get_priveleged($controllers[$link]['controller'], $controllers[$link]['function']);
+			$permissions = $CI->acls_model->get_privileged($controllers[$link]['controller'], $controllers[$link]['function']);
 			foreach($permissions->result_array() as $permission)
 			{
 				$protection[$permission['roleid']] = 1;
-			}			
+			}
 		}
 		else if (preg_match('/^([0-9]{8})\/(.+)/', $link) || preg_match('/^(.+)\/post\/(.+)/', $link)) // If it has the format of a post, check to see if that post exists
 		{
@@ -78,7 +78,7 @@ if ( ! function_exists('link_security'))
 				}
 			}
 		}
-		else 
+		else
 		{
 			$page = instantiate_library('page', $link, 'urlname');
 			if (isset($page->page['pageid'])) // If it is an internal link to a page, grab page's security
@@ -87,10 +87,10 @@ if ( ! function_exists('link_security'))
 				foreach($permissions->result_array() as $permission)
 				{
 					$protection[$permission['roleid']] = 1;
-				}			
+				}
 			}
 		}
-		
+
 		return $protection;
 	}
 }

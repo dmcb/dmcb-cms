@@ -2,7 +2,7 @@
 /**
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -70,7 +70,7 @@ class Manage_users extends MY_Controller {
 			}
 
 			// Add editing packages (specifically for calendar option and email attachments)
-			$this->packages['swfupload'] = array('weight' => '5', 'properties' => 
+			$this->packages['swfupload'] = array('weight' => '5', 'properties' =>
 				array(
 					'upload_url' => 'email',
 					'upload_size' => $this->config->item('dmcb_site_upload_size'),
@@ -761,22 +761,22 @@ class Manage_users extends MY_Controller {
 		{
 			array_push($this->data['privileges'], array('on' => 'site', 'role' => $rolestable[$site_role]));
 		}
-		$page_priveleges = $this->acls_model->get_all($user->user['userid'], 'page');
-		foreach ($page_priveleges->result_array() as $page_privelege)
+		$page_privileges = $this->acls_model->get_all($user->user['userid'], 'page');
+		foreach ($page_privileges->result_array() as $page_privilege)
 		{
-			$object = instantiate_library('page', $page_privelege['attachedid']);
+			$object = instantiate_library('page', $page_privilege['attachedid']);
 			if (isset($object->page['pageid']))
 			{
-				array_push($this->data['privileges'], array('on' => 'page', 'role' => $rolestable[$page_privelege['roleid']], 'page' => $object->page));
+				array_push($this->data['privileges'], array('on' => 'page', 'role' => $rolestable[$page_privilege['roleid']], 'page' => $object->page));
 			}
 		}
-		$post_priveleges = $this->acls_model->get_all($user->user['userid'], 'post');
-		foreach ($post_priveleges->result_array() as $post_privelege)
+		$post_privileges = $this->acls_model->get_all($user->user['userid'], 'post');
+		foreach ($post_privileges->result_array() as $post_privilege)
 		{
-			$object = instantiate_library('post', $post_privelege['attachedid']);
+			$object = instantiate_library('post', $post_privilege['attachedid']);
 			if (isset($object->post['postid']))
 			{
-				array_push($this->data['privileges'], array('on' => 'post', 'role' => $rolestable[$post_privelege['roleid']], 'post' => $object->post));
+				array_push($this->data['privileges'], array('on' => 'post', 'role' => $rolestable[$post_privilege['roleid']], 'post' => $object->post));
 			}
 		}
 

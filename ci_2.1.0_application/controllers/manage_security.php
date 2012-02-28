@@ -2,7 +2,7 @@
 /**
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -41,23 +41,23 @@ class Manage_security extends MY_Controller {
 				array_push($data['roles'], $role);
 			}
 
-			// Get all priveleges
-			$priveleges = $this->acls_model->get_priveleges_all();
-			foreach ($priveleges->result_array() as $privelege)
+			// Get all privileges
+			$privileges = $this->acls_model->get_privileges_all();
+			foreach ($privileges->result_array() as $privilege)
 			{
-				$functionid = $privelege['functionid'];
-				$roleid = $privelege['roleid'];
-				if (!isset($privelege_table))
+				$functionid = $privilege['functionid'];
+				$roleid = $privilege['roleid'];
+				if (!isset($privilege_table))
 				{
-					$privelege_table = array();
+					$privilege_table = array();
 				}
-				if (!isset($privelege_table[$functionid]))
+				if (!isset($privilege_table[$functionid]))
 				{
-					$privelege_table[$functionid] = array();
+					$privilege_table[$functionid] = array();
 				}
-				if (!isset($privelege_table[$functionid][$roleid]))
+				if (!isset($privilege_table[$functionid][$roleid]))
 				{
-					$privelege_table[$functionid][$roleid] = 1;
+					$privilege_table[$functionid][$roleid] = 1;
 				}
 			}
 
@@ -77,17 +77,17 @@ class Manage_security extends MY_Controller {
 				{
 					$data['functions'][$controller] = array();
 				}
-				// Go through each role, inserting either a 0 or 1 privelege for that function
-				$function['priveleges'] = array();
+				// Go through each role, inserting either a 0 or 1 privilege for that function
+				$function['privileges'] = array();
 				foreach ($data['roles'] as $role)
 				{
-					if (isset($privelege_table[$function['functionid']][$role['roleid']]))
+					if (isset($privilege_table[$function['functionid']][$role['roleid']]))
 					{
-						array_push($function['priveleges'], 1);
+						array_push($function['privileges'], 1);
 					}
 					else
 					{
-						array_push($function['priveleges'], 0);
+						array_push($function['privileges'], 0);
 					}
 				}
 				array_push($data['functions'][$controller], $function);
@@ -144,15 +144,15 @@ class Manage_security extends MY_Controller {
 				$this->_disable_function($this->uri->segment(3));
 				redirect('manage_security');
 			}
-			else if ($this->uri->segment(2) == "setprivelege")
+			else if ($this->uri->segment(2) == "setprivilege")
 			{
-				if (isset($privelege_table[$this->uri->segment(3)][$this->uri->segment(4)]))
+				if (isset($privilege_table[$this->uri->segment(3)][$this->uri->segment(4)]))
 				{
-					$this->_unset_privelege($this->uri->segment(3), $this->uri->segment(4));
+					$this->_unset_privilege($this->uri->segment(3), $this->uri->segment(4));
 				}
 				else
 				{
-					$this->_set_privelege($this->uri->segment(3), $this->uri->segment(4));
+					$this->_set_privilege($this->uri->segment(3), $this->uri->segment(4));
 				}
 				redirect('manage_security');
 			}
@@ -208,39 +208,39 @@ class Manage_security extends MY_Controller {
 		}
 	}
 
-	function _set_privelege($functionid, $roleid)
+	function _set_privilege($functionid, $roleid)
 	{
-		// Ensure that functions that don't allow guests or owners can't have set a privelege for them
+		// Ensure that functions that don't allow guests or owners can't have set a privilege for them
 		if (($this->functionstable[$functionid]['guestpossible'] && $this->rolestable[$roleid]['role'] == "guest") ||
 			($this->functionstable[$functionid]['ownerpossible'] && $this->rolestable[$roleid]['role'] == "owner") ||
 			($this->rolestable[$roleid]['role'] != "guest" && $this->rolestable[$roleid]['role'] != "owner"))
 		{
 			// Only set role if role isn't already set
-			if (!$this->acls_model->get_privelege($roleid, $this->functionstable[$functionid]['controller'], $this->functionstable[$functionid]['function']))
+			if (!$this->acls_model->get_privilege($roleid, $this->functionstable[$functionid]['controller'], $this->functionstable[$functionid]['function']))
 			{
-				$this->acls_model->set_function_privelege($functionid, $roleid);
+				$this->acls_model->set_function_privilege($functionid, $roleid);
 			}
 		}
 		$function = $this->acls_model->get_function($functionid);
 		if (isset($function['functionof']) && $function['functionof'] != NULL)
 		{
-			$this->_set_privelege($function['functionof'], $roleid);
+			$this->_set_privilege($function['functionof'], $roleid);
 		}
 	}
 
-	function _unset_privelege($functionid, $roleid)
+	function _unset_privilege($functionid, $roleid)
 	{
-		// Ensure that functions that don't allow guests or owners can't have set a privelege for them
+		// Ensure that functions that don't allow guests or owners can't have set a privilege for them
 		if (($this->functionstable[$functionid]['guestpossible'] && $this->rolestable[$roleid]['role'] == "guest") ||
 			($this->functionstable[$functionid]['ownerpossible'] && $this->rolestable[$roleid]['role'] == "owner") ||
 			($this->rolestable[$roleid]['role'] != "guest" && $this->rolestable[$roleid]['role'] != "owner"))
 		{
-			$this->acls_model->remove_function_privelege($functionid, $roleid);
+			$this->acls_model->remove_function_privilege($functionid, $roleid);
 		}
 		$children = $this->acls_model->get_functions_enabled_children($functionid);
 		foreach ($children->result_array() as $child)
 		{
-			$this->_unset_privelege($child['functionid'], $roleid);
+			$this->_unset_privilege($child['functionid'], $roleid);
 		}
 	}
 }

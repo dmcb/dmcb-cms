@@ -2,11 +2,11 @@
 /**
  * dmcb acl library
  *
- * Gets the role of user on a particular function and returns their priveleges
+ * Gets the role of user on a particular function and returns their privileges
  *
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -111,7 +111,7 @@ class Acl {
 		if (!$this->CI->session->userdata('signedon')) // If the user isn't signed on, let's see if the guest has permissions
 		{
 			$roleid = $this->CI->acls_model->get_roleid('guest');
-			if ($this->CI->acls_model->get_privelege($roleid, $controller, $function))
+			if ($this->CI->acls_model->get_privilege($roleid, $controller, $function))
 			{
 				return TRUE;
 			}
@@ -122,16 +122,16 @@ class Acl {
 		}
 		else
 		{
-			// Get user's site role and see if that gives them privelege
+			// Get user's site role and see if that gives them privilege
 			$roleid = $this->CI->acls_model->get($this->CI->session->userdata('userid'), 'site');
-			if ($roleid != NULL && $this->CI->acls_model->get_privelege($roleid, $controller, $function))
+			if ($roleid != NULL && $this->CI->acls_model->get_privilege($roleid, $controller, $function))
 			{
 				return TRUE;
 			}
 			else // If the user's site role doesn't have permission, try getting role on current area (i.e. the page)
 			{
 				$roleid = $this->CI->acls_model->get($this->CI->session->userdata('userid'), $controller, $attachedid);
-				if ($roleid != NULL && $this->CI->acls_model->get_privelege($roleid, $controller, $function))
+				if ($roleid != NULL && $this->CI->acls_model->get_privilege($roleid, $controller, $function))
 				{
 					return TRUE;
 				}
@@ -140,7 +140,7 @@ class Acl {
 					if ($attachedid == $this->CI->session->userdata('userid'))
 					{
 						$roleid = $this->CI->acls_model->get_roleid('owner');
-						if ($this->CI->acls_model->get_privelege($roleid, $controller, $function))
+						if ($this->CI->acls_model->get_privilege($roleid, $controller, $function))
 						{
 							return TRUE;
 						}
@@ -152,7 +152,7 @@ class Acl {
 					if (isset($object->post['userid']) && $object->post['userid'] == $this->CI->session->userdata('userid'))
 					{
 						$roleid = $this->CI->acls_model->get_roleid('owner');
-						if ($this->CI->acls_model->get_privelege($roleid, $controller, $function))
+						if ($this->CI->acls_model->get_privilege($roleid, $controller, $function))
 						{
 							return TRUE;
 						}
@@ -166,7 +166,7 @@ class Acl {
 							foreach ($page->page_tree as $pageid)
 							{
 								$roleid = $this->CI->acls_model->get($this->CI->session->userdata('userid'), 'page', $pageid);
-								if ($roleid != NULL && $this->CI->acls_model->get_privelege($roleid, $controller, $function))
+								if ($roleid != NULL && $this->CI->acls_model->get_privilege($roleid, $controller, $function))
 								{
 									return TRUE;
 								}
@@ -183,7 +183,7 @@ class Acl {
 						foreach ($page->page_tree as $pageid)
 						{
 							$roleid = $this->CI->acls_model->get($this->CI->session->userdata('userid'), 'page', $pageid);
-							if ($roleid != NULL && $this->CI->acls_model->get_privelege($roleid, $controller, $function))
+							if ($roleid != NULL && $this->CI->acls_model->get_privilege($roleid, $controller, $function))
 							{
 								return TRUE;
 							}
@@ -218,7 +218,7 @@ class Acl {
 		else
 		{
 			$roleid = $this->CI->acls_model->get_roleid($role);
-			return $this->CI->acls_model->get_privelege($roleid, $controller, $function);
+			return $this->CI->acls_model->get_privilege($roleid, $controller, $function);
 		}
 	}
 
