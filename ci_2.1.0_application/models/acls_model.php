@@ -264,6 +264,6 @@ class Acls_model extends CI_Model {
 
 	function set_function_privilege($functionid, $roleid)
 	{
-		$this->db->query("INSERT INTO acls_roles_privileges (functionid, roleid) VALUES (".$this->db->escape($functionid).", ".$this->db->escape($roleid).")");
+		$this->db->query("INSERT IGNORE INTO acls_roles_privileges (functionid, roleid) VALUES (".$this->db->escape($functionid).", ".$this->db->escape($roleid).")");
 	}
 }

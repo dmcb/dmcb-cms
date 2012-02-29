@@ -240,7 +240,7 @@ class Manage_security extends MY_Controller {
 			$this->acls_model->remove_function_privilege($functionid, $roleid);
 			if (sizeof($this->privilege_table[$functionid]) == 1)
 			{
-				$this->acls_model->set_function_availability($functionid, 0);
+				$this->_disable_function($functionid);
 			}
 		}
 		$children = $this->acls_model->get_functions_enabled_children($functionid);
