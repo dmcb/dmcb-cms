@@ -125,6 +125,19 @@ class Acls_model extends CI_Model {
 		}
 	}
 
+	function get_function_by_function($controller, $function)
+	{
+		$query = $this->db->query("SELECT * FROM acls_functions WHERE controller = ".$this->db->escape($controller)." AND function = ".$this->db->escape($function));
+		if ($query->num_rows() == 0)
+		{
+			return NULL;
+		}
+		else
+		{
+			return $query->row_array();
+		}
+	}
+
 	function get_functions_available()
 	{
 		return $this->db->query("SELECT * FROM acls_functions WHERE enabled = '0' ORDER BY controller, name ASC");

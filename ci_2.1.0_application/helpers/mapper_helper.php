@@ -30,7 +30,6 @@ if ( ! function_exists('link_security'))
 	function link_security($link)
 	{
 		$CI =& get_instance();
-		$CI->load->model('pages_model');
 
 		$protection = array();
 
@@ -60,14 +59,23 @@ if ( ! function_exists('link_security'))
 		else if (isset($controllers[$link])) // If is an internal link to a controller, grab controller's security
 		{
 			$CI->load->model('acls_model');
-			$permissions = $CI->acls_model->get_privileged($controllers[$link]['controller'], $controllers[$link]['function']);
-			foreach($permissions->result_array() as $permission)
+			$function = $CI->acls_model->get_function_by_function($controllers[$link]['controller'], $controllers[$link]['function']);
+			if (isset($function) && $function['enabled'])
 			{
-				$protection[$permission['roleid']] = 1;
+				$permissions = $CI->acls_model->get_privileged($controllers[$link]['controller'], $controllers[$link]['function']);
+				foreach($permissions->result_array() as $permission)
+				{
+					$protection[$permission['roleid']] = 1;
+				}
+			}
+			else
+			{
+				$protection[0] = 1;
 			}
 		}
 		else if (preg_match('/^([0-9]{8})\/(.+)/', $link) || preg_match('/^(.+)\/post\/(.+)/', $link)) // If it has the format of a post, check to see if that post exists
 		{
+			$CI->load->model('pages_model');
 			$post = instantiate_library('post', $link, 'urlname');
 			if (isset($post->post['pageid'])) // It's a link to a post, grab post's parent's security
 			{
@@ -80,6 +88,7 @@ if ( ! function_exists('link_security'))
 		}
 		else
 		{
+			$CI->load->model('pages_model');
 			$page = instantiate_library('page', $link, 'urlname');
 			if (isset($page->page['pageid'])) // If it is an internal link to a page, grab page's security
 			{
