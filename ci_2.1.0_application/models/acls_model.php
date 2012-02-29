@@ -252,6 +252,11 @@ class Acls_model extends CI_Model {
 		$this->db->query("DELETE FROM acls_roles_privileges WHERE functionid = ".$this->db->escape($functionid)." AND roleid = ".$this->db->escape($roleid));
 	}
 
+	function remove_function_privileges($functionid)
+	{
+		$this->db->query("DELETE FROM acls_roles_privileges WHERE functionid = ".$this->db->escape($functionid));
+	}
+
 	function set_function_availability($functionid, $available)
 	{
 		$this->db->query("UPDATE acls_functions SET enabled = ".$this->db->escape($available)." WHERE functionid = ".$this->db->escape($functionid));

@@ -47,17 +47,17 @@ class Manage_security extends MY_Controller {
 			{
 				$functionid = $privilege['functionid'];
 				$roleid = $privilege['roleid'];
-				if (!isset($privilege_table))
+				if (!isset($this->privilege_table))
 				{
-					$privilege_table = array();
+					$this->privilege_table = array();
 				}
-				if (!isset($privilege_table[$functionid]))
+				if (!isset($this->privilege_table[$functionid]))
 				{
-					$privilege_table[$functionid] = array();
+					$this->privilege_table[$functionid] = array();
 				}
-				if (!isset($privilege_table[$functionid][$roleid]))
+				if (!isset($this->privilege_table[$functionid][$roleid]))
 				{
-					$privilege_table[$functionid][$roleid] = 1;
+					$this->privilege_table[$functionid][$roleid] = 1;
 				}
 			}
 
@@ -81,7 +81,7 @@ class Manage_security extends MY_Controller {
 				$function['privileges'] = array();
 				foreach ($data['roles'] as $role)
 				{
-					if (isset($privilege_table[$function['functionid']][$role['roleid']]))
+					if (isset($this->privilege_table[$function['functionid']][$role['roleid']]))
 					{
 						array_push($function['privileges'], 1);
 					}
@@ -146,7 +146,7 @@ class Manage_security extends MY_Controller {
 			}
 			else if ($this->uri->segment(2) == "setprivilege")
 			{
-				if (isset($privilege_table[$this->uri->segment(3)][$this->uri->segment(4)]))
+				if (isset($this->privilege_table[$this->uri->segment(3)][$this->uri->segment(4)]))
 				{
 					$this->_unset_privilege($this->uri->segment(3), $this->uri->segment(4));
 				}
@@ -191,6 +191,7 @@ class Manage_security extends MY_Controller {
 	function _disable_function($functionid)
 	{
 		$this->acls_model->set_function_availability($functionid, 0);
+		$this->acls_model->remove_function_privileges($functionid);
 		$children = $this->acls_model->get_functions_enabled_children($functionid);
 		foreach ($children->result_array() as $child)
 		{
@@ -201,6 +202,7 @@ class Manage_security extends MY_Controller {
 	function _enable_function($functionid)
 	{
 		$this->acls_model->set_function_availability($functionid, 1);
+		$this->acls_model->set_function_privilege($functionid, $this->acls_model->get_roleid('administrator'));
 		$function = $this->acls_model->get_function($functionid);
 		if (isset($function['functionof']) && $function['functionof'] != NULL)
 		{
@@ -236,6 +238,10 @@ class Manage_security extends MY_Controller {
 			($this->rolestable[$roleid]['role'] != "guest" && $this->rolestable[$roleid]['role'] != "owner"))
 		{
 			$this->acls_model->remove_function_privilege($functionid, $roleid);
+			if (sizeof($this->privilege_table[$functionid]) == 1)
+			{
+				$this->acls_model->set_function_availability($functionid, 0);
+			}
 		}
 		$children = $this->acls_model->get_functions_enabled_children($functionid);
 		foreach ($children->result_array() as $child)
