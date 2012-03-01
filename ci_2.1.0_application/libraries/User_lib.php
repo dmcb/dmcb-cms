@@ -49,9 +49,21 @@ class User_lib {
 	 */
 	function _initialize_info()
 	{
-		if ($this->CI->acl->enabled('profile', 'view'))
+		$this->CI->load->model('posts_model');
+		// Profile is visible if user looking can view profiles and...
+		if ($this->CI->acl->enabled('profile', 'view') && (
+				// .. if a profile exists
+			isset($this->user['profile']) ||
+				// .. if the user has posts
+			$this->CI->posts_model->get_user_posts_count($this->user['userid']) ||
+				// .. if the user can be messaged (or if the user attempting to view isn't signed on, then we can't determine for sure)
+			($this->user['getmessages'] && (!$this->CI->session->userdata('signedon') || ($this->CI->acl->allow('profile', 'message', FALSE, 'user', $this->user['userid']) && !$this->check_blocked()))) ||
+				// .. or the profile can be edited
+			($this->CI->acl->allow('profile', 'edit', FALSE, 'user', $this->user['userid']) && $this->user['userid'] != $this->CI->session->userdata('userid')) ||
+				// .. or the profile can be created
+			($this->CI->acl->allow('profile', 'add', FALSE, 'user', $this->user['userid']) && $this->user['userid'] == $this->CI->session->userdata('userid'))
+		))
 		{
-			// Future spot of code for specific users profiles to be enabled or disabled, but for now, always enabled
 			$this->user['enabledprofile'] = TRUE;
 			$this->new_user['enabledprofile'] = TRUE;
 		}
@@ -149,6 +161,36 @@ class User_lib {
 			return FALSE;
 		}
 		return TRUE;
+	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * Check blocked
+	 *
+	 * Checks if a user is blocked from messaging this user
+	 *
+	 * @access	public
+	 * @return	bool
+	 */
+	function check_blocked()
+	{
+		if ($this->CI->session->userdata('signedon') && $this->user['userid'] == $this->CI->session->userdata('userid'))
+		{
+			return TRUE;
+		}
+		if ($this->CI->session->userdata('signedon'))
+		{
+			$blockedlist = $this->get_blocked_users();
+			foreach ($blockedlist->result_array() as $blockeduser)
+			{
+				if ($blockeduser['blockedid'] == $this->CI->session->userdata('userid'))
+				{
+					return TRUE;
+				}
+			}
+		}
+		return FALSE;
 	}
 
 	// --------------------------------------------------------------------

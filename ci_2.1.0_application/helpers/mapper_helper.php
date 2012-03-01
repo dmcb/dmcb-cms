@@ -37,7 +37,7 @@ if ( ! function_exists('link_security'))
 		$link = substr($link, 1);
 
 		$controllers = array(
-			'profile' => array('controller' => 'profile', 'function' => 'view'),
+			'profile' => array('controller' => 'profile', 'function' => 'add'),
 			'manage_activity' => array('controller' => 'site', 'function' => 'manage_activity'),
 			'manage_content' => array('controller' => 'site', 'function' => 'manage_content'),
 			'manage_pages' => array('controller' => 'site', 'function' => 'manage_pages'),

@@ -2,7 +2,7 @@
 /**
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -51,18 +51,10 @@ class Profile extends MY_Controller {
 			}
 			else
 			{
-				if ($this->user->user['enabledprofile'] || $this->_access_denied())
+				if ($this->user->user['enabledprofile'] || $this->_page_not_found())
 				{
 					// Determine if the user is blocking viewer
-					$this->blocked = FALSE;
-					$blockedlist = $this->user->get_blocked_users();
-					foreach ($blockedlist->result_array() as $blockeduser)
-					{
-						if ($blockeduser['blockedid'] == $this->session->userdata('userid'))
-						{
-							$this->blocked = TRUE;
-						}
-					}
+					$this->blocked = $this->user->check_blocked();
 
 					// Get held comments
 					$this->load->model('comments_model');
@@ -127,19 +119,16 @@ class Profile extends MY_Controller {
 		// Enable messaging
 		if ($this->acl->allow('profile', 'message', FALSE, 'user', $this->user->user['userid']) && $this->user->user['getmessages'] == 1 && !$this->blocked)
 		{
-			// Ensure you can't message yourself
-			if (!$this->session->userdata('signedon') || ($this->session->userdata('signedon') && $this->session->userdata('userid') != $this->user->user['userid']))
-			{
-				$data['messages'] = $this->load->view('form_profile_message', array('user' => $this->user->user), TRUE);
-			}
+			$data['messages'] = $this->load->view('form_profile_message', array('user' => $this->user->user), TRUE);
 		}
-		else if ($this->acl->enabled('profile', 'message', 'member') && $this->user->user['getmessages'] == 1 && !$this->blocked)
+		else if (!$this->session->userdata('signedon') && $this->acl->enabled('profile', 'message', 'member') && $this->user->user['getmessages'] == 1 && !$this->blocked)
 		{
 			$data['messages'] = $this->load->view('form_profile_messageteaser', array('user' => $this->user->user), TRUE);
 		}
 
 		// User profile editing
-		if ($this->acl->allow('profile', 'edit', FALSE, 'user', $this->user->user['userid']))
+		if (($this->acl->allow('profile', 'edit', FALSE, 'user', $this->user->user['userid']) && $this->user->user['userid'] != $this->session->userdata('userid')) ||
+			($this->acl->allow('profile', 'add', FALSE, 'user', $this->user->user['userid']) && $this->user->user['userid'] == $this->session->userdata('userid')))
 		{
 			$this->packages['swfupload'] = array('weight' => '5', 'properties' =>
 				array(
@@ -167,44 +156,44 @@ class Profile extends MY_Controller {
 			{
 				$data['edit_heldbackcomments'] = $this->load->view('form_profile_heldcomments', array('heldcomments' => $this->heldcomments), TRUE);
 			}
-		}
 
-		// User twitter settings
-		if ($this->acl->allow('profile', 'twitter', FALSE, 'user', $this->user->user['userid']))
-		{
-			$data['edit_settings'] = $this->load->view('form_profile_editsettings', array('user' => $this->user->user), TRUE);
-		}
-
-		// User post editing
-		if ($this->acl->allow('profile', 'addpost', FALSE, 'user', $this->user->user['userid']))
-		{
-			$data['add_post'] = $this->load->view('form_profile_addpost', NULL, TRUE);
-
-			// Load up drafts
-			$this->load->model('posts_model');
-			$drafts = array();
-			$draftids = $this->posts_model->get_user_drafts($this->user->user['userid']);
-			foreach ($draftids->result_array() as $draftid)
+			// User twitter settings
+			if ($this->acl->allow('profile', 'twitter', FALSE, 'user', $this->user->user['userid']))
 			{
-				$object = instantiate_library('post', $draftid['postid']);
-				array_push($drafts, $object->post);
-			}
-			if (sizeof($drafts) > 0)
-			{
-				$data['edit_drafts'] = $this->load->view('form_profile_editdrafts', array('drafts' => $drafts), TRUE);
+				$data['edit_settings'] = $this->load->view('form_profile_editsettings', array('user' => $this->user->user), TRUE);
 			}
 
-			// Load up held back posts
-			$heldposts = array();
-			$heldpostids = $this->posts_model->get_user_heldback($this->user->user['userid']);
-			foreach ($heldpostids->result_array() as $heldpostid)
+			// User post editing
+			if ($this->acl->allow('profile', 'addpost', FALSE, 'user', $this->user->user['userid']) && $this->user->user['userid'] == $this->session->userdata('userid'))
 			{
-				$object = instantiate_library('post', $heldpostid['postid']);
-				array_push($heldposts, $object->post);
-			}
-			if (sizeof($heldposts) > 0)
-			{
-				$data['edit_heldbackposts'] = $this->load->view('form_profile_heldposts', array('heldposts' => $heldposts), TRUE);
+				$data['add_post'] = $this->load->view('form_profile_addpost', NULL, TRUE);
+
+				// Load up drafts
+				$this->load->model('posts_model');
+				$drafts = array();
+				$draftids = $this->posts_model->get_user_drafts($this->user->user['userid']);
+				foreach ($draftids->result_array() as $draftid)
+				{
+					$object = instantiate_library('post', $draftid['postid']);
+					array_push($drafts, $object->post);
+				}
+				if (sizeof($drafts) > 0)
+				{
+					$data['edit_drafts'] = $this->load->view('form_profile_editdrafts', array('drafts' => $drafts), TRUE);
+				}
+
+				// Load up held back posts
+				$heldposts = array();
+				$heldpostids = $this->posts_model->get_user_heldback($this->user->user['userid']);
+				foreach ($heldpostids->result_array() as $heldpostid)
+				{
+					$object = instantiate_library('post', $heldpostid['postid']);
+					array_push($heldposts, $object->post);
+				}
+				if (sizeof($heldposts) > 0)
+				{
+					$data['edit_heldbackposts'] = $this->load->view('form_profile_heldposts', array('heldposts' => $heldposts), TRUE);
+				}
 			}
 		}
 
@@ -213,7 +202,7 @@ class Profile extends MY_Controller {
 
 	function addpost()
 	{
-		if ($this->acl->allow('profile', 'addpost', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
+		if (($this->acl->allow('profile', 'addpost', TRUE, 'user', $this->user->user['userid']) && $this->user->user['userid'] == $this->session->userdata('userid')) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('posttitle', 'title', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[100]');
 			$this->form_validation->set_rules('posturlname', 'url name', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[35]|callback_posturlname_check');
@@ -388,7 +377,7 @@ class Profile extends MY_Controller {
 
 	function editprofile()
 	{
-		if ($this->acl->allow('profile', 'edit', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
+		if ((isset($this->user->user['profile']) && $this->acl->allow('profile', 'edit', FALSE, 'user', $this->user->user['userid'])) || $this->acl->allow('profile', 'add', FALSE, 'user', $this->user->user['userid']) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('profile', 'profile', 'xss_clean|strip_tags|trim|max_length[15000]');
 
@@ -509,25 +498,9 @@ class Profile extends MY_Controller {
 				$this->index();
 			}
 		}
-		else if ($this->session->userdata('signedon') && $this->session->userdata('userid') == $this->user->user['userid'])
-		{
-			$this->_message(
-				'Send message',
-				'You want to send a message to yourself?  You so crazy!',
-				'Error'
-			);
-		}
-		else if ($this->session->userdata('signedon'))
-		{
-			$this->_message(
-				'Send message',
-				$this->user->user['displayname'].' does not want to receive messages, sorry.',
-				'Error'
-			);
-		}
 		else
 		{
-			redirect('signon'.uri_string());
+			$this->_access_denied();
 		}
 	}
 }
