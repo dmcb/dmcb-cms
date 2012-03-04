@@ -126,40 +126,54 @@
 					echo '<td>'.$user['email'].'</td>';
 				}
 
-				echo '<td><select onchange="dmcb.goto(this)" class="narrow">';
-				foreach ($userroles->result_array() as $role)
+				if ($change_role)
 				{
-					if ($role['roleid'] == $user['roleid'])
+					echo '<td><select onchange="dmcb.goto(this)" class="narrow">';
+					foreach ($userroles->result_array() as $role)
 					{
-						echo '<option value="'.base_url().'manage_users/set_role/'.$user['userid'].'/'.$role['roleid'].'" selected="selected">'.ucfirst($role['role']).'</option>';
+						if ($role['roleid'] == $user['roleid'])
+						{
+							echo '<option value="'.base_url().'manage_users/set_role/'.$user['userid'].'/'.$role['roleid'].'" selected="selected">'.ucfirst($role['role']).'</option>';
+						}
+						else
+						{
+							echo '<option value="'.base_url().'manage_users/set_role/'.$user['userid'].'/'.$role['roleid'].'">'.ucfirst($role['role']).'</option>';
+						}
 					}
-					else
-					{
-						echo '<option value="'.base_url().'manage_users/set_role/'.$user['userid'].'/'.$role['roleid'].'">'.ucfirst($role['role']).'</option>';
-					}
+					echo '</select></td>';
 				}
-				echo '</select></td>';
 
-				echo '<td><select onchange="dmcb.goto(this)" class="narrow">';
-				foreach ($userstatus->result_array() as $status)
+				if ($change_status)
 				{
-					if ($status['statusid'] == $user['statusid'])
+					echo '<td><select onchange="dmcb.goto(this)" class="narrow">';
+					foreach ($userstatus->result_array() as $status)
 					{
-						echo '<option value="'.base_url().'manage_users/set_status/'.$user['userid'].'/'.$status['statusid'].'" selected="selected">'.$status['status'].'</option>';
+						if ($status['statusid'] == $user['statusid'])
+						{
+							echo '<option value="'.base_url().'manage_users/set_status/'.$user['userid'].'/'.$status['statusid'].'" selected="selected">'.$status['status'].'</option>';
+						}
+						else
+						{
+							echo '<option value="'.base_url().'manage_users/set_status/'.$user['userid'].'/'.$status['statusid'].'">'.$status['status'].'</option>';
+						}
 					}
-					else
-					{
-						echo '<option value="'.base_url().'manage_users/set_status/'.$user['userid'].'/'.$status['statusid'].'">'.$status['status'].'</option>';
-					}
+					echo '</select></td>';
 				}
-				echo '</select></td>';
 
-				echo '<td><a href="'.base_url().'manage_users/password/'.$user['userid'].'" onclick="return dmcb.confirmation(\'Are you sure you wish to reset the password of this user?\')">Reset password</a></td>';
+				if ($set_password)
+				{
+					echo '<td><a href="'.base_url().'manage_users/password/'.$user['userid'].'" onclick="return dmcb.confirmation(\'Are you sure you wish to reset the password of this user?\')">Reset password</a></td>';
+				}
 
-				if ($this->acl->enabled('site', 'subscribe'))
+				if ($this->acl->enabled('site', 'subscribe') && $set_subscription)
+				{
 					echo '<td><a href="'.base_url().'manage_users/subscription/'.$user['userid'].'">Set subscription</a></td>';
+				}
 
-				echo '<td><a href="'.base_url().'manage_users/delete/'.$user['userid'].'" onclick="return dmcb.confirmation(\'Are you sure you wish to delete this user?\')">Delete</a></td>';
+				if (isset($this->session->userdata['signedon']) && $this->session->userdata('userid') == 1)
+				{
+					echo '<td><a href="'.base_url().'manage_users/delete/'.$user['userid'].'" onclick="return dmcb.confirmation(\'Are you sure you wish to delete this user?\')">Delete</a></td>';
+				}
 			}
 			echo '</tr><tr><td colspan="7"><br/></td></tr>';
 		}
@@ -171,137 +185,9 @@
 
 	<div class="spacer">&nbsp;</div>
 
-	<form class="collapsible" action="<?=base_url();?>manage_users/adduser" method="post" onsubmit="return dmcb.submit(this);">
-		<fieldset>
-			<legend><a href="javascript:Effect.Combo('adduser');">Add a new user</a></legend>
+	<?php
+		if (isset($add_user)) echo $add_user;
+		if (isset($mailing_list)) echo $mailing_list;
+	?>
 
-			<div id="adduser" class="panel"><div>
-				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
-				<input type="hidden" name="buttonchoice" value="" class="hidden" />
-
-				<div class="forminput">
-					<label>Display name</label>
-					<input name="displayname" type="text" class="text" maxlength="50" value="<?php echo set_value('displayname'); ?>"/>
-					<?php echo form_error('displayname'); ?>
-				</div>
-
-				<div class="forminput">
-					<label>Email address</label>
-					<input name="email" type="text" class="text" maxlength="50" value="<?php echo set_value('email'); ?>"/>
-					<?php echo form_error('email'); ?>
-				</div>
-
-				<div class="forminput">
-					<label>Account role</label>
-					<select name="role">
-						<?php
-						foreach ($userroles->result_array() as $role) {
-							$default = FALSE;
-							if (set_value('role') == $role['roleid'])
-							{
-								$default = TRUE;
-							}
-							echo '<option value="'.$role['roleid'].'" '.set_select('role', $role['roleid'], $default).' >'.$role['role'].'</option>';
-						}
-						?>
-					</select>
-				</div>
-
-				<div class="forminput">
-					<input type="submit" value="Add a new user" name="adduser" class="button" onclick="dmcb.submitSetValue(this);" onfocus="dmcb.submitSetValue(this);" onblur="dmcb.submitRemoveValue(this);"/>
-				</div>
-			</div></div>
-		</fieldset>
-	</form>
-
-	<form class="collapsible" action="<?=base_url();?>manage_users/mailinglist" method="post" onsubmit="return dmcb.submit(this);">
-		<fieldset>
-			<legend><a href="javascript:Effect.Combo('mailinglist');">Send email to mailing list</a></legend>
-
-			<div id="mailinglist" class="panel"><div>
-				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
-				<input type="hidden" name="buttonchoice" value="" class="hidden" />
-
-				<div class="forminput">
-					<label>Send to</label>
-					<input name="sendto_all" id="sendto_all" type="checkbox" class="checkbox" value="1" <?php echo set_checkbox('sendto_all', '1'); ?>/>
-					All users on the mailing list
-				</div>
-
-				<br/>
-
-				<?php
-				foreach ($userroles->result_array() as $role)
-				{
-					if ($memberrole == $role['roleid'])
-					{
-						foreach ($userstatus->result_array() as $status)
-						{
-							$id = 'sendto_'.$role['roleid'].'_'.$status['status'];
-							echo '
-								<div class="forminput">
-									<label>&nbsp;</label>
-
-									<input name="'.$id.'" id="'.$id.'" type="checkbox" class="checkbox" value="1" '.set_checkbox($id, '1').' />
-									'.$status['status'].' '.$role['role'].'s
-								</div>';
-						}
-					}
-					else
-					{
-						$id = 'sendto_'.$role['roleid'];
-						echo '
-							<div class="forminput">
-								<label>&nbsp;</label>
-
-								<input name="'.$id.'" id="'.$id.'" type="checkbox" class="checkbox" value="1" '.set_checkbox($id, '1').' />
-								'.ucfirst($role['role']).'s
-							</div>';
-					}
-				}
-
-				if (isset($subscription_types))
-				{
-					echo '<br/>';
-
-					foreach ($subscription_types->result_array() as $subscription_type)
-					{
-						$id = 'sendto_subscribers_'.$subscription_type['typeid'];
-						echo '
-							<div class="forminput">
-								<label>&nbsp;</label>
-
-								<input name="'.$id.'" id="'.$id.'" type="checkbox" class="checkbox" value="1" '.set_checkbox($id, '1').' />
-								'.ucfirst($subscription_type['type']).' subscribers
-							</div>';
-						$id = 'sendto_subscribers_'.$subscription_type['typeid'].'_expired';
-						echo '
-							<div class="forminput">
-								<label>&nbsp;</label>
-
-								<input name="'.$id.'" id="'.$id.'" type="checkbox" class="checkbox" value="1" '.set_checkbox($id, '1').' />
-								Expired '.strtolower($subscription_type['type']).' subscribers
-							</div>';
-
-					}
-				?>
-
-				<div class="forminput">
-					<label>&nbsp;</label>
-					<input name="sendto_subscribers_none" id="sendto_subscribers_none" type="checkbox" class="checkbox" value="1" <?php echo set_checkbox('sendto_subscribers_none', '1'); ?>/>
-					Non subscribers
-				</div>
-
-				<?php
-				}
-				?>
-
-				<br/>
-
-				<div class="forminput">
-					<input type="submit" value="Compose email" name="sendmail" class="button" onclick="dmcb.submitSetValue(this);" onfocus="dmcb.submitSetValue(this);" onblur="dmcb.submitRemoveValue(this);"/>
-				</div>
-			</div></div>
-		</fieldset>
-	</form>
 </div>

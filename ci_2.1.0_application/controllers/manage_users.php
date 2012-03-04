@@ -63,6 +63,7 @@ class Manage_users extends MY_Controller {
 			}
 
 			// Get subscription types
+			$this->data['subscription_types'] = NULL;
 			if ($this->acl->enabled('site', 'subscribe'))
 			{
 				$this->load->model('subscriptions_model');
@@ -94,7 +95,7 @@ class Manage_users extends MY_Controller {
 	function index()
 	{
 		// Handle user operations
-		if ($this->uri->segment(2) == "set_role")
+		if ($this->uri->segment(2) == "set_role" && ($this->acl->allow('site', 'change_role', TRUE) || $this->session->userdata('userid') == 1))
 		{
 			$user = instantiate_library('user', $this->uri->segment(3));
 			$this->acl->set($this->uri->segment(3), $this->uri->segment(4));
@@ -109,7 +110,7 @@ class Manage_users extends MY_Controller {
 			$this->session->set_flashdata('return', 'manage_users');
 			redirect('notify');
 		}
-		else if ($this->uri->segment(2) == "set_status")
+		else if ($this->uri->segment(2) == "set_status" && $this->acl->allow('site', 'change_status', TRUE))
 		{
 			$user = instantiate_library('user', $this->uri->segment(3));
 			$old_statusid = $user->user['statusid'];
@@ -133,7 +134,7 @@ class Manage_users extends MY_Controller {
 			$this->session->set_flashdata('return', 'manage_users');
 			redirect('notify');
 		}
-		else if ($this->uri->segment(2) == "delete")
+		else if ($this->uri->segment(2) == "delete" && $this->session->userdata('userid') == 1)
 		{
 			$user = instantiate_library('user', $this->uri->segment(3));
 			$user->delete();
@@ -375,363 +376,400 @@ class Manage_users extends MY_Controller {
 				}
 			}
 
+			$this->data['change_role'] = FALSE;
+			if ($this->acl->allow('site', 'change_role') || $this->session->userdata('userid') == 1)
+			{
+				$this->data['change_role'] = TRUE;
+			}
+			$this->data['change_status'] = $this->acl->allow('site', 'change_status');
+			$this->data['set_password'] = $this->acl->allow('site', 'set_password');
+			$this->data['set_subscription'] = $this->acl->allow('site', 'set_subscription');
+
+			if ($this->acl->allow('site', 'add_users', TRUE))
+			{
+				$this->data['add_user'] = $this->load->view('form_manage_users_adduser', array('userroles' => $this->data['userroles']), TRUE);
+			}
+			if ($this->acl->allow('site', 'mail_users', TRUE))
+			{
+				$this->data['mailing_list'] = $this->load->view('form_manage_users_mailinglist', array('userroles' => $this->data['userroles'], 'memberrole' => $this->data['memberrole'], 'userstatus' => $this->data['userstatus'], 'subscription_types' => $this->data['subscription_types']), TRUE);
+			}
+
 			$this->_initialize_page('manage_users', 'Manage users', $this->data);
 		}
 	}
 
 	function adduser()
 	{
-		$this->form_validation->set_rules('email', 'email address', 'xss_clean|strip_tags|trim|required|max_length[50]|valid_email|callback_email_check');
-		$this->form_validation->set_rules('displayname', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_check');
-		$this->form_validation->set_rules('role', 'role', 'xss_clean|strip_tags');
-
-		if ($this->form_validation->run())
+		if ($this->acl->allow('site', 'add_users', TRUE) || $this->_access_denied())
 		{
-			$this->load->library('user_lib',NULL,'new_user');
-			$this->new_user->new_user['email'] = set_value('email');
-			$this->new_user->new_user['displayname'] = set_value('displayname');
-			$this->new_user->new_user['roleid'] = set_value('role');
-			$result = $this->new_user->save();
+			$this->form_validation->set_rules('email', 'email address', 'xss_clean|strip_tags|trim|required|max_length[50]|valid_email|callback_email_check');
+			$this->form_validation->set_rules('displayname', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_check');
+			$this->form_validation->set_rules('role', 'role', 'xss_clean|strip_tags');
 
-			$this->_message("Add a user", $result['message'], $result['subject']);
-		}
-		else
-		{
-			$this->index();
+			if ($this->form_validation->run())
+			{
+				$this->load->library('user_lib',NULL,'new_user');
+				$this->new_user->new_user['email'] = set_value('email');
+				$this->new_user->new_user['displayname'] = set_value('displayname');
+				$this->new_user->new_user['roleid'] = set_value('role');
+				$result = $this->new_user->save();
+
+				$this->_message("Add a user", $result['message'], $result['subject']);
+			}
+			else
+			{
+				$this->index();
+			}
 		}
 	}
 
 	function email()
 	{
-		$this->form_validation->set_rules('personalcopy', 'send yourself a copy', 'xss_clean|strip_tags');
-		$this->form_validation->set_rules('emailsubject', 'email subject', 'xss_clean|strip_tags|trim|required|max_length[50]');
-		$this->form_validation->set_rules('emailmessage', 'email message', 'xss_clean|strip_tags|trim|required|max_length[1000]');
-		$this->form_validation->set_rules('maillist', 'mail list', 'xss_clean|strip_tags');
-
-		// Grab submitted maillist from flash data, if it doesn't exist, it's already in the form and we will grab it from there
-		$maillist = $this->session->flashdata('maillist');
-		$this->session->keep_flashdata('maillist');
-		if ($maillist == NULL)
+		if ($this->acl->allow('site', 'mail_users', TRUE) || $this->_access_denied())
 		{
-			$maillist = explode(';', set_value('maillist'));
-		}
+			$this->form_validation->set_rules('personalcopy', 'send yourself a copy', 'xss_clean|strip_tags');
+			$this->form_validation->set_rules('emailsubject', 'email subject', 'xss_clean|strip_tags|trim|required|max_length[50]');
+			$this->form_validation->set_rules('emailmessage', 'email message', 'xss_clean|strip_tags|trim|required|max_length[1000]');
+			$this->form_validation->set_rules('maillist', 'mail list', 'xss_clean|strip_tags');
 
-		// Loop through the maillist data and assemble it for the form
-		$this->data['maillist'] = array();
-		foreach ($maillist as $member)
-		{
-			if ($member != NULL)
+			// Grab submitted maillist from flash data, if it doesn't exist, it's already in the form and we will grab it from there
+			$maillist = $this->session->flashdata('maillist');
+			$this->session->keep_flashdata('maillist');
+			if ($maillist == NULL)
 			{
-				$object = instantiate_library('user', $member);
-				if (isset($object->user['userid']))
-				{
-					array_push($this->data['maillist'], $object->user);
-				}
-			}
-		}
-
-		// Clear out any attachments older than 1 hour that remain in the case where a mail was created with attachments and never sent out
-		if ($handle = opendir('files_managed/email/'))
-		{
-			while (false !== ($file = readdir($handle)))
-			{
-				if ($file != "." && $file != ".." && filemtime('files_managed/email/'.$file) < (time()-3600))
-				{
-					unlink('files_managed/email/'.$file);
-				}
-			}
-			closedir($handle);
-		}
-
-		// Grab any attachments
-		$this->data['upload_url'] = "email";
-		$this->data['files'] = $this->session->flashdata('mailattachments');
-		$this->session->keep_flashdata('mailattachments');
-		if ($this->data['files'] == NULL)
-		{
-			$this->data['files'] = array();
-			$this->session->set_flashdata('mailattachments', $this->data['files']);
-		}
-
-		if ($this->uri->segment(3) == "delete") // The user has chosen to delete an attachment from their email
-		{
-			$attachments = array();
-			foreach ($this->data['files'] as $file)
-			{
-				if ($file == $this->uri->segment(4) && file_exists('files_managed/email/'.$this->uri->segment(4)))
-				{
-					unlink('files_managed/email/'.$this->uri->segment(4));
-				}
-				else
-				{
-					array_push($attachments, $file);
-				}
-			}
-			$this->session->set_flashdata('mailattachments', $attachments);
-			redirect('manage_users/email');
-		}
-		else if (sizeof($this->data['maillist'])) // Otherwise, if a mailing list exists, lets take them to the email form
-		{
-			// Loop through attachments, adding the full path for use in sending the email
-			$attachments = array();
-			foreach ($this->data['files'] as $file)
-			{
-				array_push($attachments, 'files_managed/email/'.$file);
+				$maillist = explode(';', set_value('maillist'));
 			}
 
-			if ($this->form_validation->run() && $this->session->flashdata('postdone') == NULL)
+			// Loop through the maillist data and assemble it for the form
+			$this->data['maillist'] = array();
+			foreach ($maillist as $member)
 			{
-				$personalcopy = set_value('personalcopy');
-				$subject = html_entity_decode(set_value('emailsubject'), ENT_QUOTES);
-				$message = html_entity_decode(set_value('emailmessage'), ENT_QUOTES);
-
-				// Send a copy to sender if specified
-				if ($personalcopy)
+				if ($member != NULL)
 				{
-					$sender = instantiate_library('user', $this->session->userdata('userid'));
-					$log = "You sent a message to the following users:\n\n";
+					$object = instantiate_library('user', $member);
+					if (isset($object->user['userid']))
+					{
+						array_push($this->data['maillist'], $object->user);
+					}
+				}
+			}
+
+			// Clear out any attachments older than 1 hour that remain in the case where a mail was created with attachments and never sent out
+			if ($handle = opendir('files_managed/email/'))
+			{
+				while (false !== ($file = readdir($handle)))
+				{
+					if ($file != "." && $file != ".." && filemtime('files_managed/email/'.$file) < (time()-3600))
+					{
+						unlink('files_managed/email/'.$file);
+					}
+				}
+				closedir($handle);
+			}
+
+			// Grab any attachments
+			$this->data['upload_url'] = "email";
+			$this->data['files'] = $this->session->flashdata('mailattachments');
+			$this->session->keep_flashdata('mailattachments');
+			if ($this->data['files'] == NULL)
+			{
+				$this->data['files'] = array();
+				$this->session->set_flashdata('mailattachments', $this->data['files']);
+			}
+
+			if ($this->uri->segment(3) == "delete") // The user has chosen to delete an attachment from their email
+			{
+				$attachments = array();
+				foreach ($this->data['files'] as $file)
+				{
+					if ($file == $this->uri->segment(4) && file_exists('files_managed/email/'.$this->uri->segment(4)))
+					{
+						unlink('files_managed/email/'.$this->uri->segment(4));
+					}
+					else
+					{
+						array_push($attachments, $file);
+					}
+				}
+				$this->session->set_flashdata('mailattachments', $attachments);
+				redirect('manage_users/email');
+			}
+			else if (sizeof($this->data['maillist'])) // Otherwise, if a mailing list exists, lets take them to the email form
+			{
+				// Loop through attachments, adding the full path for use in sending the email
+				$attachments = array();
+				foreach ($this->data['files'] as $file)
+				{
+					array_push($attachments, 'files_managed/email/'.$file);
+				}
+
+				if ($this->form_validation->run() && $this->session->flashdata('postdone') == NULL)
+				{
+					$personalcopy = set_value('personalcopy');
+					$subject = html_entity_decode(set_value('emailsubject'), ENT_QUOTES);
+					$message = html_entity_decode(set_value('emailmessage'), ENT_QUOTES);
+
+					// Send a copy to sender if specified
+					if ($personalcopy)
+					{
+						$sender = instantiate_library('user', $this->session->userdata('userid'));
+						$log = "You sent a message to the following users:\n\n";
+						foreach ($this->data['maillist'] as $user)
+						{
+							if ($user['mailinglist'])
+							{
+								$log .= $user['displayname']." (".$user['email'].")\n";
+							}
+							else
+							{
+								$log .= $user['displayname']." (".$user['email'].") opted out of the mailing list, no email was sent\n";
+							}
+						}
+						$log .= "\nThe message was as follows:\n\n";
+						$this->notifications_model->send($sender->user['email'], "A copy of your message: ".$subject, $log.$message, $attachments);
+					}
+
+					// Send to all users individually
 					foreach ($this->data['maillist'] as $user)
 					{
 						if ($user['mailinglist'])
 						{
-							$log .= $user['displayname']." (".$user['email'].")\n";
+							$unsubscribe_message = "\n\n".
+								"If you no longer wish to receive messages from ".$this->config->item('dmcb_friendly_server').", you can unsubscribe at the link below:\n".
+								base_url()."unlist/".$user['userid']."/".$user['mailinglist_code']."\n\n";
+							$this->notifications_model->send($user['email'], $subject, $message.$unsubscribe_message, $attachments, $this->config->item('dmcb_email_mailinglist'));
+						}
+					}
+
+					// Indicate the post is done so a refresh doesn't spam the maillist again
+					$this->session->set_flashdata('postdone', TRUE);
+
+					// Clear out used attachments
+					foreach ($attachments as $attachment)
+					{
+						if (file_exists($attachment))
+						{
+							unlink($attachment);
+						}
+					}
+
+					// Render page
+					$message = "You have sent out an update to the following email addresses:</p><br/><table>";
+					foreach ($this->data['maillist'] as $user)
+					{
+						if ($user['mailinglist'])
+						{
+							$message .= '<tr><td>'.$user['displayname'].' ('.$user['email'].')</td></tr>';
 						}
 						else
 						{
-							$log .= $user['displayname']." (".$user['email'].") opted out of the mailing list, no email was sent\n";
+							$message .= '<tr><td><span class="restricted">'.$user['displayname'].' ('.$user['email'].') opted out of the mailing list, no email was sent</span></td></tr>';
 						}
 					}
-					$log .= "\nThe message was as follows:\n\n";
-					$this->notifications_model->send($sender->user['email'], "A copy of your message: ".$subject, $log.$message, $attachments);
+					$message .= '</table><br/><p><a href="'.base_url().'manage_users">Return to managing users</a>';
+					$this->_message("Send email", $message, "Success!");
 				}
-
-				// Send to all users individually
-				foreach ($this->data['maillist'] as $user)
+				else if ($this->session->flashdata('postdone') == NULL)
 				{
-					if ($user['mailinglist'])
-					{
-						$unsubscribe_message = "\n\n".
-							"If you no longer wish to receive messages from ".$this->config->item('dmcb_friendly_server').", you can unsubscribe at the link below:\n".
-							base_url()."unlist/".$user['userid']."/".$user['mailinglist_code']."\n\n";
-						$this->notifications_model->send($user['email'], $subject, $message.$unsubscribe_message, $attachments, $this->config->item('dmcb_email_mailinglist'));
-					}
+					$this->_initialize_page('send_email', 'Send email', $this->data);
 				}
-
-				// Indicate the post is done so a refresh doesn't spam the maillist again
-				$this->session->set_flashdata('postdone', TRUE);
-
-				// Clear out used attachments
-				foreach ($attachments as $attachment)
+				else
 				{
-					if (file_exists($attachment))
-					{
-						unlink($attachment);
-					}
+					redirect('manage_users');
 				}
-
-				// Render page
-				$message = "You have sent out an update to the following email addresses:</p><br/><table>";
-				foreach ($this->data['maillist'] as $user)
-				{
-					if ($user['mailinglist'])
-					{
-						$message .= '<tr><td>'.$user['displayname'].' ('.$user['email'].')</td></tr>';
-					}
-					else
-					{
-						$message .= '<tr><td><span class="restricted">'.$user['displayname'].' ('.$user['email'].') opted out of the mailing list, no email was sent</span></td></tr>';
-					}
-				}
-				$message .= '</table><br/><p><a href="'.base_url().'manage_users">Return to managing users</a>';
-				$this->_message("Send email", $message, "Success!");
 			}
-			else if ($this->session->flashdata('postdone') == NULL)
+			else // No maillist was found, give a message saying the email list is empty
 			{
-				$this->_initialize_page('send_email', 'Send email', $this->data);
+				$message = 'No users matched your mailling list criteria. <a href="'.base_url().'manage_users/mailinglist">Assemble a new list</a>.';
+				$this->_message("Send email", $message, "Empty list");
 			}
-			else
-			{
-				redirect('manage_users');
-			}
-		}
-		else // No maillist was found, give a message saying the email list is empty
-		{
-			$message = 'No users matched your mailling list criteria. <a href="'.base_url().'manage_users/mailinglist">Assemble a new list</a>.';
-			$this->_message("Send email", $message, "Empty list");
 		}
 	}
 
 	function mailinglist()
 	{
-		// Assemble types of mailing lists
-		$this->form_validation->set_rules('sendto_all', 'mailing list', 'xss_clean');
-
-		foreach ($this->data['userroles']->result_array() as $role)
+		if ($this->acl->allow('site', 'mail_users', TRUE) || $this->_access_denied())
 		{
-			if ($this->data['memberrole'] == $role['roleid'])
-			{
-				foreach ($this->data['userstatus']->result_array() as $status)
-				{
-					$this->form_validation->set_rules('sendto_'.$role['roleid'].'_'.$status['status'], $status['status'].' '.strtolower($role['role'].'s'), 'xss_clean');
-				}
-			}
-			else
-			{
-				$this->form_validation->set_rules('sendto_'.$role['roleid'], strtolower($role['role'].'s'), 'xss_clean');
-			}
-		}
+			// Assemble types of mailing lists
+			$this->form_validation->set_rules('sendto_all', 'mailing list', 'xss_clean');
 
-		if ($this->acl->enabled('site', 'subscribe'))
-		{
-			$this->load->model('subscriptions_model');
-			$this->data['subscription_types'] = $this->subscriptions_model->get_types_by_price();
-			foreach ($this->data['subscription_types']->result_array() as $subscription_type)
-			{
-				$this->form_validation->set_rules('sendto_subscribers_'.strtolower($subscription_type['typeid']), strtolower($subscription_type['type']).' subscribers', 'xss_clean');
-				$this->form_validation->set_rules('sendto_subscribers_'.strtolower($subscription_type['typeid']).'_expired', 'expired '.strtolower($subscription_type['type']).' subscribers', 'xss_clean');
-			}
-			$this->form_validation->set_rules('sendto_subscribers_none', 'expired trial subscribers', 'xss_clean');
-		}
-
-		if ($this->form_validation->run())
-		{
-			$list = array();
-
-			//If sendto_all is specified, gather all users on mailing list to mail out to
-			if (set_value('sendto_all') == "1")
-			{
-				$users = $this->users_model->get_mailing_list();
-				foreach ($users->result_array() as $user)
-				{
-					array_push($list, $user['userid']);
-				}
-			}
-
-			// Comb through all roles
 			foreach ($this->data['userroles']->result_array() as $role)
 			{
-				// If the member role is selected, we will have more verbose matching against the status of the user
 				if ($this->data['memberrole'] == $role['roleid'])
 				{
 					foreach ($this->data['userstatus']->result_array() as $status)
 					{
-						$group = 'sendto_'.$role['roleid'].'_'.$status['status'];
-						if (set_value($group) == "1")
-						{
-							$users = $this->acls_model->get_userlist_by_role($role['roleid'], 'site');
-							foreach ($users->result_array() as $user)
-							{
-								$object = instantiate_library('user', $user['userid']);
-								if ($object->user['statusid'] == $status['statusid'])
-								{
-									array_push($list, $object->user['userid']);
-								}
-							}
-						}
+						$this->form_validation->set_rules('sendto_'.$role['roleid'].'_'.$status['status'], $status['status'].' '.strtolower($role['role'].'s'), 'xss_clean');
 					}
 				}
-				else // Otherwise only match against the role
+				else
 				{
-					$group = 'sendto_'.$role['roleid'];
-					if (set_value($group) == "1")
-					{
-						$users = $this->acls_model->get_userlist_by_role($role['roleid'], 'site');
-						foreach ($users->result_array() as $user)
-						{
-							array_push($list, $user['userid']);
-						}
-					}
+					$this->form_validation->set_rules('sendto_'.$role['roleid'], strtolower($role['role'].'s'), 'xss_clean');
 				}
 			}
 
-			// If subscriptions are enabled, have options to mail out to  paid, trial and expired subscribers
 			if ($this->acl->enabled('site', 'subscribe'))
 			{
+				$this->load->model('subscriptions_model');
+				$this->data['subscription_types'] = $this->subscriptions_model->get_types_by_price();
 				foreach ($this->data['subscription_types']->result_array() as $subscription_type)
 				{
-					$group = 'sendto_subscribers_'.$subscription_type['typeid'];
-					if (set_value($group) == "1")
-					{
-						$users = $this->subscriptions_model->get_list_by_type($subscription_type['typeid']);
-						foreach ($users->result_array() as $user)
-						{
-							array_push($list, $user['userid']);
-						}
-					}
-					$group = 'sendto_subscribers_'.$subscription_type['typeid'].'_expired';
-					if (set_value($group) == "1")
-					{
-						$users = $this->subscriptions_model->get_list_by_type_expired($subscription_type['typeid']);
-						foreach ($users->result_array() as $user)
-						{
-							array_push($list, $user['userid']);
-						}
-					}
+					$this->form_validation->set_rules('sendto_subscribers_'.strtolower($subscription_type['typeid']), strtolower($subscription_type['type']).' subscribers', 'xss_clean');
+					$this->form_validation->set_rules('sendto_subscribers_'.strtolower($subscription_type['typeid']).'_expired', 'expired '.strtolower($subscription_type['type']).' subscribers', 'xss_clean');
 				}
-				$group = 'sendto_subscribers_none';
-				if (set_value($group) == "1")
+				$this->form_validation->set_rules('sendto_subscribers_none', 'expired trial subscribers', 'xss_clean');
+			}
+
+			if ($this->form_validation->run())
+			{
+				$list = array();
+
+				//If sendto_all is specified, gather all users on mailing list to mail out to
+				if (set_value('sendto_all') == "1")
 				{
-					$users = $this->subscriptions_model->get_list_by_none();
+					$users = $this->users_model->get_mailing_list();
 					foreach ($users->result_array() as $user)
 					{
 						array_push($list, $user['userid']);
 					}
 				}
-			}
 
-			// Serialize results list so that we can only grab unique results since some users may have been listed multiple times, and then unserialize
-			foreach ($list as &$listvalue)
-			{
-				$listvalue=serialize($listvalue);
+				// Comb through all roles
+				foreach ($this->data['userroles']->result_array() as $role)
+				{
+					// If the member role is selected, we will have more verbose matching against the status of the user
+					if ($this->data['memberrole'] == $role['roleid'])
+					{
+						foreach ($this->data['userstatus']->result_array() as $status)
+						{
+							$group = 'sendto_'.$role['roleid'].'_'.$status['status'];
+							if (set_value($group) == "1")
+							{
+								$users = $this->acls_model->get_userlist_by_role($role['roleid'], 'site');
+								foreach ($users->result_array() as $user)
+								{
+									$object = instantiate_library('user', $user['userid']);
+									if ($object->user['statusid'] == $status['statusid'])
+									{
+										array_push($list, $object->user['userid']);
+									}
+								}
+							}
+						}
+					}
+					else // Otherwise only match against the role
+					{
+						$group = 'sendto_'.$role['roleid'];
+						if (set_value($group) == "1")
+						{
+							$users = $this->acls_model->get_userlist_by_role($role['roleid'], 'site');
+							foreach ($users->result_array() as $user)
+							{
+								array_push($list, $user['userid']);
+							}
+						}
+					}
+				}
+
+				// If subscriptions are enabled, have options to mail out to  paid, trial and expired subscribers
+				if ($this->acl->enabled('site', 'subscribe'))
+				{
+					foreach ($this->data['subscription_types']->result_array() as $subscription_type)
+					{
+						$group = 'sendto_subscribers_'.$subscription_type['typeid'];
+						if (set_value($group) == "1")
+						{
+							$users = $this->subscriptions_model->get_list_by_type($subscription_type['typeid']);
+							foreach ($users->result_array() as $user)
+							{
+								array_push($list, $user['userid']);
+							}
+						}
+						$group = 'sendto_subscribers_'.$subscription_type['typeid'].'_expired';
+						if (set_value($group) == "1")
+						{
+							$users = $this->subscriptions_model->get_list_by_type_expired($subscription_type['typeid']);
+							foreach ($users->result_array() as $user)
+							{
+								array_push($list, $user['userid']);
+							}
+						}
+					}
+					$group = 'sendto_subscribers_none';
+					if (set_value($group) == "1")
+					{
+						$users = $this->subscriptions_model->get_list_by_none();
+						foreach ($users->result_array() as $user)
+						{
+							array_push($list, $user['userid']);
+						}
+					}
+				}
+
+				// Serialize results list so that we can only grab unique results since some users may have been listed multiple times, and then unserialize
+				foreach ($list as &$listvalue)
+				{
+					$listvalue=serialize($listvalue);
+				}
+				$list = array_unique($list);
+				foreach ($list as &$listvalue)
+				{
+					$listvalue=unserialize($listvalue);
+				}
+				$this->session->set_flashdata('maillist', $list);
+				redirect(base_url().'manage_users/email');
 			}
-			$list = array_unique($list);
-			foreach ($list as &$listvalue)
+			else
 			{
-				$listvalue=unserialize($listvalue);
+				$this->index();
 			}
-			$this->session->set_flashdata('maillist', $list);
-			redirect(base_url().'manage_users/email');
-		}
-		else
-		{
-			$this->index();
 		}
 	}
 
 	function password()
 	{
-		$user = instantiate_library('user', $this->uri->segment(3));
-
-		$this->load->helper('string');
-		$password = random_string();
-		$user->new_user['password'] = md5($password);
-
-		$this->message = "";
-		if ($user->user['code'] != "")
+		if ($this->acl->allow('site', 'set_password', TRUE) || $this->_access_denied())
 		{
-			$user->new_user['code'] = "";
-			$this->message = $user->user['displayname']."'s account has been activated.<br/><br/>";
-			// Add subscription trial if subscriptions are enabled on the site and a trial duration greater than zero is specified
-			if ($this->acl->enabled('site', 'subscribe') && $this->config->item('dmcb_post_subscriptions_trial_duration') > "0")
+			if ($this->uri->segment(3))
 			{
-				$typeid = $this->subscriptions_model->get_type_free();
-				$this->subscriptions_model->set($user->user['userid'], date("Ymd",mktime(0,0,0,date("m"),date("d")+$this->config->item('dmcb_post_subscriptions_trial_duration'),date("Y"))),$typeid);
+				$user = instantiate_library('user', $this->uri->segment(3));
+
+				$this->load->helper('string');
+				$password = random_string();
+				$user->new_user['password'] = md5($password);
+
+				$this->message = "";
+				if ($user->user['code'] != "")
+				{
+					$user->new_user['code'] = "";
+					$this->message = $user->user['displayname']."'s account has been activated.<br/><br/>";
+					// Add subscription trial if subscriptions are enabled on the site and a trial duration greater than zero is specified
+					if ($this->acl->enabled('site', 'subscribe') && $this->config->item('dmcb_post_subscriptions_trial_duration') > "0")
+					{
+						$typeid = $this->subscriptions_model->get_type_free();
+						$this->subscriptions_model->set($user->user['userid'], date("Ymd",mktime(0,0,0,date("m"),date("d")+$this->config->item('dmcb_post_subscriptions_trial_duration'),date("Y"))),$typeid);
+					}
+				}
+				$user->save();
+
+				$message = "An administrator has reset your password for ".$this->config->item('dmcb_friendly_server').".  Your temporary password is: ".$password."\n\nPlease change your password immediately by visiting the following url and signing on with your temporary password:\n".base_url()."account/changepassword";
+				if ($this->notifications_model->send($user->user['email'], $this->config->item('dmcb_friendly_server').' password reset', $message))
+				{
+					$this->subject = "Success!";
+					$this->message .= "You have successfully generated a password for ".$user->user['displayname'].". The user has been sent an email. The password is: ".$password;
+				}
+				else {
+					$this->subject = "Error";
+					$this->message .= "You have successfully generated a password for ".$user->user['displayname'].". However a notification email to the user failed to be sent. The password is: ".$password;
+				}
+				$this->message .= "<br/><br/>Click <a href=\"".base_url()."manage_users\">here</a> to return to editing.";
+				$this->_message("User password", $this->message, $this->subject);
+			}
+			else
+			{
+				$this->index();
 			}
 		}
-		$user->save();
-
-		$message = "An administrator has reset your password for ".$this->config->item('dmcb_friendly_server').".  Your temporary password is: ".$password."\n\nPlease change your password immediately by visiting the following url and signing on with your temporary password:\n".base_url()."account/changepassword";
-		if ($this->notifications_model->send($user->user['email'], $this->config->item('dmcb_friendly_server').' password reset', $message))
-		{
-			$this->subject = "Success!";
-			$this->message .= "You have successfully generated a password for ".$user->user['displayname'].". The user has been sent an email. The password is: ".$password;
-		}
-		else {
-			$this->subject = "Error";
-			$this->message .= "You have successfully generated a password for ".$user->user['displayname'].". However a notification email to the user failed to be sent. The password is: ".$password;
-		}
-		$this->message .= "<br/><br/>Click <a href=\"".base_url()."manage_users\">here</a> to return to editing.";
-		$this->_message("User password", $this->message, $this->subject);
 	}
 
 	function report()
@@ -789,7 +827,7 @@ class Manage_users extends MY_Controller {
 
 	function subscription()
 	{
-		if ($this->acl->enabled('site', 'subscribe'))
+		if (($this->acl->enabled('site', 'subscribe') && $this->acl->allow('site', 'set_subscription', TRUE)) || $this->_access_denied())
 		{
 			$this->form_validation->set_rules('subscribetype', 'subscription type', 'xss_clean|strip_tags');
 			$this->form_validation->set_rules('subscribedate', 'end date', 'xss_clean|strip_tags|trim|numeric|exact_length[8]');
