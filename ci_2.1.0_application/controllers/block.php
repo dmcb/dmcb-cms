@@ -53,7 +53,7 @@ class Block extends MY_Controller {
 	function index()
 	{
 		// Add editing packages to page
-		$this->packages['tinymce'] = array('weight' => '3');
+		$this->packages[5]['tinymce'] = array();
 
 		// Tack on blocks java script array
 		$this->load->model('blocks_model');
@@ -81,7 +81,9 @@ class Block extends MY_Controller {
 
 		if (sizeof($all_blocks) > 0)
 		{
-			$this->packages['tinymce_blocks'] = array('weight' => '2', 'properties' => array('blocks' => $all_blocks));
+			$this->packages[4]['tinymce_blocks'] = array(
+				'blocks' => $all_blocks
+			);
 		}
 
 		$data['block'] = $this->block->block;

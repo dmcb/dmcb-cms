@@ -39,13 +39,12 @@ class Manage_content extends MY_Controller {
 
 	function index()
 	{
-		$this->packages['swfupload'] = array('weight' => '5', 'properties' =>
-			array(
-				'upload_url' => 'site',
-				'upload_size' => $this->config->item('dmcb_site_upload_size'),
-				'upload_types' => $this->config->item('dmcb_site_upload_types'),
-				'upload_description' => $this->config->item('dmcb_site_upload_description')
-			));
+		$this->packages[5]['swfupload'] = array(
+			'upload_url' => 'site',
+			'upload_size' => $this->config->item('dmcb_site_upload_size'),
+			'upload_types' => $this->config->item('dmcb_site_upload_types'),
+			'upload_description' => $this->config->item('dmcb_site_upload_description')
+		);
 
 		// Grab attachments
 		$data['files'] = array();

@@ -265,11 +265,11 @@ class Post extends MY_Controller {
 				{
 					if ($theme_file['type'] == "css")
 					{
-						array_push($this->cssfiles, $theme_file['file']);
+						$this->packages[4]['cssfiles'][] = $theme_file['file'];
 					}
 					else if ($theme_file['type'] == "js")
 					{
-						array_push($this->jsfiles, $theme_file['file']);
+						$this->packages[4]['jsfiles'][] = $theme_file['file'];
 					}
 				}
 			}
@@ -438,7 +438,7 @@ class Post extends MY_Controller {
 		// Enable editing
 		if ($this->acl->allow('post', 'edit', FALSE, 'post', $this->post->post['postid']))
 		{
-			$this->packages['tinymce'] = array('weight' => '3');
+			$this->packages[5]['tinymce'] = array();
 
 			// Set editor type from template
 			$simple_editor = FALSE;
@@ -452,13 +452,12 @@ class Post extends MY_Controller {
 		// Enable attachment editing
 		if ($this->acl->allow('post', 'attachments', FALSE, 'post', $this->post->post['postid']))
 		{
-			$this->packages['swfupload'] = array('weight' => '5', 'properties' =>
-				array(
-					'upload_url' => 'post/'.$this->post->post['urlname'],
-					'upload_size' => $this->config->item('dmcb_site_upload_size'),
-					'upload_types' => $this->config->item('dmcb_site_upload_types'),
-					'upload_description' => $this->config->item('dmcb_site_upload_description')
-				));
+			$this->packages[5]['swfupload'] = array(
+				'upload_url' => 'post/'.$this->post->post['urlname'],
+				'upload_size' => $this->config->item('dmcb_site_upload_size'),
+				'upload_types' => $this->config->item('dmcb_site_upload_types'),
+				'upload_description' => $this->config->item('dmcb_site_upload_description')
+			);
 
 			// Grab stock images, if we have multiple, we will let the user choose if they want to set any as the post image
 			$stockimages = array();
@@ -480,11 +479,11 @@ class Post extends MY_Controller {
 		{
 			if ($this->post->post['css'] != NULL)
 			{
-				$this->css['post'] = array('weight' => '5', 'css' => $this->post->post['css']);
+				$this->packages[6]['css'][] = $this->post->post['css'];
 			}
 			if ($this->post->post['javascript'] != NULL)
 			{
-				$this->javascript['post'] = array('weight' => '5', 'javascript' => $this->post->post['javascript']);
+				$this->packages[6]['no_wait_javascript'][] = $this->post->post['javascript'];
 			}
 			if ($this->acl->allow('post', 'theme', FALSE, 'post', $this->post->post['postid']))
 			{
@@ -495,7 +494,7 @@ class Post extends MY_Controller {
 		// Enable events
 		if ($this->acl->allow('post', 'event', FALSE, 'post', $this->post->post['postid']))
 		{
-			$this->packages['calendardateselect'] = array('weight' => '1');
+			$this->packages[5]['calendardateselect'] = array();
 
 			$data['edit_event'] = $this->load->view('form_post_editevent', array('post' => $this->post->post), TRUE);
 		}

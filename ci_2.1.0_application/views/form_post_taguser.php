@@ -26,12 +26,12 @@
 				echo '<div class="autocomplete" id="autocomplete_'.$i.'" style="display: none; position:relative;"></div>';
 
 				if ($this->config->item('csrf_protection')) $csrf = "parameters: '".$this->security->get_csrf_token_name()."=".$this->security->get_csrf_hash()."',";
-				$this->javascript['autocomplete'.$i] = array('weight' => 1, 'javascript' => "
-				new Ajax.Autocompleter('tag_".$i."','autocomplete_".$i."','".base_url()."autocomplete/user', {
-					".$csrf."
-					minChars: 2,
-					frequency: 0.1
-				});");
+				$this->packages[4]['javascript'][] = "
+new Ajax.Autocompleter('tag_".$i."','autocomplete_".$i."','".base_url()."autocomplete/user', {
+	".$csrf."
+	minChars: 2,
+	frequency: 0.1
+});";
 
 				echo form_error($field);
 				echo '</div>';

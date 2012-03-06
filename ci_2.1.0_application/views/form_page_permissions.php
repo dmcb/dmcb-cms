@@ -48,12 +48,12 @@
 
 			<?php
 			if ($this->config->item('csrf_protection')) $csrf = "parameters: '".$this->security->get_csrf_token_name()."=".$this->security->get_csrf_hash()."',";
-			$this->javascript['autocomplete'] = array('weight' => 1, 'javascript' => "
-				new Ajax.Autocompleter('displayname','autocomplete','".base_url()."autocomplete/user', {
-					".$csrf."
-					minChars: 2,
-					frequency: 0.1
-				});");
+				$this->packages[4]['javascript'][] = "
+new Ajax.Autocompleter('displayname','autocomplete','".base_url()."autocomplete/user', {
+	".$csrf."
+	minChars: 2,
+	frequency: 0.1
+});";
 			?>
 
 			<div class="formnotes">

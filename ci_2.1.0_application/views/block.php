@@ -104,13 +104,13 @@
 						{
 							$tokens = $variable['list'] ? "tokens: ';'," : "";
 							$csrf = $this->config->item('csrf_protection') ? "parameters: '".$this->security->get_csrf_token_name()."=".$this->security->get_csrf_hash()."'," : "";
-							$this->javascript['autocomplete_'.$variablename] = array('weight' => 1, 'javascript' => "
-				new Ajax.Autocompleter('".$variablename."','autocomplete_".$variablename."','".base_url()."autocomplete/".$variable['variablename']."', {
-					".$csrf."
-					".$tokens."
-					minChars: 2,
-					frequency: 0.1
-				});");
+							$this->packages[4]['javascript'][] = "
+new Ajax.Autocompleter('".$variablename."','autocomplete_".$variablename."','".base_url()."autocomplete/".$variable['variablename']."', {
+	".$csrf."
+	".$tokens."
+	minChars: 2,
+	frequency: 0.1
+});";
 							echo '<div class="autocomplete" id="autocomplete_'.$variablename.'" style="display: none; position:relative;"></div>';
 						}
 

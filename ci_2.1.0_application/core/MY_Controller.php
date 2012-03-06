@@ -21,7 +21,7 @@ class MY_Controller extends CI_Controller {
         parent::__construct();
 
 		// Make sure the DB is up to date
-        $this->load->library('migration');
+		$this->load->library('migration');
 		if (!$this->migration->current())
 		{
 			show_error($this->migration->error_string());
@@ -30,9 +30,6 @@ class MY_Controller extends CI_Controller {
 		// Define global variables that can be set by controllers, pages and blocks:
 		$this->packages = array();
 		$this->focus = "null";
-		$this->css = array();
-		$this->cssfiles = array();
-		$this->javascript = array();
 
 		// Switch to mobile theme if developed
 		$this->load->library('user_agent');
@@ -137,74 +134,86 @@ class MY_Controller extends CI_Controller {
 		$data['page'] = $page;
 		$data['view'] = $this->load->view($page, $data, TRUE);
 
-		// Sort weighted array of packages
-		function _weighted_sort($a, $b)
-		{
-			if ($a['weight'] == $b['weight']) return 0;
-			return ($a['weight'] < $b['weight']) ? -1 : 1;
-		}
-
-		// Load up packages requested for this view
-		$data['prepackages'] = "";
-		$data['packages'] = "";
-
-		if (isset($this->packages) && $this->config->item('dmcb_packages'))
-		{
-			$this->packages = array_merge($this->config->item('dmcb_packages'), $this->packages);
-		}
-		else if ($this->config->item('dmcb_packages'))
-		{
-			$this->packages = $this->config->item('dmcb_packages');
-		}
-
-		if (isset($this->packages))
-		{
-			uasort($this->packages, '_weighted_sort');
-			foreach ($this->packages as $key => $value)
-			{
-				if (!isset($value['properties'])) $value['properties'] = NULL;
-				if ($value['weight'] < 0)
-				{
-					$data['prepackages'] .= $this->load->view('package_'.$key, $value['properties'], TRUE)."\n";
-				}
-				else
-				{
-					$data['packages'] .= $this->load->view('package_'.$key, $value['properties'], TRUE)."\n";
-				}
-			}
-		}
-
 		// Set a default focus (used for the javascript panels)
 		$data['focus'] = $this->focus;
 
-		// Endow outputted page with any custom CSS added
-		$data['css'] = "";
-		if (isset($this->css))
+		// Load up packages requested for this view
+		$data['packages'] = "";
+
+		// Add default libraries
+		if ($this->config->item('dmcb_packages'))
 		{
-			uasort($this->css, '_weighted_sort');
-			foreach ($this->css as $key => $value)
+			foreach ($this->config->item('dmcb_packages') as $weight => $value)
 			{
-				$data['css'] .= $value['css']."\n";
+				$this->packages[$weight] = $value;
 			}
-		}
-		if (isset($this->cssfiles))
-		{
-			$data['cssfiles'] = $this->cssfiles;
 		}
 
-		// Endow outputted page with any custom Javascript added
-		$data['javascript'] = "Effect.InitializePage('".$this->focus."');\n";
-		if (isset($this->javascript))
+		// Add default CSS files
+		$this->packages[0]['cssfiles'][] = base_url().'includes/styles/elements.css';
+		$this->packages[0]['cssfiles'][] = base_url().'includes/styles/layout.css';
+
+		// Add default JS files
+		$this->packages[3]['jsfiles'][] = base_url().'includes/scripts/functions.js';
+		$this->packages[3]['jsfiles'][] = base_url().'includes/scripts/panels.js';
+
+		// Add default Javascript
+		$this->packages[4]['javascript'][] = "\nEffect.InitializePage('".$this->focus."');";
+
+		ksort($this->packages);
+		foreach ($this->packages as $weight)
 		{
-			uasort($this->javascript, '_weighted_sort');
-			foreach ($this->javascript as $key => $value)
+			foreach ($weight as $key => $value)
 			{
-				$data['javascript'] .= $value['javascript']."\n";
+				if ($key == 'cssfiles')
+				{
+					$data['packages'] .= "\n\t<!-- dmcb styles -->\n\t<style type=\"text/css\">";
+					foreach($value as $cssfile)
+					{
+						$data['packages'] .= "\n\t\t@import \"".$cssfile.'";';
+					}
+					$data['packages'] .= "\n\t</style>\n";
+				}
+				else if ($key == 'css')
+				{
+					$data['packages'] .= "\n\t<!-- dmcb styles -->\n\t<style type=\"text/css\">";
+					foreach($value as $css)
+					{
+						$data['packages'] .= "\n\t\t".str_replace("\n", "\n\t\t", $css);
+					}
+					$data['packages'] .= "\n\t</style>\n";
+				}
+				else if ($key == 'jsfiles')
+				{
+					$data['packages'] .= "\n\t<!-- dmcb scripts -->\n";
+					foreach($value as $jsfile)
+					{
+						$data['packages'] .= "\t<script type=\"text/javascript\" src=\"".$jsfile."\"></script>\n";
+					}
+				}
+				else if ($key == 'javascript')
+				{
+					$data['packages'] .= "\n\t<!-- dmcb scripts -->\n\t<script type=\"text/javascript\">\n\t\t<!--\n\t\t\tdmcb.addLoadEvent(function () {";
+					foreach($value as $javascript)
+					{
+						$data['packages'] .= "\n\t\t\t\t".str_replace("\n", "\n\t\t\t\t", $javascript);
+					}
+					$data['packages'] .= "\n\t\t\t});\n\t\t-->\n\t</script>\n";
+				}
+				else if ($key == 'no_wait_javascript')
+				{
+					$data['packages'] .= "\n\t<!-- dmcb scripts -->\n\t<script type=\"text/javascript\">\n\t\t<!--";
+					foreach($value as $javascript)
+					{
+						$data['packages'] .= "\n\t\t\t".str_replace("\n", "\n\t\t\t\t", $javascript);
+					}
+					$data['packages'] .= "\n\t\t-->\n\t</script>\n";
+				}
+				else
+				{
+					$data['packages'] .= "\n".$this->load->view('package_'.$key, $value, TRUE);
+				}
 			}
-		}
-		if (isset($this->jsfiles))
-		{
-			$data['jsfiles'] = $this->jsfiles;
 		}
 
 		// Wrap the view (allows dynamically built pages to have different view information encapsulating it)
