@@ -122,6 +122,28 @@ class Block extends MY_Controller {
 
 				$rulestring .= "|callback_blockvalue_check[$list]";
 			}
+
+			// Specifying specific pages/posts/users/etc requires more diligence
+			if ($variable['pattern'] == "*")
+			{
+				if ($variable['variablename'] == "page")
+				{
+					$rulestring .= "|callback_page_check";
+				}
+				else if ($variable['variablename'] == "post")
+				{
+					$rulestring .= "|callback_post_check";
+				}
+				else if ($variable['variablename'] == "user")
+				{
+					$rulestring .= "|callback_user_check";
+				}
+				else if ($variable['variablename'] == "category")
+				{
+					$rulestring .= "|callback_category_check";
+				}
+			}
+
 			$this->form_validation->set_rules($variablename, $variablename, $rulestring);
 
 			// If the variable allows for a selection choice OR a specific text input, add a specify field
