@@ -4,7 +4,7 @@
 
 <div class="centercolumnlarge">
 	<?php
-		if ($redirection != NULL) echo '<h4>This page requires that you sign on.</h4><br/>';
+		if ($signon_message != NULL) echo '<h4>'.$signon_message.'</h4><br/>';
 		if ($signoff_message != NULL) echo '<h4>'.$signoff_message.'</h4><br/>';
 
 		if (isset($authenticate)) echo $authenticate;

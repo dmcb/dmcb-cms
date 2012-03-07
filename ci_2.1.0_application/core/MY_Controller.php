@@ -60,6 +60,21 @@ class MY_Controller extends CI_Controller {
 			'This page no longer exists, <a href="'.base_url().'">return to '.$this->config->item('dmcb_title').'</a>.'
 		);
 	}
+	
+	// Sign on prompt
+	function _signon_prompt($message = NULL)
+	{
+		if (isset($message))
+		{
+			$this->session->set_flashdata('signon_message', $message);
+		}
+		else
+		{
+			$this->lang->load('signon', 'english', FALSE, TRUE, APPPATH.'site_specific_');
+			$this->session->set_flashdata('signon_message', $this->lang->line('signon_required'));
+		}
+		redirect('signon'.$this->uri->uri_string());
+	}
 
 	// Generic redirection page
 	function _redirect($url, $instant = FALSE)

@@ -50,7 +50,7 @@ class Acl {
 			}
 			else if ($signon_prompt)
 			{
-				redirect('signon'.$this->CI->uri->uri_string());
+				$this->CI->_signon_prompt();
 			}
 		}
 		else
@@ -117,7 +117,7 @@ class Acl {
 			}
 			else if ($signon_prompt) // If the guest isn't allowed, send the guest to sign on
 			{
-				redirect('signon'.$this->CI->uri->uri_string());
+				$this->CI->_signon_prompt();
 			}
 		}
 		else

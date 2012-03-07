@@ -21,6 +21,10 @@ class Signon extends MY_Controller {
 	function _remap()
 	{
 		$this->data = array();
+		
+		// Maintain any sign on messages
+		$this->data['signon_message'] = $this->session->flashdata('signon_message');
+		$this->session->keep_flashdata('signon_message');
 
 		// Determine redirection in URL
 		$this->data['redirection'] = NULL;

@@ -202,7 +202,7 @@ if ( ! function_exists('generate_menu_html'))
 					{
 						$title = '<img class="menuicon" src="'.base_url().'includes/images/facebook_connect_icon.png" alt="Facebook" /> '.$title;
 					}
-					$menu_html .= $CI->load->view($view, array('title' => $title, 'link' => base_url().'signon', 'selected' => FALSE, 'children_html' => NULL, 'level' => $level), TRUE);
+					$menu_html .= $CI->load->view($view, array('title' => $title, 'link' => base_url().'signon'.uri_string(), 'selected' => FALSE, 'children_html' => NULL, 'level' => $level), TRUE);
 				}
 			}
 		}
