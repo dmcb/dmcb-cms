@@ -23,15 +23,7 @@ class Profile extends MY_Controller {
 		$this->user = instantiate_library('user', $this->uri->segment(2), 'urlname');
 		if ($this->acl->allow('profile', 'view', TRUE) || $this->_access_denied())
 		{
-			if (!$this->session->userdata('signedon') && (($this->uri->segment(2) == "-" && $this->uri->segment(3) != NULL) || $this->uri->segment(2) == NULL))
-			{
-				redirect('signon'.uri_string());
-			}
-			else if ($this->uri->segment(2) == "-" && $this->uri->segment(3) != NULL)
-			{
-				redirect('profile/'.$this->session->userdata('urlname').'/'.$this->uri->segment(3));
-			}
-			else if ($this->uri->segment(2) == NULL && $this->session->userdata('signedon'))
+			if ($this->uri->segment(2) == NULL && $this->session->userdata('signedon'))
 			{
 				redirect('profile/'.$this->session->userdata('urlname'));
 			}
