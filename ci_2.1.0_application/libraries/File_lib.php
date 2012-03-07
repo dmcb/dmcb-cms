@@ -19,7 +19,7 @@ class File_lib {
 	private $path;
 	private $rootpath;
 	private $folder;
-	private $rootfolder;	
+	private $rootfolder;
 	private $managed;
 
 	/**
@@ -40,10 +40,10 @@ class File_lib {
 			$this->_initialize_paths();
 			$this->_initialize_info();
 		}
-	} 
-	
+	}
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize info
 	 *
@@ -59,9 +59,9 @@ class File_lib {
 		$this->file['filemodified'] = filemtime($this->path);
 		$this->file['mimetype'] = get_mime_by_extension($this->path);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Initialize paths
 	 *
@@ -95,7 +95,7 @@ class File_lib {
 		// Ensure external URL given for the file is not a flat file path
 		$this->file['urlpath'] = 'file/'.str_replace('+', '/', $this->rootpath);
 		$this->managed;
-		
+
 		if (file_exists('files/'.$this->rootpath))
 		{
 			$this->path = 'files/'.$this->rootpath;
@@ -109,9 +109,9 @@ class File_lib {
 			$this->managed = TRUE;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Build search metadata
 	 *
@@ -119,17 +119,17 @@ class File_lib {
 	 *
 	 * @access	private
 	 * @return	void
-	 */	
+	 */
 	function _build_search_metadata()
-	{		
+	{
 		if ($this->file['extension'] == "pdf") //add more file type support in the future (i.e. office documents)
 		{
 			shell_exec('bin/pdftotext '.$this->path.' '.$this->path.'.searchmetadata');
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Clear cache
 	 *
@@ -137,15 +137,15 @@ class File_lib {
 	 *
 	 * @access	private
 	 * @return	void
-	 */	
+	 */
 	function _clear_cache()
 	{
 		if ($handle = opendir($this->folder))
 		{
-			while (false !== ($dirfile = readdir($handle))) 
+			while (false !== ($dirfile = readdir($handle)))
 			{
 				//if there is a file that has additional naming after filename.fileextension, delete it
-				if (isset($this->file['fullfilename']) && strpos($dirfile, $this->file['fullfilename'].'.') === 0) 
+				if (isset($this->file['fullfilename']) && strpos($dirfile, $this->file['fullfilename'].'.') === 0)
 				{
 					unlink($this->folder.$dirfile);
 				}
@@ -156,7 +156,7 @@ class File_lib {
 		$empty = TRUE;
 		if ($handle = opendir($this->folder))
 		{
-			while (false !== ($dirfile = readdir($handle))) 
+			while (false !== ($dirfile = readdir($handle)))
 			{
 				if ($dirfile != "." && $dirfile != ".." )
 				{
@@ -169,10 +169,10 @@ class File_lib {
 		{
 			rmdir($this->folder);
 		}
-	}	
-	
+	}
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Delete
 	 *
@@ -180,7 +180,7 @@ class File_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function delete()
 	{
 		if (file_exists($this->path))
@@ -190,9 +190,9 @@ class File_lib {
 		}
 		$this->CI->files_model->delete($this->file['fileid']);
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Manage
 	 *
@@ -200,7 +200,7 @@ class File_lib {
 	 *
 	 * @access	public
 	 * @return	void
-	 */	
+	 */
 	function manage()
 	{
 		$this->_initialize_paths();
@@ -215,7 +215,7 @@ class File_lib {
 				$newfolder = 'files_managed/'.$this->rootfolder;
 			}
 			if (!file_exists($newfolder))
-			{			
+			{
 				mkdir($newfolder);
 			}
 			rename($this->path, $newpath);
@@ -224,9 +224,9 @@ class File_lib {
 			$this->_build_search_metadata();
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Manage check
 	 *
@@ -234,7 +234,7 @@ class File_lib {
 	 *
 	 * @access	private
 	 * @return	void
-	 */	
+	 */
 	function _manage_check()
 	{
 		$attachedid = $this->new_file['attachedid'];
@@ -267,9 +267,9 @@ class File_lib {
 		}
 		return FALSE;
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Overwrite
 	 *
@@ -278,7 +278,7 @@ class File_lib {
 	 * @access	public
 	 * @param   string  temp file
 	 * @return	void
-	 */	
+	 */
 	function overwrite($tempfilepath)
 	{
 		if (file_exists($tempfilepath))
@@ -295,9 +295,9 @@ class File_lib {
 			$this->_initialize_info();
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Save
 	 *
@@ -305,7 +305,7 @@ class File_lib {
 	 *
 	 * @access	public
 	 * @return	int    new fileid from file creation
-	 */	
+	 */
 	function save()
 	{
 		// Check if the file wasn't initialized from an existing one
@@ -319,7 +319,7 @@ class File_lib {
 			{
 				$this->new_file['downloadcount'] = 0;
 			}
-			$this->new_file['fileid'] = $this->CI->files_model->add($this->new_file['filename'], $this->new_file['extension'], $this->new_file['isimage'], $this->new_file['attachedto'], $this->new_file['attachedid'], $this->new_file['filetypeid']);
+			$this->new_file['fileid'] = $this->CI->files_model->add($this->new_file['userid'], $this->new_file['filename'], $this->new_file['extension'], $this->new_file['isimage'], $this->new_file['attachedto'], $this->new_file['attachedid'], $this->new_file['filetypeid']);
 			$this->file = $this->new_file;
 			// Create search meta data for first time
 			$this->_initialize_paths();
@@ -380,16 +380,16 @@ class File_lib {
 			$this->file = $this->new_file;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------
-	
+
 	/**
 	 * Suggest
 	 *
 	 * Check to see if the propsed file name and extension already exists and if it does, suggest a new name
 	 *
 	 * @access	public
-	 */	
+	 */
 	function suggest()
 	{
 		// Get and clean up name
@@ -403,11 +403,11 @@ class File_lib {
 			$root_filename = $matches[1];
 			$i = $matches[2];
 		}
-		
+
 		// Making sure that the new uploaded file gets a unique name by checking filenames of other files attached to the same place
 		// This way if there's a file in /files and you are uploading to /files_managed, there won't be a name collision
 		$object = instantiate_library('file', array($proposed_filename, $proposed_extension, $this->new_file['attachedto'], $this->new_file['attachedid']), 'details');
-		
+
 		// If this isn't a new file, make sure we allow the name if it's the name of the file we are editing
 		if (isset($this->file['fileid']))
 		{
@@ -426,7 +426,7 @@ class File_lib {
 				$proposed_filename = $root_filename.$i;
 				$object = instantiate_library('file', array($proposed_filename, $proposed_extension, $this->new_file['attachedto'], $this->new_file['attachedid']), 'details');
 			}
-		
+
 		}
 		$this->new_file['filename'] = $proposed_filename;
 		$this->new_file['extension'] = $proposed_extension;

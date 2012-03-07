@@ -332,6 +332,7 @@ class Upload extends MY_Controller {
 
 			// Create file
 			$this->load->library('file_lib','','new_file');
+			$this->new_file->new_file['userid'] = $this->session->userdata('userid');
 			$this->new_file->new_file['filename'] = $filename;
 			$this->new_file->new_file['extension'] = $extension;
 			$this->new_file->new_file['isimage'] = $isimage;
