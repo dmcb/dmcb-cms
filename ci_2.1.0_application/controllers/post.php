@@ -2,7 +2,7 @@
 /**
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -982,19 +982,10 @@ class Post extends MY_Controller {
 
 	function deletecomment()
 	{
-		$comment = $this->comments_model->get($this->uri->segment($this->base_segment+2));
-		if ($this->session->userdata('signedon') && $this->session->userdata('userid') == $comment['userid'])
+		if ($this->acl->allow('post', 'deletecomment', TRUE, 'post', $this->post->post['postid']) || $this->_access_denied())
 		{
 			$this->comments_model->delete($this->uri->segment($this->base_segment+2));
 			redirect($this->post->post['urlname']);
-		}
-		else if ($this->session->userdata('signedon'))
-		{
-			$this->_access_denied();
-		}
-		else
-		{
-			redirect('signon'.uri_string());
 		}
 	}
 
