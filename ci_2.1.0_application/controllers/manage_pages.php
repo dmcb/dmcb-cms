@@ -2,7 +2,7 @@
 /**
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -74,7 +74,7 @@ class Manage_pages extends MY_Controller {
 					}
 
 					// If child is attempting to not restrict access at all, and parent is restricted, don't allow it
-					if (sizeof($protection) || !isset($parent->page) || !$parent->page['protected'])
+					if (sizeof($protection) || !isset($parent->page['pageid']) || !$parent->page['protected'])
 					{
 						$object->new_page['protection'] = $protection;
 						$object->save();
