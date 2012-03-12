@@ -18,7 +18,8 @@
 </head>
 <body>
 
-	<?php echo $site_content; ?>
+<?php echo $site_content; ?>
+
 
 	<!-- google analytics -->
 	<script type="text/javascript">

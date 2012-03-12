@@ -6,7 +6,7 @@
  *
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -61,6 +61,34 @@ if ( ! function_exists('reduce_spacing'))
 		return preg_replace('/\-+/',"-",$value);
 	}
 }
+
+// ------------------------------------------------------------------------
+
+/**
+ * Shift generated view over
+ *
+ * Generate properly indented html
+ *
+ * @access	public
+ * @param   string  html to shift
+ * @param   int     number of tabs to shift by
+ * @return	string
+ */
+if ( ! function_exists('shift_over'))
+{
+	function shift_over($html, $tabs)
+	{
+		// Remove trailing new line
+		$html = preg_replace("/\n$/m", "", $html);
+		$spacing = "";
+		for ($i = 0; $i < $tabs; $i++)
+		{
+			$spacing .= "\t";
+		}
+		return str_replace("\n", "\n".$spacing, $html)."\n";
+	}
+}
+
 
 // ------------------------------------------------------------------------
 

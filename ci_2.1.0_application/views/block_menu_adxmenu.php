@@ -2,7 +2,7 @@
 	$space = '';
 	for ($i=0; $i<=$level; $i++)
 	{
-		$space .= '   ';
+		$space .= "\t";
 	}
 
 	$selected_html = '';
@@ -14,20 +14,20 @@
 	{
 		$selected_html = ' class="nohover"';
 	}
-	
+
 	$link_html = '';
 	if ($link != NULL)
 	{
 		$link_html = ' href="'.$link.'"';
 	}
-	
+
 	echo $space.'<li onmouseover=""><a'.$link_html.$selected_html.'>'.$title.'</a>';
 
 	if ($children_html != NULL)
 	{
 		echo PHP_EOL.$space."<ul>".PHP_EOL.$children_html.$space."</ul>".PHP_EOL.$space;
 	}
-	
+
 	echo '</li>';
 ?>
 

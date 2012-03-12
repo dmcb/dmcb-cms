@@ -60,7 +60,7 @@ class MY_Controller extends CI_Controller {
 			'This page no longer exists, <a href="'.base_url().'">return to '.$this->config->item('dmcb_title').'</a>.'
 		);
 	}
-	
+
 	// Sign on prompt
 	function _signon_prompt($message = NULL)
 	{
