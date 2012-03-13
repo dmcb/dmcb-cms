@@ -2,7 +2,7 @@
 /**
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -13,22 +13,22 @@ class Subscription extends MY_Controller {
 	function Subscription()
 	{
 		parent::__construct();
-		
+
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<p class="error">', '</p>');
 	}
-	
+
 	function _remap()
-	{	
+	{
 		if (($this->uri->segment(2) == "order" && $this->uri->segment(3) == "validation") || $this->acl->allow('site', 'subscribe', TRUE) || $this->_access_denied())
 		{
 			// This doesn't actually work, need a better work around:
 			// $this->config->set_item('csrf_protection', FALSE); // PayPal and CSRF don't mix since I can't set CSRF values in PayPal response
-		
+
 			$this->load->model('subscriptions_model');
 			$this->user = instantiate_library('user', $this->session->userdata('userid'));
 			$this->subscription_types = $this->subscriptions_model->get_types();
-			
+
 			$method = $this->uri->segment(2);
 			if ($method == "order")
 			{
@@ -41,7 +41,7 @@ class Subscription extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function index()
 	{
 		$data['subscription'] = $this->subscriptions_model->get($this->user->user['userid']);
@@ -59,7 +59,7 @@ class Subscription extends MY_Controller {
 		}
 		$this->_initialize_page('subscription', 'Subscription', $data);
 	}
-	
+
 	function order()
 	{
 		$this->load->model('orders_model');
@@ -70,7 +70,7 @@ class Subscription extends MY_Controller {
 			if ($order != NULL && $user->user['userid'] == $order['userid'])
 			{
 				$items = $this->orders_model->get_items($order['orderid']);
-				
+
 				$data['subject'] = "Thank you!";
 				$data['message'] = "Your order number is #".$order['orderid'].". A confirmation email has been sent to ".$user->user['email'].".<br/><br/>You have ordered:<hr/>";
 				foreach ($items->result_array() as $item)
@@ -87,7 +87,7 @@ class Subscription extends MY_Controller {
 					$data['message'] .= ": <strong>$".round($item['total'],2)."</strong><br/>";
 				}
 				$data['message'] .= "Total: <strong>$".round($order['total'],2)."</strong><br/>";
-				$data['message'] .= 
+				$data['message'] .=
 					"<br/><br/>The order is for:<hr/>".
 					$order['firstname']." ".$order['lastname']."<br/>".
 					$order['address']."<br/>".
@@ -111,12 +111,12 @@ class Subscription extends MY_Controller {
 			$receiver_email = $this->input->post('receiver_email', TRUE);
 			$payer_email = $this->input->post('payer_email', TRUE);
 			$invoice = $this->input->post('invoice', TRUE);
-			
+
 			if ($invoice != NULL)
 			{
 				$order = $this->orders_model->get($invoice);
 			}
-			
+
 			if (isset($order['orderid']))
 			{
 				$user = instantiate_library('user', $order['userid']);
@@ -125,14 +125,14 @@ class Subscription extends MY_Controller {
 				// Read the post from PayPal system and add 'cmd'
 				$req = 'cmd=_notify-validate';
 
-				foreach ($_POST as $key => $value) 
+				foreach ($_POST as $key => $value)
 				{
 					$value = urlencode(stripslashes($value));
 					$req .= "&$key=$value";
 					$message .= "$key=$value\n";
 				}
 				$message .="\n";
-				
+
 				// Post back to PayPal system to validate
 				$header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
 				$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
@@ -142,14 +142,14 @@ class Subscription extends MY_Controller {
 				if (!$fp)
 				{
 					$message .= "Order failed. Error posting validation response to PayPal.\n";
-				} 
-				else 
-				{		
+				}
+				else
+				{
 					fputs ($fp, $header . $req);
 					while (!feof($fp))
 					{
 						$res = fgets ($fp, 1024);
-						if (strcmp ($res, "VERIFIED") == 0) 
+						if (strcmp ($res, "VERIFIED") == 0)
 						{
 							if ($payment_status != "Completed") // check the payment_status is Completed
 							{
@@ -179,7 +179,7 @@ class Subscription extends MY_Controller {
 							{
 								$this->orders_model->set_completed($order['orderid'], $txn_id);
 								$message .= "Order succeeded. PayPal payment validated.\n";
-								
+
 								// Send confirmation email
 								$items = $this->orders_model->get_items($order['orderid']);
 								$summary = "";
@@ -197,14 +197,14 @@ class Subscription extends MY_Controller {
 									$summary .= ": $".round($item['total'],2)."\n";
 								}
 								$summary .= "Total: $".round($order['total'],2)."\n";
-								$summary .= 
+								$summary .=
 									"\n\nThe order is for:\n".
 									$order['firstname']." ".$order['lastname']."\n".
 									$order['address']."\n".
 									$order['city'].", ".$order['province']."\n".
 									$order['postalcode']."\n".
 									$order['country']."\n";
-									
+
 									$internalsummary = $summary."\n\nDO NOT RESPOND TO THIS EMAIL. The customer has been informed of the order. Please ensure the order is filled.";
 									$externalsummary = $summary;
 									if ($this->acl->enabled('site', 'subscribe'))
@@ -222,7 +222,7 @@ class Subscription extends MY_Controller {
 						}
 					}
 					fclose ($fp);
-				}		
+				}
 			}
 			else
 			{
@@ -237,7 +237,7 @@ class Subscription extends MY_Controller {
 			{
 				$this->orders_model->delete($order['orderid']);
 				$this->_message(
-					'Order retraction', 
+					'Order retraction',
 					'Your order number #'.$order['orderid'].' has been cancelled. <a href="'.base_url().'subscription">Return to managing your subscription.</a>'
 				);
 			}
@@ -258,7 +258,7 @@ class Subscription extends MY_Controller {
 			$this->form_validation->set_rules('country', 'country', 'xss_clean|strip_tags|trim|required');
 			$this->form_validation->set_rules('phone', 'phone number', 'xss_clean|strip_tags|trim|required|callback_phone_check');
 			$this->form_validation->set_rules('comment', 'comment', 'xss_clean|strip_tags|trim|max_length[500]');
-			
+
 			# https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_html_Appx_websitestandard_htmlvariables
 			if ($this->form_validation->run())
 			{
@@ -274,16 +274,16 @@ class Subscription extends MY_Controller {
 					$order = $this->orders_model->get($orderid);
 				}
 				$this->orders_model->add(
-					$orderid, 
-					$this->user->user['userid'], 
-					set_value('firstname'), 
-					set_value('lastname'), 
-					set_value('address'), 
-					set_value('city'), 
-					set_value('province'), 
-					set_value('postalcode'), 
-					set_value('country'), 
-					set_value('phone'), 
+					$orderid,
+					$this->user->user['userid'],
+					set_value('firstname'),
+					set_value('lastname'),
+					set_value('address'),
+					set_value('city'),
+					set_value('province'),
+					set_value('postalcode'),
+					set_value('country'),
+					set_value('phone'),
 					set_value('comment')
 				);
 				$this->orders_model->add_item($orderid, $subscription['type']." subscription", 1, $subscription['price'], $subscription['tax']);
@@ -318,13 +318,13 @@ class Subscription extends MY_Controller {
 			}
 		}
 	}
-	
+
 	function phone_check($str)
 	{
 		$this->form_validation->set_message('phone_check', "The phone number must be a valid format.");
 		$formats = array('###-###-####', '####-###-###', '(###) ###-###', '####-####-####',
 			'##-###-####-####', '####-####', '###-###-###', '#####-###-###', '##########');
-		$format = trim(ereg_replace("[0-9]", "#", $str));
+		$format = trim(preg_replace("/[0-9]/", "#", $str));
 		return (in_array($format, $formats)) ? true : false;
 	}
 }
