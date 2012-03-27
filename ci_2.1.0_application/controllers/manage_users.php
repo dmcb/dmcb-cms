@@ -533,7 +533,7 @@ class Manage_users extends MY_Controller {
 					{
 						if ($user['mailinglist'])
 						{
-							$unsubscribe_message = "\n\n".
+							$unsubscribe_message = "\n\n-----\n".
 								"If you no longer wish to receive messages from ".$this->config->item('dmcb_friendly_server').", you can unsubscribe at the link below:\n".
 								base_url()."unlist/".$user['userid']."/".$user['mailinglist_code']."\n\n";
 							$this->notifications_model->send($user['email'], $subject, $message.$unsubscribe_message, $attachments, $this->config->item('dmcb_email_mailinglist'));
@@ -564,10 +564,6 @@ class Manage_users extends MY_Controller {
 						{
 							$message .= '<tr><td><span class="restricted">'.$user['displayname'].' ('.$user['email'].') opted out of the mailing list, no email was sent</span></td></tr>';
 						}
-						$unsubscribe_message = "\n\n-----\n".
-							"If you no longer wish to receive messages from ".$this->config->item('dmcb_friendly_server').", you can unsubscribe at the link below:\n".
-							base_url()."unlist/".$user['userid']."/".$user['mailinglist_code']."\n\n";
-						$this->notifications_model->send($user['email'], $subject, $message.$unsubscribe_message, $attachments, $this->config->item('dmcb_email_mailinglist'));
 					}
 					$message .= '</table><br/><p><a href="'.base_url().'manage_users">Return to managing users</a>';
 					$this->_message("Send email", $message, "Success!");
