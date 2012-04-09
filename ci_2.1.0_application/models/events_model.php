@@ -2,7 +2,7 @@
 /**
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -82,7 +82,7 @@ class Events_model extends CI_Model {
 		{
 			$sql_featured = "AND posts.featured = ".$this->db->escape($featured);
 		}
-		return $this->db->query("SELECT *, posts_events.date AS date, posts.date AS publisheddate FROM $sql_from WHERE (posts_events.date $sql_upcoming NOW() OR (posts_events.enddate IS NOT NULL AND posts_events.enddate $sql_upcoming NOW())) AND posts_events.postid = posts.postid AND posts.published = '1' $sql_featured $sql_page ORDER BY posts_events.date,posts_events.time ASC LIMIT $offset, $num");
+		return $this->db->query("SELECT posts.*, posts_events.*, posts_events.date AS date, posts.date AS publisheddate FROM $sql_from WHERE (posts_events.date $sql_upcoming NOW() OR (posts_events.enddate IS NOT NULL AND posts_events.enddate $sql_upcoming NOW())) AND posts_events.postid = posts.postid AND posts.published = '1' $sql_featured $sql_page ORDER BY posts_events.date,posts_events.time ASC LIMIT $offset, $num");
 	}
 
 	function get_published_count($timeline, $pages, $featured)
