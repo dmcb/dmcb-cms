@@ -38,7 +38,10 @@ class File_lib {
 			$this->new_file = $this->CI->files_model->get($params['id']);
 			$this->file = $this->new_file;
 			$this->_initialize_paths();
-			$this->_initialize_info();
+			if (file_exists($this->path))
+			{
+				$this->_initialize_info();
+			}
 		}
 	}
 
@@ -102,11 +105,15 @@ class File_lib {
 			$this->folder = 'files/'.$this->rootfolder;
 			$this->managed = FALSE;
 		}
-		else
+		else if (file_exists('files_managed/'.$this->rootpath))
 		{
 			$this->path = 'files_managed/'.$this->rootpath;
 			$this->folder = 'files_managed/'.$this->rootfolder;
 			$this->managed = TRUE;
+		}
+		else // File doesn't exist, delete faulty database reference to it
+		{
+			$this->delete();
 		}
 	}
 
