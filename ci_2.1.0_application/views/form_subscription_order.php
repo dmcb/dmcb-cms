@@ -1,25 +1,25 @@
 <form action="<?=base_url();?>subscription/order" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend>Order a subscription</legend>
-	
+
 		<div id="order" class="panel alwaysopen"><div>
 			<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
 			<input class="hidden" name="buttonchoice" type="hidden" />
 			<input class="hidden" name="form" type="hidden" value="Subscription form" />
-			
+
 			<div class="forminput">
-				<label>Email address</label> 
+				<label>Email address</label>
 				<?=$user['email'];?>
 			</div>
-		
+
 			<br />
-		
+
 			<div class="forminput">
 				<label> Subscription type</label>
 			</div>
-			
+
 			<br />
-			
+
 			<?php
 				foreach ($subscription_types->result_array() as $subscription_type)
 				{
@@ -35,33 +35,33 @@
 					}
 				}
 			?>
-			
+
 			<br />
-			
+
 			<div class="forminput">
-				<label>First name</label> 
+				<label>First name</label>
 				<input class="text" maxlength="50" name="firstname" type="text" value="<?php echo set_value('firstname'); ?>"/>
 				<?php echo form_error('firstname'); ?>
 			</div>
-			
+
 			<div class="forminput">
-				<label>Last name</label> 
+				<label>Last name</label>
 				<input class="text" maxlength="50" name="lastname" type="text" value="<?php echo set_value('lastname'); ?>"/>
 				<?php echo form_error('lastname'); ?>
 			</div>
-			
+
 			<div class="forminput">
-				<label>Address</label> 
+				<label>Address</label>
 				<input class="text" maxlength="200" name="address" type="text" value="<?php echo set_value('address'); ?>"/>
 				<?php echo form_error('address'); ?>
 			</div>
-			
+
 			<div class="forminput">
-				<label>City</label> 
+				<label>City</label>
 				<input class="text" maxlength="50" name="city" type="text" value="<?php echo set_value('city'); ?>"/>
 				<?php echo form_error('city'); ?>
 			</div>
-			
+
 			<div class="forminput">
 				<label>Province/State</label>
 				<select name="province">
@@ -69,35 +69,35 @@
 				</select>
 				<?php echo form_error('province'); ?>
 			</div>
-			
+
 			<div class="forminput">
 				<label>Postal/zip code</label>
 				<input class="text" maxlength="30" name="postalcode" type="text" value="<?php echo set_value('postalcode'); ?>"/>
 				<?php echo form_error('postalcode'); ?>
 			</div>
-			
+
 			<div class="forminput">
-				<label>Country</label> 
+				<label>Country</label>
 				<select name="country">
 					<option value="">[Select country]</option> <option label="Canada" value="CA">Canada</option> <option label="United States" value="US">United States</option> <option label="Afghanistan" value="AF">Afghanistan</option> <option label="Albania" value="AL">Albania</option> <option label="Algeria" value="DZ">Algeria</option> <option label="American Samoa" value="AS">American Samoa</option> <option label="Andorra" value="AD">Andorra</option> <option label="Angola" value="AO">Angola</option> <option label="Anguilla" value="AI">Anguilla</option> <option label="Antarctica" value="AQ">Antarctica</option> <option label="Antigua and Barbuda" value="AG">Antigua and Barbuda</option> <option label="Argentina" value="AR">Argentina</option> <option label="Armenia" value="AM">Armenia</option> <option label="Aruba" value="AW">Aruba</option> <option label="Australia" value="AU">Australia</option> <option label="Austria" value="AT">Austria</option> <option label="Azerbaijan" value="AZ">Azerbaijan</option> <option label="Bahamas" value="BS">Bahamas</option> <option label="Bahrain" value="BH">Bahrain</option> <option label="Bangladesh" value="BD">Bangladesh</option> <option label="Barbados" value="BB">Barbados</option> <option label="Belarus" value="BY">Belarus</option> <option label="Belgium" value="BE">Belgium</option> <option label="Belize" value="BZ">Belize</option> <option label="Benin" value="BJ">Benin</option> <option label="Bermuda" value="BM">Bermuda</option> <option label="Bhutan" value="BT">Bhutan</option> <option label="Bolivia" value="BO">Bolivia</option> <option label="Bosnia and Herzegovina" value="BA">Bosnia and Herzegovina</option> <option label="Botswana" value="BW">Botswana</option> <option label="Bouvet Island" value="BV">Bouvet Island</option> <option label="Brazil" value="BR">Brazil</option> <option label="British Indian Ocean Territory" value="IO">British Indian Ocean Territory</option> <option label="Brunei" value="BN">Brunei</option> <option label="Bulgaria" value="BG">Bulgaria</option> <option label="Burkina Faso" value="BF">Burkina Faso</option> <option label="Burundi" value="BI">Burundi</option> <option label="Cambodia" value="KH">Cambodia</option> <option label="Cameroon" value="CM">Cameroon</option> <option label="Cape Verde" value="CV">Cape Verde</option> <option label="Cayman Islands" value="KY">Cayman Islands</option> <option label="Central African Republic" value="CF">Central African Republic</option> <option label="Chad" value="TD">Chad</option> <option label="Chile" value="CL">Chile</option> <option label="China" value="CN">China</option> <option label="Christmas Island" value="CX">Christmas Island</option> <option label="Cocos (Keeling) Islands" value="CC">Cocos (Keeling) Islands</option> <option label="Colombia" value="CO">Colombia</option> <option label="Comoros" value="KM">Comoros</option> <option label="Congo" value="CG">Congo</option> <option label="Cook Islands" value="CK">Cook Islands</option> <option label="Costa Rica" value="CR">Costa Rica</option> <option label="Cote d'Ivoire" value="CI">Cote d'Ivoire</option> <option label="Croatia (Hrvatska)" value="HR">Croatia (Hrvatska)</option> <option label="Cuba" value="CU">Cuba</option> <option label="Cyprus" value="CY">Cyprus</option> <option label="Czech Republic" value="CZ">Czech Republic</option> <option label="Congo (DRC)" value="CD">Congo (DRC)</option> <option label="Denmark" value="DK">Denmark</option> <option label="Djibouti" value="DJ">Djibouti</option> <option label="Dominica" value="DM">Dominica</option> <option label="Dominican Republic" value="DO">Dominican Republic</option> <option label="East Timor" value="TP">East Timor</option> <option label="Ecuador" value="EC">Ecuador</option> <option label="Egypt" value="EG">Egypt</option> <option label="El Salvador" value="SV">El Salvador</option> <option label="Equatorial Guinea" value="GQ">Equatorial Guinea</option> <option label="Eritrea" value="ER">Eritrea</option> <option label="Estonia" value="EE">Estonia</option> <option label="Ethiopia" value="ET">Ethiopia</option> <option label="Falkland Islands (Islas Malvinas)" value="FK">Falkland Islands (Islas Malvinas)</option> <option label="Faroe Islands" value="FO">Faroe Islands</option> <option label="Fiji Islands" value="FJ">Fiji Islands</option> <option label="Finland" value="FI">Finland</option> <option label="France" value="FR">France</option> <option label="French Guiana" value="GF">French Guiana</option> <option label="French Polynesia" value="PF">French Polynesia</option> <option label="French Southern and Antarctic Lands" value="TF">French Southern and Antarctic Lands</option> <option label="Gabon" value="GA">Gabon</option> <option label="Gambia" value="GM">Gambia</option> <option label="Georgia" value="GE">Georgia</option> <option label="Germany" value="DE">Germany</option> <option label="Ghana" value="GH">Ghana</option> <option label="Gibraltar" value="GI">Gibraltar</option> <option label="Greece" value="GR">Greece</option> <option label="Greenland" value="GL">Greenland</option> <option label="Grenada" value="GD">Grenada</option> <option label="Guadeloupe" value="GP">Guadeloupe</option> <option label="Guam" value="GU">Guam</option> <option label="Guatemala" value="GT">Guatemala</option> <option label="Guinea" value="GN">Guinea</option> <option label="Guinea-Bissau" value="GW">Guinea-Bissau</option> <option label="Guyana" value="GY">Guyana</option> <option label="Haiti" value="HT">Haiti</option> <option label="Heard Island and McDonald Islands" value="HM">Heard Island and McDonald Islands</option> <option label="Honduras" value="HN">Honduras</option> <option label="Hong Kong SAR" value="HK">Hong Kong SAR</option> <option label="Hungary" value="HU">Hungary</option> <option label="Iceland" value="IS">Iceland</option> <option label="India" value="IN">India</option> <option label="Indonesia" value="ID">Indonesia</option> <option label="Iran" value="IR">Iran</option> <option label="Iraq" value="IQ">Iraq</option> <option label="Ireland" value="IE">Ireland</option> <option label="Israel" value="IL">Israel</option> <option label="Italy" value="IT">Italy</option> <option label="Jamaica" value="JM">Jamaica</option> <option label="Japan" value="JP">Japan</option> <option label="Jordan" value="JO">Jordan</option> <option label="Kazakhstan" value="KZ">Kazakhstan</option> <option label="Kenya" value="KE">Kenya</option> <option label="Kiribati" value="KI">Kiribati</option> <option label="Korea" value="KR">Korea</option> <option label="Kuwait" value="KW">Kuwait</option> <option label="Kyrgyzstan" value="KG">Kyrgyzstan</option> <option label="Laos" value="LA">Laos</option> <option label="Latvia" value="LV">Latvia</option> <option label="Lebanon" value="LB">Lebanon</option> <option label="Lesotho" value="LS">Lesotho</option> <option label="Liberia" value="LR">Liberia</option> <option label="Libya" value="LY">Libya</option> <option label="Liechtenstein" value="LI">Liechtenstein</option> <option label="Lithuania" value="LT">Lithuania</option> <option label="Luxembourg" value="LU">Luxembourg</option> <option label="Macao SAR" value="MO">Macao SAR</option> <option label="Macedonia" value="MK">Macedonia</option> <option label="Madagascar" value="MG">Madagascar</option> <option label="Malawi" value="MW">Malawi</option> <option label="Malaysia" value="MY">Malaysia</option> <option label="Maldives" value="MV">Maldives</option> <option label="Mali" value="ML">Mali</option> <option label="Malta" value="MT">Malta</option> <option label="Marshall Islands" value="MH">Marshall Islands</option> <option label="Martinique" value="MQ">Martinique</option> <option label="Mauritania" value="MR">Mauritania</option> <option label="Mauritius" value="MU">Mauritius</option> <option label="Mayotte" value="YT">Mayotte</option> <option label="Mexico" value="MX">Mexico</option> <option label="Micronesia" value="FM">Micronesia</option> <option label="Moldova" value="MD">Moldova</option> <option label="Monaco" value="MC">Monaco</option> <option label="Mongolia" value="MN">Mongolia</option> <option label="Montserrat" value="MS">Montserrat</option> <option label="Morocco" value="MA">Morocco</option> <option label="Mozambique" value="MZ">Mozambique</option> <option label="Myanmar" value="MM">Myanmar</option> <option label="Namibia" value="NA">Namibia</option> <option label="Nauru" value="NR">Nauru</option> <option label="Nepal" value="NP">Nepal</option> <option label="Netherlands" value="NL">Netherlands</option> <option label="Netherlands Antilles" value="AN">Netherlands Antilles</option> <option label="New Caledonia" value="NC">New Caledonia</option> <option label="New Zealand" value="NZ">New Zealand</option> <option label="Nicaragua" value="NI">Nicaragua</option> <option label="Niger" value="NE">Niger</option> <option label="Nigeria" value="NG">Nigeria</option> <option label="Niue" value="NU">Niue</option> <option label="Norfolk Island" value="NF">Norfolk Island</option> <option label="North Korea" value="KP">North Korea</option> <option label="Northern Mariana Islands" value="MP">Northern Mariana Islands</option> <option label="Norway" value="NO">Norway</option> <option label="Oman" value="OM">Oman</option> <option label="Pakistan" value="PK">Pakistan</option> <option label="Palau" value="PW">Palau</option> <option label="Panama" value="PA">Panama</option> <option label="Papua New Guinea" value="PG">Papua New Guinea</option> <option label="Paraguay" value="PY">Paraguay</option> <option label="Peru" value="PE">Peru</option> <option label="Philippines" value="PH">Philippines</option> <option label="Pitcairn Islands" value="PN">Pitcairn Islands</option> <option label="Poland" value="PL">Poland</option> <option label="Portugal" value="PT">Portugal</option> <option label="Puerto Rico" value="PR">Puerto Rico</option> <option label="Qatar" value="QA">Qatar</option> <option label="Reunion" value="RE">Reunion</option> <option label="Romania" value="RO">Romania</option> <option label="Russia" value="RU">Russia</option> <option label="Rwanda" value="RW">Rwanda</option> <option label="Samoa" value="WS">Samoa</option> <option label="San Marino" value="SM">San Marino</option> <option label="Sao Tome and Principe" value="ST">Sao Tome and Principe</option> <option label="Saudi Arabia" value="SA">Saudi Arabia</option> <option label="Senegal" value="SN">Senegal</option> <option label="Serbia and Montenegro" value="YU">Serbia and Montenegro</option> <option label="Seychelles" value="SC">Seychelles</option> <option label="Sierra Leone" value="SL">Sierra Leone</option> <option label="Singapore" value="SG">Singapore</option> <option label="Slovakia" value="SK">Slovakia</option> <option label="Slovenia" value="SI">Slovenia</option> <option label="Solomon Islands" value="SB">Solomon Islands</option> <option label="Somalia" value="SO">Somalia</option> <option label="South Africa" value="ZA">South Africa</option> <option label="South Georgia and the South Sandwich Islands" value="GS">South Georgia and the South Sandwich Islands</option> <option label="Spain" value="ES">Spain</option> <option label="Sri Lanka" value="LK">Sri Lanka</option> <option label="St. Helena" value="SH">St. Helena</option> <option label="St. Kitts and Nevis" value="KN">St. Kitts and Nevis</option> <option label="St. Lucia" value="LC">St. Lucia</option> <option label="St. Pierre and Miquelon" value="PM">St. Pierre and Miquelon</option> <option label="St. Vincent and the Grenadines" value="VC">St. Vincent and the Grenadines</option> <option label="Sudan" value="SD">Sudan</option> <option label="Suriname" value="SR">Suriname</option> <option label="Svalbard and Jan Mayen" value="SJ">Svalbard and Jan Mayen</option> <option label="Swaziland" value="SZ">Swaziland</option> <option label="Sweden" value="SE">Sweden</option> <option label="Switzerland" value="CH">Switzerland</option> <option label="Syria" value="SY">Syria</option> <option label="Taiwan" value="TW">Taiwan</option> <option label="Tajikistan" value="TJ">Tajikistan</option> <option label="Tanzania" value="TZ">Tanzania</option> <option label="Thailand" value="TH">Thailand</option> <option label="Togo" value="TG">Togo</option> <option label="Tokelau" value="TK">Tokelau</option> <option label="Tonga" value="TO">Tonga</option> <option label="Trinidad and Tobago" value="TT">Trinidad and Tobago</option> <option label="Tunisia" value="TN">Tunisia</option> <option label="Turkey" value="TR">Turkey</option> <option label="Turkmenistan" value="TM">Turkmenistan</option> <option label="Turks and Caicos Islands" value="TC">Turks and Caicos Islands</option> <option label="Tuvalu" value="TV">Tuvalu</option> <option label="Uganda" value="UG">Uganda</option> <option label="Ukraine" value="UA">Ukraine</option> <option label="United Arab Emirates" value="AE">United Arab Emirates</option> <option label="United Kingdom" value="UK">United Kingdom</option> <option label="United States Minor Outlying Islands" value="UM">United States Minor Outlying Islands</option> <option label="Uruguay" value="UY">Uruguay</option> <option label="Uzbekistan" value="UZ">Uzbekistan</option> <option label="Vanuatu" value="VU">Vanuatu</option> <option label="Vatican City" value="VA">Vatican City</option> <option label="Venezuela" value="VE">Venezuela</option> <option label="Viet Nam" value="VN">Viet Nam</option> <option label="Virgin Islands (British)" value="VG">Virgin Islands (British)</option> <option label="Virgin Islands" value="VI">Virgin Islands</option> <option label="Wallis and Futuna" value="WF">Wallis and Futuna</option> <option label="Yemen" value="YE">Yemen</option> <option label="Zambia" value="ZM">Zambia</option> <option label="Zimbabwe" value="ZW">Zimbabwe</option>
 				</select>
 				<?php echo form_error('country'); ?>
 			</div>
-			
+
 			<div class="forminput">
-				<label>Phone Number</label> 
-				<input class="text" maxlength="16" name="phone" type="text" value="<?php echo set_value('phone'); ?>"/>
+				<label>Phone Number</label>
+				<input class="text" maxlength="20" name="phone" type="text" value="<?php echo set_value('phone'); ?>"/>
 				<?php echo form_error('phone'); ?>
 			</div>
-			
+
 			<br />
-			
+
 			<div class="forminput">
 				<label>How did you hear about <?=$this->config->item('dmcb_title');?>?</label>
 				<textarea name="comment"><?php echo set_value('comment'); ?></textarea>
 				<?php echo form_error('comment'); ?>
 			</div>
-			
+
 			<div class="forminput">
 				<input type="submit" value="Order via PayPal"  name="order" class="button" onclick="dmcb.submitSetValue(this);" onfocus="dmcb.submitSetValue(this);" onblur="dmcb.submitRemoveValue(this);"/>
 			</div>

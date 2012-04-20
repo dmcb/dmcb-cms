@@ -321,10 +321,7 @@ class Subscription extends MY_Controller {
 
 	function phone_check($str)
 	{
-		$this->form_validation->set_message('phone_check', "The phone number must be a valid format.");
-		$formats = array('###-###-####', '####-###-###', '(###) ###-###', '####-####-####',
-			'##-###-####-####', '####-####', '###-###-###', '#####-###-###', '##########');
-		$format = trim(preg_replace("/[0-9]/", "#", $str));
-		return (in_array($format, $formats)) ? true : false;
+		$this->form_validation->set_message('phone_check', "The phone number must be a valid format, e.g. 123-456-7890 or +1-123-456-7890.");
+		return (preg_match('/\d|\+|\-/', $str)) ? true : false;
 	}
 }
