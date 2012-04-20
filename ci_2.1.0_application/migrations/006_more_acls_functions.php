@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Migration_Acls_functions extends CI_Migration {
+class Migration_More_Acls_functions extends CI_Migration {
 
 	public function up()
 	{
@@ -28,7 +28,7 @@ class Migration_Acls_functions extends CI_Migration {
 		$this->db->query("UPDATE `acls_roles_privileges` SET `functionid` = `functionid`-4 WHERE `functionid` >= '28' AND `functionid` <= '33' ORDER BY `functionid` ASC;");
 		$this->db->query("UPDATE `acls_functions` SET `functionid` = `functionid`-6 WHERE `functionid` = '36';");
 		$this->db->query("UPDATE `acls_functions` SET `functionof` = `functionof`-6 WHERE `functionof` = '36';");
-		$this->db->query("UPDATE `acls_roles_privileges` SET `functionid` = `functionid`-6 WHERE `functionid` = '36';");	
-		$this->db->query("ALTER TABLE `acls_functions` ORDER BY `functionid`;");		
+		$this->db->query("UPDATE `acls_roles_privileges` SET `functionid` = `functionid`-6 WHERE `functionid` = '36';");
+		$this->db->query("ALTER TABLE `acls_functions` ORDER BY `functionid`;");
 	}
 }
