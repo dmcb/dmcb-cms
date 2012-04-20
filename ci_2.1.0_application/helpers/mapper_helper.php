@@ -44,7 +44,7 @@ if ( ! function_exists('link_security'))
 			'manage_security' => array('controller' => 'site', 'function' => 'manage_security'),
 			'manage_users' => array('controller' => 'site', 'function' => 'manage_users'),
 			'search' => array('controller' => 'site', 'function' => 'search'),
-			'subscription' => array('controller' => 'site', 'function' => 'susbcribe')
+			'subscription' => array('controller' => 'site', 'function' => 'subscribe')
 		);
 
 		if ($link == "account" || $link == "signoff") // Account + Signoff links are available to any role that isn't a guest
