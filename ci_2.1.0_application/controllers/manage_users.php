@@ -168,7 +168,11 @@ class Manage_users extends MY_Controller {
 
 			$this->data['userlist'] = array();
 			$page_limit = 50;
-			$offset = generate_pagination($this->users_model->get_user_count(), $page_limit);
+			if ($this->uri->segment(3) == "print")
+			{
+				$page_limit = 9999999;
+			}
+			$offset = generate_pagination($this->users_model->get_user_count(), $page_limit, NULL, base_url().'manage_users/'.$this->data['sort'].'/print');
 
 			if ($this->data['sort'] == "by_name") // Organize users by their name
 			{
