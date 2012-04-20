@@ -2,7 +2,7 @@
 /**
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -169,7 +169,11 @@ class Manage_users extends MY_Controller {
 
 			$this->data['userlist'] = array();
 			$page_limit = 50;
-			$offset = generate_pagination($this->users_model->get_user_count(), $page_limit);
+			if ($this->uri->segment(3) == "print")
+			{
+				$page_limit = 9999999;
+			}
+			$offset = generate_pagination($this->users_model->get_user_count(), $page_limit, NULL, base_url().'manage_users/'.$this->data['sort'].'/print');
 
 			if ($this->data['sort'] == "by_name") // Organize users by their name
 			{

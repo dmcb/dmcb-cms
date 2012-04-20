@@ -6,13 +6,13 @@
  *
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
  * @link		http://dmcbdesign.com
  */
- 
+
 // ------------------------------------------------------------------------
 
 /**
@@ -23,26 +23,26 @@
  *
  * @access	public
  * @param	string	the total number of items to paginate through
- * @param	string  the number of items per page	
+ * @param	string  the number of items per page
  * @return	string
  */
 if ( ! function_exists('generate_pagination'))
 {
-	function generate_pagination($count, $perpage = 10, $page_base_url = NULL)
+	function generate_pagination($count, $perpage = 10, $page_base_url = NULL, $printer_view = NULL)
 	{
 		$CI =& get_instance();
 		$offset = 0;
-		
+
 		// Get the URI segment of the pagination index
 		$page_uri = get_pagination_uri();
-		
+
 		// If URI doesn't exist, we will place it
 		if ($page_uri == NULL)
 		{
 			$page_uri = $CI->uri->total_segments()+2;
 		}
 
-		// Reconstruct base url of pagination by using everything but stripping the index value out 
+		// Reconstruct base url of pagination by using everything but stripping the index value out
 		// This way subfunctions like 'addcomment' can be kept in the URL despite going through pages
 		// If a page_base_url is already specified, then use specified value instead of dynamically generated one
 		if ($page_base_url == NULL)
@@ -55,7 +55,7 @@ if ( ! function_exists('generate_pagination'))
 					$page_base_url .= $CI->uri->segment($i).'/';
 				}
 			}
-			
+
 			if ($page_base_url == base_url()) // We are on a page that has no URL name, so therefore it's the default page
 			{
 				$page_base_url .= $CI->config->item('dmcb_default_page').'/';
@@ -66,11 +66,18 @@ if ( ! function_exists('generate_pagination'))
 			$page_base_url = base_url().$page_base_url.'/';
 		}
 		$page_base_url .= 'index';
-		
+
 		$CI->load->library('pagination');
 		$config['per_page'] = $perpage;
 		$config['full_tag_open'] = '<div class="pagination"><ul>';
-		$config['full_tag_close'] = '</ul></div>';
+		if (isset($printer_view))
+		{
+			$config['full_tag_close'] = '<li><a href="'.$printer_view.'">printer view (show all)</a></li></ul></div>';
+		}
+		else
+		{
+			$config['full_tag_close'] = '</ul></div>';
+		}
 		$config['first_link'] = '|<<';
 		$config['first_tag_open'] = '<li>';
 		$config['first_tag_close'] = '</li>';
@@ -97,7 +104,7 @@ if ( ! function_exists('generate_pagination'))
 			// If 10 items are allowed per page, and an index of 12 is specified (instead of expected multiple of 10) round down to nearest multiple of 10
 			$offset = $CI->uri->segment($page_uri)-($CI->uri->segment($page_uri)%$perpage);
 		}
-		
+
 		return $offset;
 	}
 }
@@ -109,7 +116,7 @@ if ( ! function_exists('generate_pagination'))
  *
  * Grabs pagination index URI segment
  *
- * @access	public	
+ * @access	public
  * @return	integer  the number of the URI segment that has the pagination index value
  */
 if ( ! function_exists('get_pagination_uri'))
@@ -117,12 +124,12 @@ if ( ! function_exists('get_pagination_uri'))
 	function get_pagination_uri()
 	{
 		$CI =& get_instance();
-		
+
 		$page_uri = NULL;
 		// Find last possible URI segment where pagination index is specified
 		for ($i=1; $i<=$CI->uri->total_segments(); $i++)
 		{
-			if ($CI->uri->segment($i) == "index") 
+			if ($CI->uri->segment($i) == "index")
 			{
 				$page_uri = $i+1;
 			}
@@ -130,4 +137,3 @@ if ( ! function_exists('get_pagination_uri'))
 		return $page_uri;
 	}
 }
- 
