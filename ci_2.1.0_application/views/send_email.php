@@ -72,7 +72,7 @@
 		</fieldset>
 	</form>
 
-	<form action="<?=current_url();?>" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?php echo base_url();?>manage_users/email" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend>Email body</legend>
 
@@ -84,6 +84,12 @@
 				<div class="forminput">
 					<label>Send yourself a copy</label>
 					<input name="personalcopy" type="checkbox" class="checkbox" value="1" <?php echo set_checkbox('personalcopy', '1', true); ?> />
+					<?php echo form_error('personalcopy'); ?>
+				</div>
+
+				<div class="forminput">
+					<label>Include signature</label>
+					<input name="usesignature" type="checkbox" class="checkbox" value="1" <?php echo set_checkbox('usesignature', '1', true); ?> />
 					<?php echo form_error('personalcopy'); ?>
 				</div>
 
@@ -101,6 +107,31 @@
 
 				<div class="forminput">
 					<input type="submit" value="Send email" name="sendmail" class="button" onclick="dmcb.submitSetValue(this);" onfocus="dmcb.submitSetValue(this);" onblur="dmcb.submitRemoveValue(this);"/>
+				</div>
+			</div></div>
+		</fieldset>
+	</form>
+
+	<form action="<?php echo base_url();?>manage_users/email/signature" method="post" onsubmit="return dmcb.submit(this);">
+		<fieldset>
+			<legend>Email signature</legend>
+
+			<div class="panel alwaysopen"><div>
+				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
+				<input type="hidden" name="buttonchoice" value="" class="hidden" />
+
+				<div class="formnotes">
+					<p>If you'd like a signature to appear on your emails, please write one below. This signature will persist for subsequent emails.</p>
+				</div>
+
+				<div class="forminput">
+					<label>Signature</label>
+					<textarea name="signature" rows="" cols=""><?php echo set_value('signature', $signature); ?></textarea>
+					<?php echo form_error('signature'); ?>
+				</div>
+
+				<div class="forminput">
+					<input type="submit" value="Update signature" name="updatesignature" class="button" onclick="dmcb.submitSetValue(this);" onfocus="dmcb.submitSetValue(this);" onblur="dmcb.submitRemoveValue(this);"/>
 				</div>
 			</div></div>
 		</fieldset>

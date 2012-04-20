@@ -430,10 +430,18 @@ class Manage_users extends MY_Controller {
 	{
 		if ($this->acl->allow('site', 'mail_users', TRUE) || $this->_access_denied())
 		{
-			$this->form_validation->set_rules('personalcopy', 'send yourself a copy', 'xss_clean|strip_tags');
-			$this->form_validation->set_rules('emailsubject', 'email subject', 'xss_clean|strip_tags|trim|required|max_length[50]');
-			$this->form_validation->set_rules('emailmessage', 'email message', 'xss_clean|strip_tags|trim|required|max_length[1000]');
-			$this->form_validation->set_rules('maillist', 'mail list', 'xss_clean|strip_tags');
+			if ($this->uri->segment(3) == "signature")
+			{
+				$this->form_validation->set_rules('signature', 'email signature', 'xss_clean|strip_tags|trim|max_length[1000]');
+			}
+			else
+			{
+				$this->form_validation->set_rules('personalcopy', 'send yourself a copy', 'xss_clean|strip_tags');
+				$this->form_validation->set_rules('usesignature', 'include signature', 'xss_clean|strip_tags');
+				$this->form_validation->set_rules('emailsubject', 'email subject', 'xss_clean|strip_tags|trim|required|max_length[50]');
+				$this->form_validation->set_rules('emailmessage', 'email message', 'xss_clean|strip_tags|trim|required|max_length[1000]');
+				$this->form_validation->set_rules('maillist', 'mail list', 'xss_clean|strip_tags');
+			}
 
 			// Grab submitted maillist from flash data, if it doesn't exist, it's already in the form and we will grab it from there
 			$maillist = $this->session->flashdata('maillist');
@@ -480,6 +488,11 @@ class Manage_users extends MY_Controller {
 				$this->session->set_flashdata('mailattachments', $this->data['files']);
 			}
 
+			// Grab email signature
+			$this->load->model('variables_model');
+			$this->data['signature'] = $this->variables_model->get('signature');
+
+			// Process actions
 			if ($this->uri->segment(3) == "delete") // The user has chosen to delete an attachment from their email
 			{
 				$attachments = array();
@@ -497,6 +510,15 @@ class Manage_users extends MY_Controller {
 				$this->session->set_flashdata('mailattachments', $attachments);
 				redirect('manage_users/email');
 			}
+			else if ($this->uri->segment(3) == "signature") // User is updating signature
+			{
+				if ($this->form_validation->run())
+				{
+					$this->variables_model->set('signature', html_entity_decode(set_value('signature'), ENT_QUOTES));
+				}
+
+				$this->_initialize_page('send_email', 'Send email', $this->data);
+			}
 			else if (sizeof($this->data['maillist'])) // Otherwise, if a mailing list exists, lets take them to the email form
 			{
 				// Loop through attachments, adding the full path for use in sending the email
@@ -511,6 +533,10 @@ class Manage_users extends MY_Controller {
 					$personalcopy = set_value('personalcopy');
 					$subject = html_entity_decode(set_value('emailsubject'), ENT_QUOTES);
 					$message = html_entity_decode(set_value('emailmessage'), ENT_QUOTES);
+					if (set_value('usesignature') && $this->data['signature'] != "")
+					{
+						$message .= "\n\n".$this->data['signature'];
+					}
 
 					// Send a copy to sender if specified
 					if ($personalcopy)
