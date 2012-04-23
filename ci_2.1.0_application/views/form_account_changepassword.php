@@ -1,6 +1,6 @@
-	<form action="<?=base_url();?>account/changepassword" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?=base_url();?>account/<?php echo $user['urlname'];?>/changepassword" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
-			<legend>Change your password</legend>
+			<legend>Change <?php echo $person_edited;?> password</legend>
 
 			<div id="changepassword" class="panel alwaysopen"><div>
 				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>

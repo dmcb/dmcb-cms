@@ -12,7 +12,7 @@
 					}
 					else
 					{
-						echo 'You have associated Facebook with your account. <a href="'.base_url().'account/removefacebook/" onclick="return dmcb.confirmation(\'Are you sure you wish to remove Facebook association with your account?\')">Remove association</a>.';
+						echo 'You have associated Facebook with your account. <a href="'.base_url().'account/'.$user['urlname'].'/removefacebook" onclick="return dmcb.confirmation(\'Are you sure you wish to remove Facebook association with your account?\')">Remove association</a>.';
 					}
 					?>
 					</p>

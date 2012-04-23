@@ -812,6 +812,13 @@ class Manage_users extends MY_Controller {
 		// Get moderation activity
 		$this->data['moderations'] = $this->notifications_model->get($user->user['userid']);
 
+		// Get subscription
+		if ($this->acl->enabled('site', 'subscribe'))
+		{
+			$this->load->model('subscriptions_model');
+			$this->data['subscription'] = $this->subscriptions_model->get($user->user['userid']);
+		}
+
 		// Get all roles
 		$this->load->model('acls_model');
 		$roles = $this->acls_model->get_roles_all();
@@ -846,10 +853,6 @@ class Manage_users extends MY_Controller {
 				array_push($this->data['privileges'], array('on' => 'post', 'role' => $rolestable[$post_privilege['roleid']], 'post' => $object->post));
 			}
 		}
-
-		// Get subscription
-		$this->load->model('subscriptions_model');
-		$this->data['subscription'] = $this->subscriptions_model->get($user->user['userid']);
 
 		$this->_initialize_page("user_report", "User report", $this->data);
 	}

@@ -68,7 +68,14 @@
 			foreach ($value as $user)
 			{
 				echo '<tr class="data"><td>';
-				echo '<a href="'.base_url().'manage_users/report/'.$user['userid'].'">'.$user['displayname'].'</a>';
+				if ($set_password)
+				{
+					echo '<a href="'.base_url().'account/'.$user['urlname'].'">'.$user['displayname'].'</a>';
+				}
+				else
+				{
+					echo '<a href="'.base_url().'manage_users/report/'.$user['userid'].'">'.$user['displayname'].'</a>';
+				}
 
 				if (substr($user['plusminus'], 0, 1) != '0')
 				{

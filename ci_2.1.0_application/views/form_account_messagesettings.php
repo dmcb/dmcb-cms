@@ -1,6 +1,6 @@
-	<form action="<?=base_url();?>account/messagesettings" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?=base_url();?>account/<?php echo $user['urlname'];?>/messagesettings" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
-			<legend>Message settings</legend>
+			<legend><?php echo ucfirst($person_edited);?> message settings</legend>
 
 			<div id="messagesettings" class="panel alwaysopen"><div>
 				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>

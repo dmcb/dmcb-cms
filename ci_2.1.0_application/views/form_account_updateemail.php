@@ -1,6 +1,6 @@
-	<form action="<?=base_url();?>account/updateemail" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?=base_url();?>account/<?php echo $user['urlname'];?>/updateemail" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
-			<legend>Update your email address</legend>
+			<legend>Update <?php echo $person_edited;?> email address</legend>
 
 			<div id="updateemail" class="panel alwaysopen"><div>
 				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
