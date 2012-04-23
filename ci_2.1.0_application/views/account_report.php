@@ -39,16 +39,15 @@ if (!$self_editing)
 	{
 		echo '<a href="'.base_url().'profile/'.$user['urlname'].'">Visit profile</a>';
 	}
-?>
-
-<br/>
-<br/>
-
-<?php
 }
 
 if (sizeof($privileges) > 0)
 {
+	if (!$self_editing)
+	{
+		echo '<br/><br/>';
+	}
+
 	echo '<h2>Site privileges</h2><br/>';
 	foreach ($privileges as $privilege)
 	{
@@ -64,12 +63,14 @@ if (sizeof($privileges) > 0)
 		echo '</li>';
 	}
 	echo '</ul>';
-	echo '<br/><br/>';
 }
 
 if (!$self_editing)
 {
 ?>
+
+<br/>
+<br/>
 
 <h2>Moderating report</h2>
 
