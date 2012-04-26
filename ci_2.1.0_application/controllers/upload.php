@@ -252,7 +252,7 @@ class Upload extends MY_Controller {
 							$allowed_to_upload = TRUE;
 						}
 					}
-					else if ($attachedto == "user" && $this->acl->allow('profile', 'edit', FALSE, 'user', $attachedid))
+					else if ($attachedto == "user" && $this->acl->allow('profile', 'add', FALSE, 'user', $attachedid))
 					{
 						$allowed_to_upload = TRUE;
 					}

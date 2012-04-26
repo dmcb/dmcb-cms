@@ -258,7 +258,7 @@ class Profile extends MY_Controller {
 
 	function attachments()
 	{
-		if ($this->acl->allow('profile', 'edit', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
+		if ($this->acl->allow('profile', 'add', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
 		{
 			$this->attachment = instantiate_library('file', $this->uri->segment(5));
 			if ($this->uri->segment(4) != "" && ($this->attachment->file['attachedto'] != "user" || $this->attachment->file['attachedid'] != $this->user->user['userid']))
