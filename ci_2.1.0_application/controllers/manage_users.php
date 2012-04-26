@@ -79,7 +79,7 @@ class Manage_users extends MY_Controller {
 			);
 
 			$method = $this->uri->segment(2);
-			if ($method == "adduser" || $method == "email" || $method == "mailinglist" || $method == "password" || $method == "report" || $method == "subscription")
+			if ($method == "adduser" || $method == "email" || $method == "mailinglist" || $method == "report" || $method == "subscription")
 			{
 				$this->focus = $method;
 				$this->$method();
@@ -747,52 +747,6 @@ class Manage_users extends MY_Controller {
 				}
 				$this->session->set_flashdata('maillist', $list);
 				redirect(base_url().'manage_users/email');
-			}
-			else
-			{
-				$this->index();
-			}
-		}
-	}
-
-	function password()
-	{
-		if ($this->acl->allow('site', 'set_password', TRUE) || $this->_access_denied())
-		{
-			if ($this->uri->segment(3))
-			{
-				$user = instantiate_library('user', $this->uri->segment(3));
-
-				$this->load->helper('string');
-				$password = random_string();
-				$user->new_user['password'] = md5($password);
-
-				$this->message = "";
-				if ($user->user['code'] != "")
-				{
-					$user->new_user['code'] = "";
-					$this->message = $user->user['displayname']."'s account has been activated.<br/><br/>";
-					// Add subscription trial if subscriptions are enabled on the site and a trial duration greater than zero is specified
-					if ($this->acl->enabled('site', 'subscribe') && $this->config->item('dmcb_post_subscriptions_trial_duration') > "0")
-					{
-						$typeid = $this->subscriptions_model->get_type_free();
-						$this->subscriptions_model->set($user->user['userid'], date("Ymd",mktime(0,0,0,date("m"),date("d")+$this->config->item('dmcb_post_subscriptions_trial_duration'),date("Y"))),$typeid);
-					}
-				}
-				$user->save();
-
-				$message = "An administrator has reset your password for ".$this->config->item('dmcb_friendly_server').".  Your temporary password is: ".$password."\n\nPlease change your password immediately by visiting the following url and signing on with your temporary password:\n".base_url()."account/changepassword";
-				if ($this->notifications_model->send($user->user['email'], $this->config->item('dmcb_friendly_server').' password reset', $message))
-				{
-					$this->subject = "Success!";
-					$this->message .= "You have successfully generated a password for ".$user->user['displayname'].". The user has been sent an email. The password is: ".$password;
-				}
-				else {
-					$this->subject = "Error";
-					$this->message .= "You have successfully generated a password for ".$user->user['displayname'].". However a notification email to the user failed to be sent. The password is: ".$password;
-				}
-				$this->message .= "<br/><br/>Click <a href=\"".base_url()."manage_users\">here</a> to return to editing.";
-				$this->_message("User password", $this->message, $this->subject);
 			}
 			else
 			{
