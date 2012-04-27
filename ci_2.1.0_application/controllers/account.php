@@ -30,6 +30,7 @@ class Account extends MY_Controller {
 			// Check if we have picked a specific account to go to and if not, go to your own account
 			if ($this->uri->segment(2) == "changepassword" ||
 				$this->uri->segment(2) == "messagesettings" ||
+				$this->uri->segment(2) == "resetpassword" ||
 				$this->uri->segment(2) == "updateemail")
 			{
 				redirect(base_url().'account/'.$yourself->user['urlname'].'/'.$this->uri->segment(2));
@@ -58,7 +59,7 @@ class Account extends MY_Controller {
 				$this->blocked = $this->user->get_blocked_users();
 
 				$method = $this->uri->segment(3);
-				if ($method == "changepassword" || $method == "messagesettings" || $method == "updateemail")
+				if ($method == "changepassword" || $method == "messagesettings" || $method == "resetpassword" || $method == "updateemail")
 				{
 					$this->focus = $method;
 					$this->$method();
@@ -143,11 +144,18 @@ class Account extends MY_Controller {
 		// Load page
 		$this->data['user'] = $this->user->user;
 		$this->data['account_report'] = $this->load->view('account_report', $this->data, TRUE);
-		$this->data['change_password'] = $this->load->view('form_account_changepassword', $this->data, TRUE);
+		if ($this->data['self_editing'])
+		{
+			$this->data['change_password'] = $this->load->view('form_account_changepassword', $this->data, TRUE);
+		}
+		else
+		{
+			$this->data['change_password'] = $this->load->view('form_account_resetpassword', $this->data, TRUE);
+		}
 		$this->data['update_email'] = $this->load->view('form_account_updateemail', $this->data, TRUE);
 		$this->data['message_settings'] = $this->load->view('form_account_messagesettings', $this->data, TRUE);
 
-		if ($this->config->item('dmcb_signon_facebook') == "true")
+		if ($this->config->item('dmcb_signon_facebook') == "true" && $this->data['self_editing'])
 		{
 			$this->data['facebook'] = $this->load->view('form_account_facebook', $this->data, TRUE);
 		}
@@ -256,6 +264,43 @@ class Account extends MY_Controller {
 		else
 		{
 			return TRUE;
+		}
+	}
+
+	function resetpassword()
+	{
+		if (($this->input->post('buttonchoice', TRUE) == "reset" && $this->acl->allow('site', 'set_password', TRUE)) || $this->_access_denied())
+		{
+			$this->load->helper('string');
+			$password = random_string();
+			$this->user->new_user['password'] = md5($password);
+
+			$this->message = "";
+			if ($this->user->user['code'] != "")
+			{
+				$this->user->new_user['code'] = "";
+				$this->message = $this->user->user['displayname']."'s account has been activated.<br/><br/>";
+				// Add subscription trial if subscriptions are enabled on the site and a trial duration greater than zero is specified
+				if ($this->acl->enabled('site', 'subscribe') && $this->config->item('dmcb_post_subscriptions_trial_duration') > "0")
+				{
+					$typeid = $this->subscriptions_model->get_type_free();
+					$this->subscriptions_model->set($this->user->user['userid'], date("Ymd",mktime(0,0,0,date("m"),date("d")+$this->config->item('dmcb_post_subscriptions_trial_duration'),date("Y"))),$typeid);
+				}
+			}
+			$this->user->save();
+
+			$message = "An administrator has reset your password for ".$this->config->item('dmcb_friendly_server').".  Your temporary password is: ".$password."\n\nPlease change your password immediately by visiting the following url and signing on with your temporary password:\n".base_url()."account/changepassword";
+			if ($this->notifications_model->send($this->user->user['email'], $this->config->item('dmcb_friendly_server').' password reset', $message))
+			{
+				$this->subject = "Success!";
+				$this->message .= "You have successfully generated a password for ".$this->user->user['displayname'].", and the user has been sent an email. The user's password is: ".$password;
+			}
+			else {
+				$this->subject = "Error";
+				$this->message .= "You have successfully generated a password for ".$this->user->user['displayname'].", however a notification email to the user failed to be sent. The user's password is: ".$password;
+			}
+			$this->message .= "<br/><a href=\"".base_url()."manage_users\">Return to editing</a>.";
+			$this->_message("User password", $this->message, $this->subject);
 		}
 	}
 

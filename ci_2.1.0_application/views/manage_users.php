@@ -63,7 +63,7 @@
 
 		foreach ($userlist as $key => $value)
 		{
-			echo '<tr><td colspan="7"><h2>'.ucfirst($key).'</h2></td></tr>';
+			echo '<tr><td colspan="6"><h2>'.ucfirst($key).'</h2></td></tr>';
 
 			foreach ($value as $user)
 			{
@@ -165,11 +165,6 @@
 						}
 					}
 					echo '</select></td>';
-				}
-
-				if ($set_password)
-				{
-					echo '<td><a href="'.base_url().'manage_users/password/'.$user['userid'].'" onclick="return dmcb.confirmation(\'Are you sure you wish to reset the password of this user?\')">Reset password</a></td>';
 				}
 
 				if ($this->acl->enabled('site', 'subscribe') && $set_subscription)
