@@ -2,7 +2,7 @@
 /**
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -313,10 +313,12 @@ class File extends MY_Controller {
 							if ($downloadwidth > $this->config->item('dmcb_max_image_width'))
 							{
 								$downloadwidth = $this->config->item('dmcb_max_image_width');
+								$downloadheight = floor($downloadwidth/$ratio);
 							}
 							if ($downloadheight > $this->config->item('dmcb_max_image_height'))
 							{
 								$downloadheight = $this->config->item('dmcb_max_image_height');
+								$downloadwidth = floor($downloadheight*$ratio);
 							}
 
 							if ($downloadwidth == $info[0] && $downloadheight == $info[1])
