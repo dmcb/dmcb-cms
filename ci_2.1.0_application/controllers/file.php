@@ -106,6 +106,10 @@ class File extends MY_Controller {
 			{
 				$downloadheight = $filepieces[2];
 			}
+			else if (sizeof($filepieces) == 4 && ctype_digit($filepieces[1]) && !ctype_digit($filepieces[2]))
+			{
+				$downloadwidth = $filepieces[1];
+			}
 			else if (sizeof($filepieces) == 4 && ctype_digit($filepieces[1]) && ctype_digit($filepieces[2]))
 			{
 				$downloadwidth = $filepieces[1];
@@ -263,55 +267,73 @@ class File extends MY_Controller {
 					// Resize if an image
 					if (isset($info[0]) && substr(strrchr($info['mime'], '/'), 1) != "bmp")
 					{
+						$ratio = $info[0]/$info[1];
 						if (isset($downloadwidth) && isset($downloadheight))
 						{
 							$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth.".".$downloadheight;
 						}
 						else if (isset($downloadwidth))
 						{
-							$ratio = $info[0]/$info[1];
-							$height = floor($downloadwidth/$ratio);
-							if ($height > $this->config->item('dmcb_max_image_height'))
+							$downloadheight = floor($downloadwidth/$ratio);
+							$downloadheight = round($downloadheight/$this->config->item('dmcb_image_interval'))*$this->config->item('dmcb_image_interval');
+
+							if ($downloadheight > $this->config->item('dmcb_max_image_height'))
 							{
-								$height = $this->config->item('dmcb_max_image_height');
-								$downloadwidth = floor($ratio*$height);
+								$downloadheight = $this->config->item('dmcb_max_image_height');
+								$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth.".".$downloadheight;
 							}
-							$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth;
+							else
+							{
+								$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth;
+							}
 						}
 						else if (isset($downloadheight))
 						{
-							$ratio = $info[0]/$info[1];
-							$width = floor($downloadheight/$ratio);
-							if ($width > $this->config->item('dmcb_max_image_width'))
+							$downloadwidth = floor($downloadheight*$ratio);
+							$downloadwidth = round($downloadwidth/$this->config->item('dmcb_image_interval'))*$this->config->item('dmcb_image_interval');
+
+							if ($downloadwidth > $this->config->item('dmcb_max_image_width'))
 							{
-								$width = $this->config->item('dmcb_max_image_width');
-								$downloadheight = floor($ratio*$width);
+								$downloadwidth = $this->config->item('dmcb_max_image_width');
+								$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth.".".$downloadheight;
 							}
-							$downloadpath_with_dimensions = $downloadpath."..".$downloadheight;
+							else
+							{
+								$downloadpath_with_dimensions = $downloadpath."..".$downloadheight;
+							}
 						}
 						else // If no width or height was specified, ensure the image comes in under the size of the maximum dimensions
 						{
 							$downloadwidth = $info[0];
+							$downloadwidth = round($downloadwidth/$this->config->item('dmcb_image_interval'))*$this->config->item('dmcb_image_interval');
+
 							$downloadheight = $info[1];
+							$downloadheight = round($downloadheight/$this->config->item('dmcb_image_interval'))*$this->config->item('dmcb_image_interval');
+
 							if ($downloadwidth > $this->config->item('dmcb_max_image_width'))
 							{
 								$downloadwidth = $this->config->item('dmcb_max_image_width');
 							}
-							$ratio = $info[0]/$info[1];
-							$height = floor($downloadwidth/$ratio);
-							if ($height > $this->config->item('dmcb_max_image_height'))
+							if ($downloadheight > $this->config->item('dmcb_max_image_height'))
 							{
-								$height = $this->config->item('dmcb_max_image_height');
-								$downloadwidth = floor($ratio*$height);
+								$downloadheight = $this->config->item('dmcb_max_image_height');
 							}
 
 							if ($downloadwidth == $info[0] && $downloadheight == $info[1])
 							{
 								$downloadpath_with_dimensions = $downloadpath;
 							}
-							else
+							else if ($downloadwidth != $info[0] && $downloadheight == $info[1])
 							{
 								$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth;
+							}
+							else if ($downloadwidth == $info[0] && $downloadheight != $info[1])
+							{
+								$downloadpath_with_dimensions = $downloadpath."..".$downloadheight;
+							}
+							else
+							{
+								$downloadpath_with_dimensions = $downloadpath.".".$downloadwidth.".".$downloadheight;
 							}
 						}
 
@@ -341,7 +363,7 @@ class File extends MY_Controller {
 		}
 	}
 
-	function _image_resize($newwidth = NULL, $newheight = NULL, $source, $dest)
+	function _image_resize($newwidth, $newheight, $source, $dest)
 	{
 		$info = @getimagesize($source);
 		$type = substr(strrchr($info['mime'], '/'), 1);
@@ -375,15 +397,6 @@ class File extends MY_Controller {
 
 		$x_offset = 0;
 		$y_offset = 0;
-
-		if ($newheight == NULL)
-		{
-			$targetheight = floor($newwidth/$ratio);
-		}
-		else if ($newwidth == NULL)
-		{
-			$targetwidth = floor($newheight*$ratio);
-		}
 
 		$resizedimage = imagecreatetruecolor($targetwidth, $targetheight);
 		imagealphablending($resizedimage, false);
