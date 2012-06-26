@@ -129,7 +129,7 @@ class File_lib {
 	 */
 	function _build_search_metadata()
 	{
-		if ($this->file['extension'] == "pdf") //add more file type support in the future (i.e. office documents)
+		if ($this->file['extension'] == "pdf" && in_array('files', $this->config->item('dmcb_search_types'))) //add more file type support in the future (i.e. office documents)
 		{
 			shell_exec('bin/pdftotext '.$this->path.' '.$this->path.'.searchmetadata');
 		}

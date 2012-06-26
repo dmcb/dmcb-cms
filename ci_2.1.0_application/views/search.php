@@ -26,18 +26,18 @@
 				</div>
 
 				<?php
-				if ($search_page == NULL)
+				if ($search_page == NULL && sizeof($this->config->item('dmcb_search_types')) > 1)
 				{
 				?>
 
 				<div class="forminput">
 					<label>Search type</label>
 					<select name="searchtype">
-						<option value="all" <option value="users" <?php echo set_select('searchtype', 'all', TRUE); ?>>All</option>
-						<?php if ($this->acl->enabled('profile', 'view')) {?><option value="users" <?php echo set_select('searchtype', 'users'); ?>>Users</option><?php } ?>
-						<option value="pages" <?php if (isset($search_type) && $search_type == "pages") echo 'selected="selected"'; echo set_select('searchtype', 'pages'); ?>>Pages</option>
-						<option value="posts" <?php if (isset($search_type) && $search_type == "posts") echo 'selected="selected"'; echo set_select('searchtype', 'posts'); ?>>Posts</option>
-						<option value="files" <?php if (isset($search_type) && $search_type == "files") echo 'selected="selected"'; echo set_select('searchtype', 'files'); ?>>Files</option>
+						<option value="all" <?php echo set_select('searchtype', 'all', TRUE); ?>>All</option>
+						<?php if ($this->acl->enabled('profile', 'view') && in_array('users', $this->config->item('dmcb_search_types'))) {?><option value="users" <?php echo set_select('searchtype', 'users'); ?>>Users</option><?php } ?>
+						<?php if (in_array('pages', $this->config->item('dmcb_search_types'))) {?><option value="pages" <?php if (isset($search_type) && $search_type == "pages") echo 'selected="selected"'; echo set_select('searchtype', 'pages'); ?>>Pages</option><?php } ?>
+						<?php if (in_array('posts', $this->config->item('dmcb_search_types'))) {?><option value="posts" <?php if (isset($search_type) && $search_type == "posts") echo 'selected="selected"'; echo set_select('searchtype', 'posts'); ?>>Posts</option><?php } ?>
+						<?php if (in_array('files', $this->config->item('dmcb_search_types'))) {?><option value="files" <?php if (isset($search_type) && $search_type == "files") echo 'selected="selected"'; echo set_select('searchtype', 'files'); ?>>Files</option><?php } ?>
 					</select>
 				</div>
 
