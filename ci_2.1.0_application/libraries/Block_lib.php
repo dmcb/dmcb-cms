@@ -1362,7 +1362,7 @@ class Block_lib {
 		}
 		else // This posts block requires specific category, ignore URL
 		{
-			$categoryid = $this->CI->categories_model->get_by_urlname($this->block['values']['category']);
+			$categoryid = $this->CI->categories_model->get_by_name($this->block['values']['category']);
 		}
 
 		// Report error for invalid category
