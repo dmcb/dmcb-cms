@@ -1,5 +1,9 @@
-# Ignore all site-specific files
+# Ignore OS and SASS garbage
+.DS_Store*
+Thumbs.db
+.sass-cache
 
+# Ignore all site-specific files
 backup/
 cgi-bin/
 ci_*_application/cache
