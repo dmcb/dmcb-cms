@@ -106,7 +106,7 @@
 
 	<div class="spacer">&nbsp;</div>
 
-	<form class="collapsible" action="<?=base_url();?>manage_pages/addpage" method="post" onsubmit="return dmcb.submit(this);">
+	<form class="collapsible" action="<?php echo base_url();?>manage_pages/addpage" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend><a href="javascript:Effect.Combo('addpage');">Add a new page / menu item</a></legend>
 			
@@ -154,7 +154,7 @@
 				</div>
 				
 				<div class="formnotes full">
-					<p>Choose to nest a URL if the page appears under another page and you want a URL like <?=base_url();?>parent/child instead of <?=base_url();?>child</p>
+					<p>Choose to nest a URL if the page appears under another page and you want a URL like <?php echo base_url();?>parent/child instead of <?php echo base_url();?>child</p>
 				</div>
 				
 				<div class="forminput">

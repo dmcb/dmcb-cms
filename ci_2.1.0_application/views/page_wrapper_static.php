@@ -1,1 +1,1 @@
-<div class="page static">	<?=$view;?></div>
+<div class="page static">	<?php echo $view;?></div>

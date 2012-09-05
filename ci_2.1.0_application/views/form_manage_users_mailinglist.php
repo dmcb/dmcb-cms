@@ -1,4 +1,4 @@
-	<form class="collapsible" action="<?=base_url();?>manage_users/mailinglist" method="post" onsubmit="return dmcb.submit(this);">
+	<form class="collapsible" action="<?php echo base_url();?>manage_users/mailinglist" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend><a href="javascript:Effect.Combo('mailinglist');">Send email to mailing list</a></legend>
 

@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?><?=$post['urlname'];?>/theme" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?><?php echo $post['urlname'];?>/theme" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('theme');">Edit post's theme</a></legend>
 

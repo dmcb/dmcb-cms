@@ -18,11 +18,11 @@
 	?>
 	</p>
 	<br/>
-	<p><a href="<?=base_url().'manage_users/mailinglist';?>">Assemble a different list</a></p>
+	<p><a href="<?php echo base_url().'manage_users/mailinglist';?>">Assemble a different list</a></p>
 
 	<div class="spacer">&nbsp;</div>
 
-	<form action="<?=base_url();?>upload/file/<?=$upload_url;?>" method="post" enctype="multipart/form-data" onsubmit="return dmcb.submit(this);" id="uploadform">
+	<form action="<?php echo base_url();?>upload/file/<?php echo $upload_url;?>" method="post" enctype="multipart/form-data" onsubmit="return dmcb.submit(this);" id="uploadform">
 		<fieldset>
 			<legend>Add attachments to email</legend>
 
@@ -79,7 +79,7 @@
 			<div class="panel alwaysopen"><div>
 				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
 				<input type="hidden" name="buttonchoice" value="" class="hidden" />
-				<input type="hidden" name="maillist" value="<?=$userids;?>" class="hidden" />
+				<input type="hidden" name="maillist" value="<?php echo $userids;?>" class="hidden" />
 
 				<div class="forminput">
 					<label>Send yourself a copy</label>

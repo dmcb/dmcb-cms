@@ -1,7 +1,7 @@
 <div class="fullcolumn">
 	<p>Please enter a new file name for <?php echo $attachment['filename'].'.'.$attachment['extension'];?>.  You cannot change the extension.</p>
 	<div class="seperator">&nbsp;</div>
-	<form action="<?=current_url();?>" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?php echo current_url();?>" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<div class="panel alwaysopen"><div>
 				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>

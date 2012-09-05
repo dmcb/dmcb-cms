@@ -1,4 +1,4 @@
-<form class="collapsible important" action="<?=base_url();?>profile/<?=$this->uri->segment(2);?>/heldcomments" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible important" action="<?php echo base_url();?>profile/<?php echo $this->uri->segment(2);?>/heldcomments" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('heldcomments');">Held back comments</a></legend>
 		

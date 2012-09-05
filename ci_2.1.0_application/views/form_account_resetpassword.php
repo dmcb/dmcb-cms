@@ -1,4 +1,4 @@
-	<form action="<?=base_url();?>account/<?php echo $user['urlname'];?>/resetpassword" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?php echo base_url();?>account/<?php echo $user['urlname'];?>/resetpassword" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend>Reset <?php echo $person_edited;?> password</legend>
 

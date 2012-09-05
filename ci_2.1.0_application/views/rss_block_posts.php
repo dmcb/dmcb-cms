@@ -1,8 +1,8 @@
 		<item>
-			<title><?=$post['title'];?></title>
-			<link><?=base_url();?><?=$post['urlname'];?></link>
-			<guid><?=base_url();?><?=$post['urlname'];?></guid>
-			<pubDate><?=date('r',strtotime($post['date']));?></pubDate>
+			<title><?php echo $post['title'];?></title>
+			<link><?php echo base_url();?><?php echo $post['urlname'];?></link>
+			<guid><?php echo base_url();?><?php echo $post['urlname'];?></guid>
+			<pubDate><?php echo date('r',strtotime($post['date']));?></pubDate>
 <?php
 			if ($post['userid'] != NULL)
 			{

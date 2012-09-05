@@ -1,4 +1,4 @@
-<form action="<?=base_url();?>subscription/order" method="post" onsubmit="return dmcb.submit(this);">
+<form action="<?php echo base_url();?>subscription/order" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend>Order a subscription</legend>
 
@@ -9,7 +9,7 @@
 
 			<div class="forminput">
 				<label>Email address</label>
-				<?=$user['email'];?>
+				<?php echo $user['email'];?>
 			</div>
 
 			<br />
@@ -93,7 +93,7 @@
 			<br />
 
 			<div class="forminput">
-				<label>How did you hear about <?=$this->config->item('dmcb_title');?>?</label>
+				<label>How did you hear about <?php echo $this->config->item('dmcb_title');?>?</label>
 				<textarea name="comment"><?php echo set_value('comment'); ?></textarea>
 				<?php echo form_error('comment'); ?>
 			</div>

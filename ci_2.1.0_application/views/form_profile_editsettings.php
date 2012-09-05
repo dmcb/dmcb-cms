@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?>profile/<?=$this->uri->segment(2);?>/editsettings" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?>profile/<?php echo $this->uri->segment(2);?>/editsettings" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('editsettings');">Twitter settings</a></legend>
 												

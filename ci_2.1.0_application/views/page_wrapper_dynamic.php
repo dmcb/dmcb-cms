@@ -1,3 +1,3 @@
 <div class="page dynamic">
-	<?=$view;?>
+	<?php echo $view;?>
 </div>

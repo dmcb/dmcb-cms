@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?><?=$page['urlname'];?>/editpage" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?><?php echo $page['urlname'];?>/editpage" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('editpage');">Edit this page</a></legend>
 		
@@ -24,7 +24,7 @@
 			?>
 				
 			<div class="formnotes full">
-				<p>Choose to nest a URL if you want a URL like <?=base_url();?>parent/child instead of <?=base_url();?>child</p>
+				<p>Choose to nest a URL if you want a URL like <?php echo base_url();?>parent/child instead of <?php echo base_url();?>child</p>
 			</div>
 			
 			<div class="forminput">

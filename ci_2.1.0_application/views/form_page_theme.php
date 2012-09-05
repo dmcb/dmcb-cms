@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?><?=$page['urlname'];?>/theme" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?><?php echo $page['urlname'];?>/theme" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('templates');">Edit page's CSS</a></legend> 
 		
@@ -8,7 +8,7 @@
 			<div class="forminput">
 				<label for="template">Page CSS</label>
 				<textarea name="css" rows="" cols=""><?php if ($this->form_validation->css != NULL || !isset($page['css'])) echo $this->form_validation->css; else echo $page['css']; ?></textarea>
-				<?=$this->form_validation->css_error; ?>	
+				<?php echo $this->form_validation->css_error; ?>	
 			</div>
 
 			<div class="forminput">

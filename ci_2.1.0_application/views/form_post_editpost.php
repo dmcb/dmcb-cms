@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?><?=$post['urlname'];?>/editpost" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?><?php echo $post['urlname'];?>/editpost" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('editpost');">Edit this post</a></legend>
 		
@@ -6,14 +6,14 @@
 			<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
 			<input type="hidden" name="buttonchoice" value="" class="hidden" />
 			
-			<input type="hidden" name="categoryvalues" id="categoryvalues" value="<?=$post['categoryvalues'];?>" class="hidden"/>
-			<input type="hidden" name="categorynames" id="categorynames" value="<?=$post['categorynames'];?>" class="hidden"/>
+			<input type="hidden" name="categoryvalues" id="categoryvalues" value="<?php echo $post['categoryvalues'];?>" class="hidden"/>
+			<input type="hidden" name="categorynames" id="categorynames" value="<?php echo $post['categorynames'];?>" class="hidden"/>
 			<?php
 			if (isset($post['previousposts']))
 			{
 			?>
-			<input type="hidden" name="previouspostvalues" id="previouspostvalues" value="<?=$post['previouspostvalues'];?>" class="hidden"/>
-			<input type="hidden" name="previouspostnames" id="previouspostnames" value="<?=$post['previouspostnames'];?>" class="hidden"/>
+			<input type="hidden" name="previouspostvalues" id="previouspostvalues" value="<?php echo $post['previouspostvalues'];?>" class="hidden"/>
+			<input type="hidden" name="previouspostnames" id="previouspostnames" value="<?php echo $post['previouspostnames'];?>" class="hidden"/>
 			<?php
 			}
 			?>
@@ -155,7 +155,7 @@
 			</div>
 			<?php } ?>
 			<div class="forminput">
-				<input type="button" value="Delete post" class="button" onclick="return dmcb.confirmationLink('Are you sure you wish to delete this post?','<?=base_url();?><?=$post['urlname'];?>/delete')"/>
+				<input type="button" value="Delete post" class="button" onclick="return dmcb.confirmationLink('Are you sure you wish to delete this post?','<?php echo base_url();?><?php echo $post['urlname'];?>/delete')"/>
 			</div>
 		</div></div>
 	</fieldset>

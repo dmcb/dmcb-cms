@@ -50,7 +50,7 @@
 
 	<div class="spacer">&nbsp;</div>
 
-	<form class="collapsible" action="<?=base_url();?>manage_security/enablefunction" method="post" onsubmit="return dmcb.submit(this);">
+	<form class="collapsible" action="<?php echo base_url();?>manage_security/enablefunction" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend><a href="javascript:Effect.Combo('enablefunction');">Enable a function</a></legend>
 
@@ -81,7 +81,7 @@
 		</fieldset>
 	</form>
 
-	<form class="collapsible" action="<?=base_url();?>manage_security/addrole" method="post" onsubmit="return dmcb.submit(this);">
+	<form class="collapsible" action="<?php echo base_url();?>manage_security/addrole" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend><a href="javascript:Effect.Combo('addrole');">Manage roles</a></legend>
 

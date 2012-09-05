@@ -1,4 +1,4 @@
-	<form action="<?=base_url();?>account/<?php echo $user['urlname'];?>/messagesettings" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?php echo base_url();?>account/<?php echo $user['urlname'];?>/messagesettings" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend><?php echo ucfirst($person_edited);?> message settings</legend>
 

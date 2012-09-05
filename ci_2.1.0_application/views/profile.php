@@ -11,7 +11,7 @@
 </div>
 
 <div class="centercolumnlarge">
-	<h2><?=$title;?></h2>
+	<h2><?php echo $title;?></h2>
 
 	<?php if (isset($user['profile'])) echo $user['profile']; ?>
 

@@ -1,1 +1,1 @@
-<span style="background-color:yellow"><?=$content;?></span>
+<span style="background-color:yellow"><?php echo $content;?></span>

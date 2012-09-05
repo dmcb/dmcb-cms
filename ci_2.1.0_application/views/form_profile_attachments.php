@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?>upload/file/<?=$upload_url;?>" method="post" enctype="multipart/form-data" onsubmit="return dmcb.submit(this);" id="uploadform">
+<form class="collapsible" action="<?php echo base_url();?>upload/file/<?php echo $upload_url;?>" method="post" enctype="multipart/form-data" onsubmit="return dmcb.submit(this);" id="uploadform">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('attachments');">Manage profile pictures</a></legend>
 		
@@ -9,7 +9,7 @@
 			
 			<div class="formnotes full">
 				<p>You can upload photos to use as an avatar and profile picture on the site (your profile picture will only show if you've added a profile).</p>
-				<p>If you don't set a photo, <?=$this->config->item('dmcb_title');?> will try to use any <a href="http://www.gravatar.com/">Gravatars</a> you may have.</p>
+				<p>If you don't set a photo, <?php echo $this->config->item('dmcb_title');?> will try to use any <a href="http://www.gravatar.com/">Gravatars</a> you may have.</p>
 			</div>
 			
 			<div class="forminput">

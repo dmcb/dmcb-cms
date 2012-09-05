@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?><?=$page['urlname'];?>/addtemplates" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?><?php echo $page['urlname'];?>/addtemplates" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('addtemplates');">Add and edit templates</a></legend> 
 		

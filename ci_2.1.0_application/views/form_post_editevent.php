@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?><?=$post['urlname'];?>/editevent" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?><?php echo $post['urlname'];?>/editevent" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('editevent');">Attach an event to this post</a></legend>
 		
@@ -13,7 +13,7 @@
 			<div class="forminput">
 				<label>Date (YYYYMMDD)</label>
 				<input name="eventdate" type="text" class="text" maxlength="8" value="<?php $default = NULL; if (isset($post['event']['date'])) $default = date('Ymd',strtotime($post['event']['date'])); echo set_value('eventdate', $default); ?>"/>
-				<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?=base_url();?>includes/images/calendar.gif" style="border:0px; cursor:pointer;" />
+				<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?php echo base_url();?>includes/images/calendar.gif" style="border:0px; cursor:pointer;" />
 				<?php echo form_error('eventdate'); ?>
 			</div>
 			
@@ -28,7 +28,7 @@
 			<div class="forminput">
 				<label>End date (YYYYMMDD)</label>
 				<input name="eventenddate" type="text" class="text" maxlength="8" value="<?php $default = NULL; if (isset($post['event']['enddate'])) $default = date('Ymd',strtotime($post['event']['enddate'])); echo set_value('eventenddate', $default); ?>"/>
-				<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?=base_url();?>includes/images/calendar.gif" style="border:0px; cursor:pointer;" />
+				<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?php echo base_url();?>includes/images/calendar.gif" style="border:0px; cursor:pointer;" />
 				<?php echo form_error('eventenddate'); ?>
 			</div>
 			
@@ -66,7 +66,7 @@
 				<input type="submit" value="Update event" name="save" class="button" onclick="dmcb.submitSetValue(this);" onfocus="dmcb.submitSetValue(this);" onblur="dmcb.submitRemoveValue(this);"/>
 			</div>
 			<div class="forminput">
-				<input type="button" value="Delete event" class="button" onclick="return dmcb.confirmationLink('Are you sure you wish to delete this event?','<?=base_url();?><?=$post['urlname'];?>/editevent/delete')"/>
+				<input type="button" value="Delete event" class="button" onclick="return dmcb.confirmationLink('Are you sure you wish to delete this event?','<?php echo base_url();?><?php echo $post['urlname'];?>/editevent/delete')"/>
 			</div>
 			<?php
 			}

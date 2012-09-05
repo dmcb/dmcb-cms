@@ -1,4 +1,4 @@
-<form action="<?=base_url();?><?=$post['urlname'];?>/addcomment" method="post" onsubmit="return dmcb.submit(this);">
+<form action="<?php echo base_url();?><?php echo $post['urlname'];?>/addcomment" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend>Add a comment</legend>
 
@@ -12,7 +12,7 @@
 			?>
 
 			<div class="formnotes full">
-				<p>You are not signed on, but you can comment. Your comment will need to be approved. To skip the wait for approval <a href="<?=base_url();?>signon/<?=$this->uri->segment(2);?>/addcomment/">sign on</a>.
+				<p>You are not signed on, but you can comment. Your comment will need to be approved. To skip the wait for approval <a href="<?php echo base_url();?>signon/<?php echo $this->uri->segment(2);?>/addcomment/">sign on</a>.
 
 				<?php if ($this->config->item('dmcb_signon_facebook') == "true") { ?>
 				<span id="fb-root"></span>

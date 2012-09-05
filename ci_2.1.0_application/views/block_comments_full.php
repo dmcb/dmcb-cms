@@ -41,7 +41,7 @@
 	}
 ?>
 
-	<form action="<?=base_url().$comment['post']['urlname'].'/reportcomment/'.$comment['commentid'];?>" method="post" id="commentform<?=$comment['commentid'];?>">
+	<form action="<?php echo base_url().$comment['post']['urlname'].'/reportcomment/'.$comment['commentid'];?>" method="post" id="commentform<?php echo $comment['commentid'];?>">
 		<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
 		<input name="information" type="text" class="hidden" />
 	</form>

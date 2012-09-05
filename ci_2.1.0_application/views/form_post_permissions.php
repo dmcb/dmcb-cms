@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?><?=$post['urlname'];?>/permissions" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?><?php echo $post['urlname'];?>/permissions" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('permissions');">Manage permissions</a></legend>
 

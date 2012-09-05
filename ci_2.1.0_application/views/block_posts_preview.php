@@ -1,5 +1,5 @@
 <div class="post preview">
-	<h3><?=$post['title'];?></h3>
+	<h3><?php echo $post['title'];?></h3>
 
 	<h5>
 	<?php

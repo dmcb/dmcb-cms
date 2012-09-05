@@ -1,1 +1,1 @@
-<?=$menu_html;?>
+<?php echo $menu_html;?>

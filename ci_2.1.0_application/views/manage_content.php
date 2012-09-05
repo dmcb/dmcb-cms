@@ -3,7 +3,7 @@
 	
 	<div class="spacer">&nbsp;</div>
 	
-	<form class="collapsible" action="<?=base_url();?>upload/file/site" method="post" enctype="multipart/form-data" onsubmit="return dmcb.submit(this);" id="uploadform">
+	<form class="collapsible" action="<?php echo base_url();?>upload/file/site" method="post" enctype="multipart/form-data" onsubmit="return dmcb.submit(this);" id="uploadform">
 		<fieldset>
 			<legend><a href="javascript:Effect.Combo('attachments');">Stock photos and attachments</a></legend>
 			
@@ -80,7 +80,7 @@
 		</fieldset>
 	</form>
 			
-	<form class="collapsible" action="<?=base_url();?>manage_content/blocks" method="post" onsubmit="return dmcb.submit(this);">
+	<form class="collapsible" action="<?php echo base_url();?>manage_content/blocks" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend><a href="javascript:Effect.Combo('blocks');">Add and edit blocks</a></legend>
 			
@@ -200,7 +200,7 @@
 		</fieldset>
 	</form>
 	
-	<form class="collapsible" action="<?=base_url();?>manage_content/templates" method="post" onsubmit="return dmcb.submit(this);">
+	<form class="collapsible" action="<?php echo base_url();?>manage_content/templates" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<legend><a href="javascript:Effect.Combo('templates');">Add and edit templates</a></legend>
 			

@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?>signon/recover" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?>signon/recover" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('recover');">Recover your password</a></legend>
 

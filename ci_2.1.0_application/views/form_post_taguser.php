@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?><?=$post['urlname'];?>/taguser" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?><?php echo $post['urlname'];?>/taguser" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('taguser');">Tag a user to post</a></legend>
 

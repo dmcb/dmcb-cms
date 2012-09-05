@@ -1,6 +1,6 @@
 <div class="fullcolumn">
 
-	<form action="<?=base_url();?>search" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?php echo base_url();?>search" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<?php
 			if (isset($search_page_details))

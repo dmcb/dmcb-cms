@@ -1,5 +1,5 @@
 <div class="event full">
-	<h2><?=$event['title'];?></h2>
+	<h2><?php echo $event['title'];?></h2>
 
 	<h6>
 	<?php
@@ -43,7 +43,7 @@
 
 	?>
 
-	<a href="<?=base_url();?><?=$event['urlname'];?>/addcomment">Add comment</a>
+	<a href="<?php echo base_url();?><?php echo $event['urlname'];?>/addcomment">Add comment</a>
 	</p>
 </div>
 <?php

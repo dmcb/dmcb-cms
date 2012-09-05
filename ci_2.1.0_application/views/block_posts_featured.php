@@ -1,5 +1,5 @@
 <div class="post featured">
-	<h2><?=$post['title'];?></h2>
+	<h2><?php echo $post['title'];?></h2>
 
 	<?php
 	if (isset($post['image']['urlpath']))

@@ -1,2 +1,2 @@
- <span class="error"><?=$content;?></span> 
+ <span class="error"><?php echo $content;?></span> 
  

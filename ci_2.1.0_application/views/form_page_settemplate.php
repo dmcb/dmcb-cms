@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?><?=$page['urlname'];?>/settemplate" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?><?php echo $page['urlname'];?>/settemplate" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('settemplate');">Set page template</a></legend> 
 		

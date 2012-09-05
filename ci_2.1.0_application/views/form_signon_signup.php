@@ -1,6 +1,6 @@
-<form class="collapsible" action="<?=base_url();?>signon/signup" method="post" onsubmit="return dmcb.submit(this);">
+<form class="collapsible" action="<?php echo base_url();?>signon/signup" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
-		<legend><a href="javascript:Effect.Combo('signup');">Sign up for <?=$this->config->item('dmcb_title');?></a></legend>
+		<legend><a href="javascript:Effect.Combo('signup');">Sign up for <?php echo $this->config->item('dmcb_title');?></a></legend>
 
 		<div id="signup" class="panel"><div>
 			<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>

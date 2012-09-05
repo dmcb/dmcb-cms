@@ -1,6 +1,6 @@
 <div class="fullcolumn">
 	<p>Please set the subscription for <?php echo $user['displayname'];?>.</p>
-	<form action="<?=current_url();?>" method="post" onsubmit="return dmcb.submit(this);">
+	<form action="<?php echo current_url();?>" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
 			<div class="panel alwaysopen"><div>
 				<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
@@ -24,7 +24,7 @@
 				<div class="forminput">
 					<label>End Date (YYYYMMDD)</label>
 					<input name="subscribedate" type="text" class="text" maxlength="8" value="<?php $default = NULL; if (isset($subscription['date'])) $default = date('Ymd',strtotime($subscription['date'])); echo set_value('subscribedate', $default); ?>"/>
-					<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?=base_url();?>includes/images/calendar.gif" style="border:0px; cursor:pointer;" />
+					<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?php echo base_url();?>includes/images/calendar.gif" style="border:0px; cursor:pointer;" />
 					<?php echo form_error('subscribedate'); ?>
 				</div>
 				

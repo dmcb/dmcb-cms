@@ -1,6 +1,6 @@
-<form action="<?=base_url();?>profile/<?=$user['urlname'];?>/message" method="post" onsubmit="return dmcb.submit(this);">
+<form action="<?php echo base_url();?>profile/<?php echo $user['urlname'];?>/message" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
-		<legend>Send <?=$user['displayname'];?> a message</legend>
+		<legend>Send <?php echo $user['displayname'];?> a message</legend>
 		
 		<div id="message" class="panel alwaysopen"><div>
 			<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>

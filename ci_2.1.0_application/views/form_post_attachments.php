@@ -1,4 +1,4 @@
-<form class="collapsible" action="<?=base_url();?>upload/file/post/<?=$post['urlname'];?>" method="post" enctype="multipart/form-data" onsubmit="return dmcb.submit(this);" id="uploadform">
+<form class="collapsible" action="<?php echo base_url();?>upload/file/post/<?php echo $post['urlname'];?>" method="post" enctype="multipart/form-data" onsubmit="return dmcb.submit(this);" id="uploadform">
 	<fieldset>
 		<legend><a href="javascript:Effect.Combo('attachments');">Manage attachments</a></legend>
 		

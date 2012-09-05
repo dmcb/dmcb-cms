@@ -1,3 +1,3 @@
 <ul class="menu">
-<?=$menu_html;?>
+<?php echo $menu_html;?>
 </ul>

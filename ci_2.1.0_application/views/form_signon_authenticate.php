@@ -1,4 +1,4 @@
-<form action="<?=base_url();?>signon/authenticate<?=$redirection;?>" method="post" onsubmit="return dmcb.submit(this);">
+<form action="<?php echo base_url();?>signon/authenticate<?php echo $redirection;?>" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
 		<legend>Sign on</legend>
 

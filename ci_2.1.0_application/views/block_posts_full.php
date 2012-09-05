@@ -1,5 +1,5 @@
 <div class="post full">
-	<h2><?=$post['title'];?></h2>
+	<h2><?php echo $post['title'];?></h2>
 
 	<h5>
 	<?php

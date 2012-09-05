@@ -1,8 +1,8 @@
 		<item>
-			<title><?=$event['title'];?></title>
-			<link><?=base_url();?><?=$event['urlname'];?></link>
-			<guid><?=base_url();?><?=$event['urlname'];?></guid>
-			<pubDate><?=date('r',strtotime($event['publisheddate']));?></pubDate>
+			<title><?php echo $event['title'];?></title>
+			<link><?php echo base_url();?><?php echo $event['urlname'];?></link>
+			<guid><?php echo base_url();?><?php echo $event['urlname'];?></guid>
+			<pubDate><?php echo date('r',strtotime($event['publisheddate']));?></pubDate>
 			<?php
 			if ($event['userid'] != NULL)
 			{
