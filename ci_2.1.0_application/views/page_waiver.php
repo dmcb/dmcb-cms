@@ -16,6 +16,7 @@ Event.observe('waiver', 'submit', function(event) {
 		},
 		onSuccess: function(t) {
 			if (t.responseText == \"TRUE\") {
+				$('waiver_container').setStyle({ background: 'none' });
 				Effect.Shrink('waiver_container');
 			}
 			else {
