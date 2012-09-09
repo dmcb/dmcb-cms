@@ -18,6 +18,7 @@
 </head>
 <body>
 
+<?php if (isset($waiver)) echo $waiver; ?>
 <?php echo $site_content; ?>
 
 

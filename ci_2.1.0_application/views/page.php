@@ -1,6 +1,4 @@
 <?php
-	if (isset($waiver)) echo $waiver;
-
 	if (isset($pagecontent)) echo $pagecontent;
 
 	if (isset($edit_page) || isset($edit_theme) || isset($set_template) || isset($add_templates) || isset($edit_drafts) || isset($add_post) || isset($add_page) || isset($attachments) || isset($edit_blocks) || isset($permissions))
