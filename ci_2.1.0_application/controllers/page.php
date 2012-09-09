@@ -143,6 +143,25 @@ class Page extends MY_Controller {
 			// Initialize array of page's parents
 			$this->page->initialize_page_tree();
 
+			// Check for waivers
+			$this->waiver_in_use = NULL;
+			if ($this->acl->enabled('site', 'waivers') && $this->session->userdata('signedon'))
+			{
+				$this->load->helper('waiver');
+				$waiver = check_waiver($this->page->page_tree, $this->session->userdata('userid'));
+				if ($waiver != NULL && $waiver['pageid'] != $this->page->page['pageid'])
+				{
+					// Waiver that needs to be accepted on a parent page, so redirect to it
+					$page_to_redirect_to = instantiate_library('page', $waiver['pageid']);
+					$this->_redirect(base_url().$page_to_redirect_to->page['urlname'], TRUE);
+				}
+				else if ($waiver != NULL)
+				{
+					// Waiver is in play, load it up
+					$this->waiver_in_use = $waiver;
+				}
+			}
+
 			// Grab this page's template and values
 			if (isset($this->page->page['page_templateid']))
 			{
@@ -179,7 +198,7 @@ class Page extends MY_Controller {
 			}
 
 			$method = $this->uri->segment($this->base_segment+1);
-			if ($method == "addpage" || $method == "addpost" || $method == "addtemplates" || $method == "attachments" || $method == "blocks" || $method == "editpage" || $method == "permissions" || $method == "settemplate")
+			if ($method == "addpage" || $method == "addpost" || $method == "addtemplates" || $method == "attachments" || $method == "blocks" || $method == "editpage" || $method == "permissions" || $method == "settemplate" || $method == "waiver")
 			{
 				$this->focus = $method;
 				$this->$method();
@@ -212,6 +231,11 @@ class Page extends MY_Controller {
 			}
 
 			// Generate page by parsing through template and page content, loading up blocks as necessary
+			if ($this->waiver_in_use != NULL)
+			{
+				$data['waiver'] = $this->load->view('page_waiver', array('waiver' => $this->waiver_in_use, 'page' => $this->page->page), TRUE);
+			}
+
 			$data['pagecontent'] = "";
 
 			// If page was reached via search, highlight the searched word
@@ -1264,6 +1288,44 @@ class Page extends MY_Controller {
 				else
 				{
 					$this->index();
+				}
+			}
+		}
+	}
+
+	function waiver()
+	{
+		if ($this->waiver_in_use != NULL)
+		{
+			$this->form_validation->set_rules('ajax', 'ajax', 'xss_clean');
+
+			$this->load->model('waivers_model');
+
+			if ($this->form_validation->run())
+			{
+				if (set_value('ajax'))
+				{
+					if ($_POST['buttonchoice'] == "accept")
+					{
+						$this->waivers_model->acknowledge($this->waiver_in_use['waiverid'], $this->session->userdata('userid'));
+						echo "TRUE";
+					}
+					else
+					{
+						echo "FALSE";
+					}
+				}
+				else
+				{
+					if ($_POST['buttonchoice'] == "accept")
+					{
+						$this->waivers_model->acknowledge($this->waiver_in_use['waiverid'], $this->session->userdata('userid'));
+						$this->_redirect(base_url().$this->page->page['urlname'], TRUE);
+					}
+					else
+					{
+						$this->_redirect(base_url(), TRUE);
+					}
 				}
 			}
 		}
