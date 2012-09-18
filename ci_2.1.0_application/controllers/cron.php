@@ -44,9 +44,10 @@ class Cron extends MY_Controller {
 			}
 			else if ($cron['cron'] == "site_backup")
 			{
-				system('mysqldump -h '.$this->db->hostname.' -u'.$this->db->username.' -p'.$this->db->password.' --databases '.$this->db->database.' > backup/'.$this->db->database.'.sql', $return_value);
+				$output = array();
+				exec('mysqldump -h '.$this->db->hostname.' -u'.$this->db->username.' -p'.$this->db->password.' --databases '.$this->db->database.' > backup/'.$this->db->database.'.sql', $output, $return_value);
 				echo "mysqldump return value: ".$return_value."\n";
-				system("tar --exclude 'backup/*.tar.gz' -czf backup/".date("Ymd").".".$this->config->item('dmcb_server').".tar.gz .", $return_value);
+				exec("tar --exclude 'backup/*.tar.gz' -czf backup/".date("Ymd").".".$this->config->item('dmcb_server').".tar.gz .", $output, $return_value);
 				echo "tar return value: ".$return_value."\n";
 
 				if ($backup_folder = opendir('backup'))
