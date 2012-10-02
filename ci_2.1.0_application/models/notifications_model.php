@@ -120,25 +120,45 @@ class Notifications_model extends CI_Model {
 	{
 		$subject = "Your account at ".$this->config->item('dmcb_title')." has changed";
 
-		if ($action == "set")
+		if ($action == "set" || $action == "removed")
 		{
 			if ($scope != NULL)
 			{
-				$object = instantiate_library($scope, $scopeid);
-				$scopedata = $object->$scope;
-				$content .= " for the ".$scope." '".$scopedata['title']."' located at ".base_url().$scopedata['urlname'];
+				$ids = explode(";", $scopeid);
+				$count = 0;
+				$title;
+				foreach ($ids as $id)
+				{
+					if ($id != "")
+					{
+						$count++;
+						$object = instantiate_library($scope, $id);
+						$scopedata = $object->$scope;
+						if ($count > 1)
+						{
+							$title .= "\n";
+						}
+						$title .= $scopedata['title'];
+					}
+				}
+				if ($count > 1)
+				{
+					$content .= " for the ".$scope."s:'".$scopedata['title'];	
+				}
+				else
+				{
+					$content .= " for the ".$scope." '".$scopedata['title']."' located at ".base_url().$scopedata['urlname'];
+				}
 			}
-			$message = "Your role has been set to ".$content.".";
-		}
-		else if ($action == "removed")
-		{
-			if ($scope != NULL)
+			
+			if ($action =="set")
 			{
-				$object = instantiate_library($scope, $scopeid);
-				$scopedata = $object->$scope;
-				$content .= " for the ".$scope." '".$scopedata['title']."' located at ".base_url().$scopedata['urlname'];
+				$message = "Your role has been set to ".$content.".";
 			}
-			$message = "Your role has been removed ".$content.".";
+			else 
+			{
+				$message = "Your role has been removed ".$content.".";
+			}
 		}
 		else if ($action == "downgraded")
 		{
