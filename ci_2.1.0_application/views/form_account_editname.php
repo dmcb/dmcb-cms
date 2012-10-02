@@ -1,8 +1,8 @@
-<form class="collapsible" action="<?php echo base_url();?>profile/<?php echo $this->uri->segment(2);?>/editname" method="post" onsubmit="return dmcb.submit(this);">
+<form action="<?php echo base_url();?>account/<?php echo $user['urlname'];?>/editname" method="post" onsubmit="return dmcb.submit(this);">
 	<fieldset>
-		<legend><a href="javascript:Effect.Combo('editname');">Rename your display name</a></legend>
+		<legend>Rename <?php echo $person_edited;?> display name</legend>
 				
-		<div id="editname" class="panel"><div>
+		<div id="editname" class="panel alwaysopen"><div>
 			<?php if ($this->config->item('csrf_protection')) echo '<input type="hidden" name="'.$this->security->get_csrf_token_name().'" value="'.$this->security->get_csrf_hash().'" />';?>
 			<input type="hidden" name="buttonchoice" value="" class="hidden" />
 			

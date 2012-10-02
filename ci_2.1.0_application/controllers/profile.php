@@ -20,9 +20,10 @@ class Profile extends MY_Controller {
 
 	function _remap()
 	{
-		$this->user = instantiate_library('user', $this->uri->segment(2), 'urlname');
 		if ($this->acl->allow('profile', 'view', TRUE) || $this->_access_denied())
 		{
+			$this->user = instantiate_library('user', $this->uri->segment(2), 'urlname');
+			
 			if ($this->uri->segment(2) == NULL && $this->session->userdata('signedon'))
 			{
 				redirect('profile/'.$this->session->userdata('urlname'));
@@ -53,7 +54,7 @@ class Profile extends MY_Controller {
 					$this->heldcomments = $this->comments_model->get_user_heldback($this->user->user['userid']);
 
 					$method = $this->uri->segment(3);
-					if ($method == "addpost" || $method == "attachments" || $method == "heldcomments" || $method == "editname" || $method == "editprofile" || $method == "editsettings" || $method == "message")
+					if ($method == "addpost" || $method == "attachments" || $method == "heldcomments" || $method == "editprofile" || $method == "editsettings" || $method == "message")
 					{
 						$this->focus = $method;
 						$this->$method();
@@ -128,7 +129,6 @@ class Profile extends MY_Controller {
 				'upload_types' => $this->config->item('dmcb_profile_upload_types'),
 				'upload_description' => $this->config->item('dmcb_profile_upload_description')
 			);
-			$data['edit_name'] = $this->load->view('form_profile_editname', array('user' => $this->user->user), TRUE);
 			$data['edit_profile'] = $this->load->view('form_profile_editprofile', array('user' => $this->user->user), TRUE);
 
 			// Grab profile picture attachments
@@ -324,46 +324,6 @@ class Profile extends MY_Controller {
 		}
 		else
 			return TRUE;
-	}
-
-	function editname()
-	{
-		if ($this->acl->allow('profile', 'edit', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
-		{
-			$this->form_validation->set_rules('displayname', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_check');
-
-			if ($this->form_validation->run())
-			{
-				$this->user->new_user['displayname'] = set_value('displayname');
-				$this->user->save();
-				$this->session->set_userdata('displayname',$this->user->user['displayname']);
-				$this->session->set_userdata('urlname',$this->user->user['urlname']);
-				redirect('profile/'.$this->user->user['urlname']);
-			}
-			else
-			{
-				$this->index();
-			}
-		}
-	}
-
-	function displayname_check($str)
-	{
-		$checkuser = instantiate_library('user', $str, 'displayname');
-		if (isset($checkuser->user['userid']))
-		{
-			$this->form_validation->set_message('displayname_check', "The display name $str is in use, please try a new display name.");
-			return FALSE;
-		}
-		else if (!preg_match('/^[a-z0-9- ]+$/i', $str))
-		{
-			$this->form_validation->set_message('displayname_check', "The display name must be made of only letters, numbers, dashes, and spaces.");
-			return FALSE;
-		}
-		else
-		{
-			return TRUE;
-		}
 	}
 
 	function editprofile()

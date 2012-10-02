@@ -36,7 +36,6 @@
 		echo '<div class="spacer">&nbsp</div>';
 		echo '<div class="admin">';
 
-		if (isset($edit_name)) echo $edit_name;
 		if (isset($edit_profile)) echo $edit_profile;
 		if (isset($edit_settings)) echo $edit_settings;
 		if (isset($attachments)) echo $attachments;

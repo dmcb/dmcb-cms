@@ -4,11 +4,8 @@ if (!$self_editing)
 ?>
 <h2>Account information for <?php echo $user['displayname'];?></h2>
 
-<br/>
+<p><a href="<?php echo base_url();?>manage_users/email"><?php echo $user['email'];?></a></p>
 
-<a href="<?php echo base_url();?>manage_users/email"><?php echo $user['email'];?></a>
-
-<br/>
 <br/>
 
 <?php

@@ -59,7 +59,7 @@ class Account extends MY_Controller {
 				$this->blocked = $this->user->get_blocked_users();
 
 				$method = $this->uri->segment(3);
-				if ($method == "changepassword" || $method == "messagesettings" || $method == "resetpassword" || $method == "updateemail")
+				if ($method == "changepassword" || $method == "editname" || $method == "messagesettings" || $method == "resetpassword" || $method == "updateemail")
 				{
 					$this->focus = $method;
 					$this->$method();
@@ -144,6 +144,7 @@ class Account extends MY_Controller {
 		// Load page
 		$this->data['user'] = $this->user->user;
 		$this->data['account_report'] = $this->load->view('account_report', $this->data, TRUE);
+		$this->data['edit_name'] = $this->load->view('form_account_editname', $this->data, TRUE);
 		if ($this->data['self_editing'])
 		{
 			$this->data['change_password'] = $this->load->view('form_account_changepassword', $this->data, TRUE);
@@ -217,6 +218,43 @@ class Account extends MY_Controller {
 		{
 			$this->form_validation->set_message('password_check', "Incorrect password.");
 			return FALSE;
+		}
+	}
+
+	function editname()
+	{
+		$this->form_validation->set_rules('displayname', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_check');
+
+		if ($this->form_validation->run())
+		{
+			$this->user->new_user['displayname'] = set_value('displayname');
+			$this->user->save();
+			$this->session->set_userdata('displayname',$this->user->user['displayname']);
+			$this->session->set_userdata('urlname',$this->user->user['urlname']);
+			redirect('account/'.$this->user->user['urlname'].'/editname');
+		}
+		else
+		{
+			$this->index();
+		}
+	}
+
+	function displayname_check($str)
+	{
+		$checkuser = instantiate_library('user', $str, 'displayname');
+		if (isset($checkuser->user['userid']))
+		{
+			$this->form_validation->set_message('displayname_check', "The display name $str is in use, please try a new display name.");
+			return FALSE;
+		}
+		else if (!preg_match('/^[a-z0-9- ]+$/i', $str))
+		{
+			$this->form_validation->set_message('displayname_check', "The display name must be made of only letters, numbers, dashes, and spaces.");
+			return FALSE;
+		}
+		else
+		{
+			return TRUE;
 		}
 	}
 
