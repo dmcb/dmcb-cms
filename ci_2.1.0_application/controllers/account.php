@@ -30,6 +30,7 @@ class Account extends MY_Controller {
 			// Check if we have picked a specific account to go to and if not, go to your own account
 			if ($this->uri->segment(2) == "changepassword" ||
 				$this->uri->segment(2) == "messagesettings" ||
+				$this->uri->segment(2) == "permissions" ||
 				$this->uri->segment(2) == "resetpassword" ||
 				$this->uri->segment(2) == "updateemail")
 			{
@@ -44,12 +45,17 @@ class Account extends MY_Controller {
 			$this->user = instantiate_library('user', $this->uri->segment(2), 'urlname');
 
 			// You can only edit the account if it's your own, or you have special privileges
-			$this->data['self_editing'] = TRUE;
 			$this->data['person_edited'] = "your";
+			$this->data['self_editing'] = TRUE;
+			$this->data['change_permissions'] = FALSE;
 			if ($yourself->user['userid'] != $this->user->user['userid'])
 			{
 				$this->data['person_edited'] = $this->user->user['displayname']."'s";
 				$this->data['self_editing'] = FALSE;
+				if ($this->acl->allow('site', 'change_role')) 
+				{
+					$this->data['change_permissions'] = TRUE;
+				}
 			}
 
 			if ($this->acl->allow('site', 'set_password') || $this->data['self_editing'] || $this->_access_denied())
@@ -59,7 +65,7 @@ class Account extends MY_Controller {
 				$this->blocked = $this->user->get_blocked_users();
 
 				$method = $this->uri->segment(3);
-				if ($method == "changepassword" || $method == "editname" || $method == "messagesettings" || $method == "resetpassword" || $method == "updateemail")
+				if ($method == "changepassword" || $method == "editname" || $method == "messagesettings" || $method == "pagepermissions" || $method == "resetpassword" || $method == "updateemail")
 				{
 					$this->focus = $method;
 					$this->$method();
@@ -102,11 +108,11 @@ class Account extends MY_Controller {
 
 		// Get all roles
 		$this->load->model('acls_model');
-		$roles = $this->acls_model->get_roles_all();
-		$rolestable = array();
-		foreach ($roles->result_array() as $role)
+		$this->data['roles'] = $this->acls_model->get_roles_all();
+		$this->data['roles_table'] = array();
+		foreach ($this->data['roles']->result_array() as $role)
 		{
-			$rolestable[$role['roleid']] = $role['role'];
+			$this->data['roles_table'][$role['roleid']] = $role['role'];
 		}
 
 		// Get any special site privileges for the user
@@ -114,24 +120,28 @@ class Account extends MY_Controller {
 		$site_role = $this->acls_model->get($this->user->user['userid'], 'site');
 		if ($site_role != NULL && $this->acls_model->get_role_name($site_role) != "member")
 		{
-			array_push($this->data['privileges'], array('on' => 'site', 'role' => $rolestable[$site_role]));
+			$this->data['privileges']['site'] = $site_role;
 		}
+		
 		$page_privileges = $this->acls_model->get_all($this->user->user['userid'], 'page');
+		$this->data['privileges']['page'] = array();
 		foreach ($page_privileges->result_array() as $page_privilege)
 		{
 			$object = instantiate_library('page', $page_privilege['attachedid']);
 			if (isset($object->page['pageid']))
 			{
-				array_push($this->data['privileges'], array('on' => 'page', 'role' => $rolestable[$page_privilege['roleid']], 'page' => $object->page));
+				array_push($this->data['privileges']['page'], array('role' => $page_privilege['roleid'], 'page' => $object->page));
 			}
 		}
+		
 		$post_privileges = $this->acls_model->get_all($this->user->user['userid'], 'post');
+		$this->data['privileges']['post'] = array();
 		foreach ($post_privileges->result_array() as $post_privilege)
 		{
 			$object = instantiate_library('post', $post_privilege['attachedid']);
 			if (isset($object->post['postid']))
 			{
-				array_push($this->data['privileges'], array('on' => 'post', 'role' => $rolestable[$post_privilege['roleid']], 'post' => $object->post));
+				array_push($this->data['privileges']['post'], array('role' => $post_privilege['roleid'], 'post' => $object->post));
 			}
 		}
 
@@ -143,25 +153,26 @@ class Account extends MY_Controller {
 
 		// Load page
 		$this->data['user'] = $this->user->user;
-		$this->data['account_report'] = $this->load->view('account_report', $this->data, TRUE);
-		$this->data['edit_name'] = $this->load->view('form_account_editname', $this->data, TRUE);
+		$this->account_views['account_report'] = $this->load->view('account_report', $this->data, TRUE);
+		$this->account_views['edit_name'] = $this->load->view('form_account_editname', $this->data, TRUE);
 		if ($this->data['self_editing'])
 		{
-			$this->data['change_password'] = $this->load->view('form_account_changepassword', $this->data, TRUE);
+			$this->account_views['change_password'] = $this->load->view('form_account_changepassword', $this->data, TRUE);
 		}
 		else
 		{
-			$this->data['change_password'] = $this->load->view('form_account_resetpassword', $this->data, TRUE);
+			$this->account_views['change_password'] = $this->load->view('form_account_resetpassword', $this->data, TRUE);
+			$this->account_views['manage_page_permissions'] = $this->load->view('form_account_pagepermissions', $this->data, TRUE);
 		}
-		$this->data['update_email'] = $this->load->view('form_account_updateemail', $this->data, TRUE);
-		$this->data['message_settings'] = $this->load->view('form_account_messagesettings', $this->data, TRUE);
+		$this->account_views['update_email'] = $this->load->view('form_account_updateemail', $this->data, TRUE);
+		$this->account_views['message_settings'] = $this->load->view('form_account_messagesettings', $this->data, TRUE);
 
 		if ($this->config->item('dmcb_signon_facebook') == "true" && $this->data['self_editing'])
 		{
-			$this->data['facebook'] = $this->load->view('form_account_facebook', $this->data, TRUE);
+			$this->account_views['facebook'] = $this->load->view('form_account_facebook', $this->data, TRUE);
 		}
 
-		$this->_initialize_page('account', 'Account', $this->data);
+		$this->_initialize_page('account', 'Account', $this->account_views);
 	}
 
 	function blogsettings() // Not used any more
@@ -303,6 +314,106 @@ class Account extends MY_Controller {
 		{
 			return TRUE;
 		}
+	}
+	
+	function pagepermissions()
+	{
+		if ($this->data['change_permissions'] || $this->_access_denied())
+		{
+			$this->form_validation->set_rules('pagename', 'page name', 'xss_clean|strip_tags|trim|required|min_length[2]|callback_page_and_acl_check');
+			$this->form_validation->set_rules('role', 'role', 'xss_clean');
+
+			$this->load->model('acls_model');
+			if ($this->uri->segment(4) == "set_role")
+			{
+				$this->acls_model->delete($this->user->user['userid'], 'page', $this->uri->segment(5));
+				$this->acls_model->add($this->user->user['userid'], $this->uri->segment(6), 'page', $this->uri->segment(5));
+
+				// Do notification
+				$this->session->set_flashdata('change', 'role change');
+				$this->session->set_flashdata('action', 'set');
+				$this->session->set_flashdata('actionon', 'user');
+				$this->session->set_flashdata('actiononid', $this->user->user['userid']);
+				$this->session->set_flashdata('parentid', $this->user->user['userid']);
+				$this->session->set_flashdata('scope', 'page');
+				$this->session->set_flashdata('scopeid', $this->uri->segment(5));
+				$this->session->set_flashdata('content', $this->data['roles_table'][$this->uri->segment(6)]);
+				$this->session->set_flashdata('return', 'account/'.$this->user->user['urlname'].'/pagepermissions');
+				redirect('notify');
+			}
+			else if ($this->uri->segment(4) == "delete")
+			{
+				$this->acls_model->delete($this->user->user['userid'], 'page', $this->uri->segment(5));
+
+				// Do notification
+				$this->session->set_flashdata('change', 'role removal');
+				$this->session->set_flashdata('action', 'removed');
+				$this->session->set_flashdata('actionon', 'user');
+				$this->session->set_flashdata('actiononid', $this->user->user['userid']);
+				$this->session->set_flashdata('parentid', $this->user->user['userid']);
+				$this->session->set_flashdata('scope', 'page');
+				$this->session->set_flashdata('scopeid', $this->uri->segment(5));
+				$this->session->set_flashdata('return', 'account/'.$this->user->user['urlname'].'/pagepermissions');
+				redirect('notify');
+			}
+			else if ($this->form_validation->run())
+			{
+				$pages = explode(";", set_value('pagename'));
+				$pageids = "";
+				foreach ($pages as $page)
+				{
+					if ($page != "")
+					{
+						$object = instantiate_library('page', $page, 'urlname');
+						$this->acls_model->add($this->user->user['userid'], set_value('role'), 'page', $object->page['pageid']);
+						$pageids .= $object->page['pageid'].";";
+					}
+				}
+
+				// Do notification
+				$this->session->set_flashdata('change', 'added role');
+				$this->session->set_flashdata('action', 'set');
+				$this->session->set_flashdata('actionon', 'user');
+				$this->session->set_flashdata('actiononid', $this->user->user['userid']);
+				$this->session->set_flashdata('parentid', $this->user->user['userid']);
+				$this->session->set_flashdata('scope', 'page'); 
+				$this->session->set_flashdata('scopeid', $pageids);
+				$this->session->set_flashdata('content', $this->data['roles_table'][set_value('role')]);
+				$this->session->set_flashdata('return', 'account/'.$this->user->user['urlname'].'/pagepermissions');
+				redirect('notify');
+			}
+			else
+			{
+				$this->index();
+			}
+		}
+	}
+
+	function page_and_acl_check($str)
+	{
+		$pages = explode(";", $str);
+		foreach ($pages as $page)
+		{
+			if ($page != "")
+			{
+				$object = instantiate_library('page', $page, 'urlname');
+				if (isset($object->page['pageid']))
+				{
+					$role = $this->acls_model->get($this->user->user['userid'], 'page', $object->page['pageid']);
+					if ($role != NULL)
+					{
+						$this->form_validation->set_message('page_and_acl_check', "User already has permissions on the page ".$page.".");
+						return FALSE;
+					}
+				}
+				else
+				{
+					$this->form_validation->set_message('page_and_acl_check', "Page ".$page." doesn't exist.");
+					return FALSE;
+				}
+			}
+		}
+		return TRUE;
 	}
 
 	function resetpassword()

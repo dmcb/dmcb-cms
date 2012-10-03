@@ -40,26 +40,34 @@ if (!$self_editing)
 
 if (sizeof($privileges) > 0)
 {
-	if (!$self_editing)
+	if (!$self_editing && !$change_permissions)
 	{
 		echo '<br/><br/>';
 	}
-
-	echo '<h2>Site privileges</h2><br/>';
-	foreach ($privileges as $privilege)
+	
+	if (!$change_permissions)
 	{
-		echo '<li>';
-		if ($privilege['on'] == "site")
+
+		echo '<h2>Site privileges</h2><br/>';
+		foreach ($privileges as $domain => $privilege)
 		{
-			echo 'Site-wide '.$privilege['role'];
+			echo '<li>';
+			if ($domain == "site")
+			{
+				echo 'Site-wide '.$roles_table[$privilege];
+			}
+			else
+			{
+				foreach ($privilege as $privilege_on)
+				{
+					echo ucfirst($roles_table[$privilege_on['role']]).' on <a href="'.base_url().$privilege_on[$domain]['urlname'].'">'.$privilege_on[$domain]['title'].'</a>';
+				}
+			}
+			echo '</li>';
 		}
-		else
-		{
-			echo ucfirst($privilege['role']).' on <a href="'.base_url().$privilege[$privilege['on']]['urlname'].'">'.$privilege[$privilege['on']]['title'].'</a>';
-		}
-		echo '</li>';
+		echo '</ul>';
+	
 	}
-	echo '</ul>';
 }
 
 if (!$self_editing)
@@ -80,7 +88,7 @@ if (!$self_editing)
 	}
 	else
 	{
-		if ($moderations->num_rows() == 30)
+		if ($moderations->num_rows() >= 10)
 		{
 			echo "Most recent entries listed...<br/><br/>";
 		}
