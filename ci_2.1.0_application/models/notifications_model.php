@@ -53,7 +53,7 @@ class Notifications_model extends CI_Model {
 
 	function get($userid)
 	{
-		return $this->db->query("SELECT * FROM notifications WHERE parentid = ".$this->db->escape($userid)." AND action != 'edited' ORDER BY date DESC LIMIT 30");
+		return $this->db->query("SELECT * FROM notifications WHERE parentid = ".$this->db->escape($userid)." AND action != 'edited' ORDER BY date DESC LIMIT 10");
 	}
 
 	function get_plus_minus($userid)
@@ -143,21 +143,21 @@ class Notifications_model extends CI_Model {
 				}
 				if ($count > 1)
 				{
-					$content .= " for the ".$scope."s:'".$scopedata['title'];	
+					$content .= " for the ".$scope."s:\n".$title."\n";	
 				}
 				else
 				{
-					$content .= " for the ".$scope." '".$scopedata['title']."' located at ".base_url().$scopedata['urlname'];
+					$content .= " for the ".$scope." '".$title."' located at ".base_url().$scopedata['urlname'].".";
 				}
 			}
 			
 			if ($action =="set")
 			{
-				$message = "Your role has been set to ".$content.".";
+				$message = "Your role has been set to ".$content;
 			}
 			else 
 			{
-				$message = "Your role has been removed ".$content.".";
+				$message = "Your role has been removed ".$content;
 			}
 		}
 		else if ($action == "downgraded")
