@@ -1160,10 +1160,10 @@ class Page extends MY_Controller {
 		else
 		{
 			$checkuser = instantiate_library('user', $str, 'displayname');
-			$role = $this->acls_model->get($checkuser->user['userid'], 'post', $this->post->post['postid']);
+			$role = $this->acls_model->get($checkuser->user['userid'], 'page', $this->page->page['pageid']);
 			if (isset($checkuser->user['userid']) && $role != NULL)
 			{
-				$this->form_validation->set_message('acl_exists_check', "$str already has permissions on this post.");
+				$this->form_validation->set_message('acl_exists_check', "$str already has permissions on this page.");
 				return FALSE;
 			}
 			else
