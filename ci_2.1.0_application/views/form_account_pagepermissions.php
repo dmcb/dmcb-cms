@@ -29,7 +29,7 @@
 						}
 						echo '</select></td>';
 
-						echo '<td><a href="'.base_url().'account/'.$user['urlname'].'/pagepermissions/delete/'.$privilege['page']['pageid'].'">Remove permission</a></td>';
+						echo '<td><a href="'.base_url().'account/'.$user['urlname'].'/pagepermissions/delete/'.$privilege['page']['pageid'].'">Remove</a></td>';
 					}
 					echo '</table></div><br/>';
 				}
