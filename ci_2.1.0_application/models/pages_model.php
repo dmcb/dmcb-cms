@@ -89,7 +89,7 @@ class Pages_model extends CI_Model {
 		return $this->db->query("SELECT * FROM pages_menus");
 	}
 
-	function get_children($menu, $pageid = NULL)
+	function get_children($menu, $pageid = NULL, $alphabetical = FALSE)
 	{
 		$menu_sql = '';
 		if ($menu != NULL)
@@ -101,7 +101,12 @@ class Pages_model extends CI_Model {
 		{
 			$pageof_sql = 'pageof = '.$this->db->escape($pageid);
 		}
-		return $this->db->query("SELECT pageid FROM pages WHERE $menu_sql $pageof_sql ORDER BY position ASC");
+		$order_sql = 'position';
+		if ($alphabetical)
+		{
+			$order_sql = 'title';
+		}
+		return $this->db->query("SELECT pageid FROM pages WHERE $menu_sql $pageof_sql ORDER BY $order_sql ASC");
 	}
 
 	function get_children_tree($urlname, &$result = array())

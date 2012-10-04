@@ -73,7 +73,7 @@ if ( ! function_exists('generate_menu_pages'))
  */
 if ( ! function_exists('generate_menu_html'))
 {
-	function generate_menu_html($view, $menu, $pageid = NULL, $maxlevel = NULL, $back_button = FALSE, $all = FALSE, $level = 0, &$itemnumber = 0)
+	function generate_menu_html($view, $menu, $pageid = NULL, $maxlevel = NULL, $back_button = FALSE, $alphabetical = FALSE, $all = FALSE, $level = 0, &$itemnumber = 0)
 	{
 		$CI =& get_instance();
 		$CI->load->model('pages_model');
@@ -82,7 +82,7 @@ if ( ! function_exists('generate_menu_html'))
 		if ($maxlevel == NULL || $level < $maxlevel)
 		{
 			// Get menu children
-			$children = $CI->pages_model->get_children($menu, $pageid);
+			$children = $CI->pages_model->get_children($menu, $pageid, $alphabetical);
 
 			// If the back button is enabled and an specific page is used to build the menu off of, and there's only one level of menu items, place a back button
 			if ($back_button)
@@ -126,7 +126,7 @@ if ( ! function_exists('generate_menu_html'))
 				// If showing all pages isn't set, than check if the page isn't published, or it's set to be hidden from view if protected and the user doesn't have the proper role, don't show it in menu
 				if ($all || ($object->page['published'] == 1 && (!$object->page['protected'] || ($object->page['protected'] && $CI->acl->access($object->page['protection'], $object)))))
 				{
-					$children_html = generate_menu_html($view, $menu, $object->page['pageid'], $maxlevel, $back_button, $all, $level+1, $newset = 0);
+					$children_html = generate_menu_html($view, $menu, $object->page['pageid'], $maxlevel, $back_button, $alphabetical, $all, $level+1, $newset = 0);
 
 					// Determine what the link of the menu item is and if it is selected
 					$link;

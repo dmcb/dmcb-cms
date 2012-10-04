@@ -1153,6 +1153,10 @@ class Block_lib {
 		{
 			$this->block['values']['page'] = "current";
 		}
+		if (!isset($this->block['values']['sort']))
+		{
+			$this->block['values']['sort'] = "page-order";
+		}
 		if (!isset($this->block['values']['back_button']))
 		{
 			$this->block['values']['back_button'] = "no";
@@ -1214,9 +1218,16 @@ class Block_lib {
 			{
 				$pageid = NULL;
 			}
+			
+			$alphabetical = FALSE;
+			if ($this->block['values']['sort'] == "alphabetical")
+			{
+				$alphabetical = TRUE;
+			}
 
 			$this->CI->load->helper('menu_helper');
-			$menu_html = generate_menu_html('block_menu_'.$this->block['values']['detail'], $this->block['values']['menu'], $pageid, $this->block['values']['limit'], $this->block['values']['back_button']);
+			//, FALSE, 0, 0, $alphbetical
+			$menu_html = generate_menu_html('block_menu_'.$this->block['values']['detail'], $this->block['values']['menu'], $pageid, $this->block['values']['limit'], $this->block['values']['back_button'], $alphabetical);
 
 			array_push($this->contents, array("view" => "content", "data" => array("content" => $menu_html)));
 		}
