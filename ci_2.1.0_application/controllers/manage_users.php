@@ -133,7 +133,7 @@ class Manage_users extends MY_Controller {
 			$this->session->set_flashdata('return', 'manage_users');
 			redirect('notify');
 		}
-		else if ($this->uri->segment(2) == "delete" && $this->session->userdata('userid') == 1)
+		else if ($this->uri->segment(2) == "delete" && $this->acl->allow('site', 'delete_users', TRUE))
 		{
 			$user = instantiate_library('user', $this->uri->segment(3));
 			$user->delete();
@@ -384,6 +384,7 @@ class Manage_users extends MY_Controller {
 			{
 				$this->data['change_role'] = TRUE;
 			}
+			$this->data['delete_users'] = $this->acl->allow('site', 'delete_users');
 			$this->data['change_status'] = $this->acl->allow('site', 'change_status');
 			$this->data['set_password'] = $this->acl->allow('site', 'set_password');
 			$this->data['set_subscription'] = $this->acl->allow('site', 'set_subscription');

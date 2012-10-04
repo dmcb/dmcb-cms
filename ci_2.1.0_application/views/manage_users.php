@@ -172,7 +172,7 @@
 					echo '<td><a href="'.base_url().'manage_users/subscription/'.$user['userid'].'">Set subscription</a></td>';
 				}
 
-				if (isset($this->session->userdata['signedon']) && $this->session->userdata('userid') == 1)
+				if ($delete_users)
 				{
 					echo '<td><a href="'.base_url().'manage_users/delete/'.$user['userid'].'" onclick="return dmcb.confirmation(\'Are you sure you wish to delete this user?\')">Delete</a></td>';
 				}
