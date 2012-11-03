@@ -25,20 +25,21 @@
  * @param	string   menu
  * @param	string   optional pageid to start from
  * @param	string   optional maximum depth value
+ * @param	boolean  optional value to alphabetize menu items
  * @param	boolean  optional value to show all menu items
  * @param	string   optional current depth in the tree
  * @return	void
  */
 if ( ! function_exists('generate_menu_pages'))
 {
-	function generate_menu_pages(&$menu_pages, $menu, $pageid = NULL, $maxlevel = NULL, $all = FALSE, $level = 0)
+	function generate_menu_pages(&$menu_pages, $menu, $pageid = NULL, $maxlevel = NULL, $alphabetical = FALSE, $all = FALSE, $level = 0)
 	{
 		$CI =& get_instance();
 		$CI->load->model('pages_model');
 
 		if ($maxlevel == NULL || $level < $maxlevel)
 		{
-			$children = $CI->pages_model->get_children($menu, $pageid);
+			$children = $CI->pages_model->get_children($menu, $pageid, $alphabetical);
 			foreach ($children->result_array() as $child)
 			{
 				$object = instantiate_library('page', $child['pageid']);
@@ -48,7 +49,7 @@ if ( ! function_exists('generate_menu_pages'))
 				{
 					$object->page['level'] = $level;
 					array_push($menu_pages, $object->page);
-					generate_menu_pages($menu_pages, $menu, $child['pageid'], $maxlevel, $all, $level+1);
+					generate_menu_pages($menu_pages, $menu, $child['pageid'], $maxlevel, $alphabetical, $all, $level+1);
 				}
 			}
 		}
@@ -214,3 +215,37 @@ if ( ! function_exists('generate_menu_html'))
 		return $menu_html;
 	}
 }
+
+// ------------------------------------------------------------------------
+
+/**
+ * Generate all pages
+ *
+ * Returns page objects from all menus
+ *
+ * @access	public
+ * @param	boolean  optional value to alphabetize results
+ * @param	boolean  optional value to return only published pages
+ * @return	void
+ */
+if ( ! function_exists('generate_all_pages'))
+{
+	function generate_all_pages($alphabetical = FALSE, $all = TRUE)
+	{
+		$CI =& get_instance();
+		$CI->load->model('pages_model');
+		$menu_types = $CI->pages_model->get_all_menus();
+		$menu_sections = array();
+
+		foreach ($menu_types->result_array() as $menu_type)
+		{
+			$menu_pages = array();
+			generate_menu_pages($menu_pages, $menu_type['menu'], NULL, NULL, $alphabetical, $all);
+
+			$menu_sections[$menu_type['menu']] = $menu_pages;
+		}
+		
+		return $menu_sections;
+	}
+}
+ 

@@ -8,6 +8,7 @@
  *              attribution.
  * @link		http://dmcbdesign.com
  */
+
 class Account extends MY_Controller {
 
 	function Account()
@@ -55,6 +56,10 @@ class Account extends MY_Controller {
 				if ($this->acl->allow('site', 'change_role')) 
 				{
 					$this->data['change_permissions'] = TRUE;
+		
+					// Load up pages you can set the user's permissions for if an admin
+					$this->load->helper('menu');
+					$this->data['pages'] = generate_all_pages(TRUE);
 				}
 			}
 
@@ -145,6 +150,7 @@ class Account extends MY_Controller {
 			}
 		}
 
+		// Remove facebook if specified
 		if ($this->uri->segment(3) == "removefacebook")
 		{
 			$this->user->new_user['facebook_uid'] = NULL;
@@ -320,7 +326,7 @@ class Account extends MY_Controller {
 	{
 		if ($this->data['change_permissions'] || $this->_access_denied())
 		{
-			$this->form_validation->set_rules('pagename', 'page name', 'xss_clean|strip_tags|trim|required|min_length[2]|callback_page_and_acl_check');
+			$this->form_validation->set_rules('pages[]', 'page', 'xss_clean|strip_tags|trim|required|callback_pages_check');
 			$this->form_validation->set_rules('role', 'role', 'xss_clean');
 
 			$this->load->model('acls_model');
@@ -358,16 +364,11 @@ class Account extends MY_Controller {
 			}
 			else if ($this->form_validation->run())
 			{
-				$pages = explode(";", set_value('pagename'));
 				$pageids = "";
-				foreach ($pages as $page)
+				foreach ($this->input->post('pages') as $pageid) 
 				{
-					if ($page != "")
-					{
-						$object = instantiate_library('page', $page, 'urlname');
-						$this->acls_model->add($this->user->user['userid'], set_value('role'), 'page', $object->page['pageid']);
-						$pageids .= $object->page['pageid'].";";
-					}
+					$this->acls_model->add($this->user->user['userid'], set_value('role'), 'page', $pageid);
+					$pageids .= $pageid.";";
 				}
 
 				// Do notification
@@ -379,6 +380,7 @@ class Account extends MY_Controller {
 				$this->session->set_flashdata('scope', 'page'); 
 				$this->session->set_flashdata('scopeid', $pageids);
 				$this->session->set_flashdata('content', $this->data['roles_table'][set_value('role')]);
+				
 				$this->session->set_flashdata('return', 'account/'.$this->user->user['urlname'].'/pagepermissions');
 				redirect('notify');
 			}
@@ -388,30 +390,23 @@ class Account extends MY_Controller {
 			}
 		}
 	}
-
-	function page_and_acl_check($str)
+	
+	function pages_check($str)
 	{
-		$pages = explode(";", $str);
-		foreach ($pages as $page)
+		$object = instantiate_library('page', $str);
+		if (isset($object->page['pageid']))
 		{
-			if ($page != "")
+			$role = $this->acls_model->get($this->user->user['userid'], 'page', $object->page['pageid']);
+			if ($role != NULL)
 			{
-				$object = instantiate_library('page', $page, 'urlname');
-				if (isset($object->page['pageid']))
-				{
-					$role = $this->acls_model->get($this->user->user['userid'], 'page', $object->page['pageid']);
-					if ($role != NULL)
-					{
-						$this->form_validation->set_message('page_and_acl_check', "User already has permissions on the page ".$page.".");
-						return FALSE;
-					}
-				}
-				else
-				{
-					$this->form_validation->set_message('page_and_acl_check', "Page ".$page." doesn't exist.");
-					return FALSE;
-				}
+				$this->form_validation->set_message('pages_check', "User already has permissions on the page ".$object->page['title'].".");
+				return FALSE;
 			}
+		}
+		else
+		{
+			$this->form_validation->set_message('pages_check', "Page doesn't exist.");
+			return FALSE;
 		}
 		return TRUE;
 	}

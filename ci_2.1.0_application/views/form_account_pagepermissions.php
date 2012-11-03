@@ -36,22 +36,25 @@
 			?>
 
 			<div class="forminput">
-				<label>Page name</label>
-				<input name="pagename" id="pagename" type="text" class="text" value="<?php echo set_value('pagename'); ?>"/>
-				<div class="autocomplete" id="autocomplete" style="display: none; position:relative;"></div>
-				<?php echo form_error('pagename'); ?>
+				<label>Pages</label>
+				<div class="list">
+					<?php
+					foreach ($pages as $menu => $menu_section)
+					{
+						foreach($menu_section as $page) 
+						{
+							echo '<label>';
+							for ($i=0; $i<$page['level']; $i++)
+							{
+								echo '&nbsp;&nbsp;&nbsp;';	
+							}
+							echo '<input type="checkbox" name="pages[]" value="'.$page['pageid'].'"> '.$page['title'].'</label>';
+						}
+					}
+					?>
+				</div>
+				<?php echo form_error('pages[]'); ?>
 			</div>
-
-			<?php
-			if ($this->config->item('csrf_protection')) $csrf = "parameters: '".$this->security->get_csrf_token_name()."=".$this->security->get_csrf_hash()."',";
-				$this->packages[4]['javascript'][] = "
-new Ajax.Autocompleter('pagename','autocomplete','".base_url()."autocomplete/page', {
-	".$csrf."
-	tokens: ';',
-	minChars: 2,
-	frequency: 0.1
-});";
-			?>
 			
 			<div class="forminput">
 				<label>Permission level</label>

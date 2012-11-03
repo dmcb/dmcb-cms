@@ -209,7 +209,7 @@ class Manage_pages extends MY_Controller {
 				{
 					$this->load->helper('menu_helper');
 					$menu_pages = array();
-					generate_menu_pages($menu_pages, $menutype['menu'], NULL, NULL, TRUE);
+					generate_menu_pages($menu_pages, $menutype['menu'], NULL, NULL, FALSE, TRUE);
 
 					array_push($data['menusections'], $menu_pages);
 				}
