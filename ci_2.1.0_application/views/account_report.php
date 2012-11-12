@@ -51,19 +51,17 @@ if (sizeof($privileges) > 0)
 		echo '<h2>Site privileges</h2><br/>';
 		foreach ($privileges as $domain => $privilege)
 		{
-			echo '<li>';
 			if ($domain == "site")
 			{
-				echo 'Site-wide '.$roles_table[$privilege];
+				echo '<li>Site-wide '.$roles_table[$privilege].'</li>';
 			}
 			else
 			{
 				foreach ($privilege as $privilege_on)
 				{
-					echo ucfirst($roles_table[$privilege_on['role']]).' on <a href="'.base_url().$privilege_on[$domain]['urlname'].'">'.$privilege_on[$domain]['title'].'</a>';
+					echo '<li>'.ucfirst($roles_table[$privilege_on['role']]).' on <a href="'.base_url().$privilege_on[$domain]['urlname'].'">'.$privilege_on[$domain]['title'].'</a></li>';
 				}
 			}
-			echo '</li>';
 		}
 		echo '</ul>';
 	

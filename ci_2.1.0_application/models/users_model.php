@@ -289,6 +289,7 @@ class Users_model extends CI_Model {
 			statusid = ".$this->db->escape($user['statusid']).",
 			facebook_uid = ".$this->db->escape($user['facebook_uid']).",
 			twitter = ".$this->db->escape($user['twitter']).",
+			google = ".$this->db->escape($user['google']).",
 			lastsignon = ".$this->db->escape($user['lastsignon']).",
 			datemodified = ".$this->db->escape($user['datemodified'])."
 			WHERE userid=".$this->db->escape($userid));

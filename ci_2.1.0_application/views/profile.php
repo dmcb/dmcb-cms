@@ -38,6 +38,7 @@
 
 		if (isset($edit_profile)) echo $edit_profile;
 		if (isset($edit_settings)) echo $edit_settings;
+		if (isset($edit_google)) echo $edit_google;
 		if (isset($attachments)) echo $attachments;
 		if (isset($edit_heldbackposts)) echo $edit_heldbackposts;
 		if (isset($edit_heldbackcomments)) echo $edit_heldbackcomments;

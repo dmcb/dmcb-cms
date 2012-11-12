@@ -54,7 +54,7 @@ class Profile extends MY_Controller {
 					$this->heldcomments = $this->comments_model->get_user_heldback($this->user->user['userid']);
 
 					$method = $this->uri->segment(3);
-					if ($method == "addpost" || $method == "attachments" || $method == "heldcomments" || $method == "editprofile" || $method == "editsettings" || $method == "message")
+					if ($method == "addpost" || $method == "attachments" || $method == "heldcomments" || $method == "editgoogle" || $method == "editprofile" || $method == "editsettings" || $method == "message")
 					{
 						$this->focus = $method;
 						$this->$method();
@@ -153,6 +153,12 @@ class Profile extends MY_Controller {
 			{
 				$data['edit_settings'] = $this->load->view('form_profile_editsettings', array('user' => $this->user->user), TRUE);
 			}
+			
+			// User Google settings
+			if ($this->acl->allow('profile', 'google', FALSE, 'user', $this->user->user['userid']))
+			{
+				$data['edit_google'] = $this->load->view('form_profile_google', array('user' => $this->user->user), TRUE);
+			}			
 
 			// User post editing
 			if ($this->acl->allow('profile', 'addpost', FALSE, 'user', $this->user->user['userid']) && $this->user->user['userid'] == $this->session->userdata('userid'))
@@ -355,6 +361,25 @@ class Profile extends MY_Controller {
 			if ($this->form_validation->run())
 			{
 				$this->user->new_user['twitter'] = set_value('twitter');
+				$this->user->save();
+				redirect('profile/'.$this->user->user['urlname']);
+			}
+			else
+			{
+				$this->index();
+			}
+		}
+	}
+	
+	function editgoogle()
+	{
+		if ($this->acl->allow('profile', 'google', TRUE, 'user', $this->user->user['userid']) || $this->_access_denied())
+		{
+			$this->form_validation->set_rules('google', 'Google Plus account', 'xss_clean|strip_tags|trim|numeric|max_length[25]');
+
+			if ($this->form_validation->run())
+			{
+				$this->user->new_user['google'] = set_value('google');
 				$this->user->save();
 				redirect('profile/'.$this->user->user['urlname']);
 			}
