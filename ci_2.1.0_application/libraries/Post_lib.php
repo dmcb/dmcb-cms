@@ -6,7 +6,7 @@
  *
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -173,7 +173,6 @@ class Post_lib {
 			// Minimum requirements for creating a post
 			if (isset($this->new_post['title']) && isset($this->new_post['urlname']) && isset($this->new_post['pageid']) || isset($this->new_post['userid']))
 			{
-				$this->new_post['title'] = reduce_spacing($this->new_post['title']);
 				if (!isset($this->new_post['pageid'])) // If a pageid isn't specified, set it NULL for add
 				{
 					$this->new_post['pageid'] = NULL;
@@ -181,10 +180,6 @@ class Post_lib {
 				if (!isset($this->new_post['userid'])) // If a userid isn't specified, set it NULL for add
 				{
 					$this->new_post['userid'] = NULL;
-				}
-				else
-				{
-					$this->new_post['urlname'] = to_urlname($this->new_post['urlname'], FALSE);
 				}
 				
 				$this->new_post['postid'] = $this->CI->posts_model->add($this->new_post['pageid'], $this->new_post['userid'], $this->new_post['title'], $this->new_post['urlname']);

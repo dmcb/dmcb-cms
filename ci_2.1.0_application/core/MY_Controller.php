@@ -6,7 +6,7 @@
  *
  * @package		dmcb-cms
  * @author		Derek McBurney
- * @copyright	Copyright (c) 2011, Derek McBurney, derek@dmcbdesign.com
+ * @copyright	Copyright (c) 2012, Derek McBurney, derek@dmcbdesign.com
  *              This code may not be used commercially without the expressed
  *              written consent of Derek McBurney. Non-commercial use requires
  *              attribution.
@@ -28,6 +28,7 @@ class MY_Controller extends CI_Controller {
 		}
 
 		// Define global variables that can be set by controllers, pages and blocks:
+		$this->metadata = array();
 		$this->packages = array();
 		$this->focus = "null";
 
@@ -154,8 +155,41 @@ class MY_Controller extends CI_Controller {
 
 		// Load up packages requested for this view
 		$data['packages'] = "";
+		
+		// Add default metadata
+		if ($this->config->item('dmcb_metadata'))
+		{
+			foreach ($this->config->item('dmcb_metadata') as $type => $values)
+			{
+				foreach ($values as $value)
+				{
+					$this->metadata[$type][] = $value;
+				}
+			}
+		}
+		$this->metadata['link'][] = array('pingback', base_url().'pingback');
+		
+		// Render metadata
+		$data['metadata'] = "";
+		foreach ($this->metadata as $metadata => $items) 
+		{
+			if ($metadata == "meta")
+			{
+				foreach ($items as $meta) 
+				{
+					$data['metadata'] .= "\t<meta name=\"".$meta[0]."\" content=\"".$meta[1]."\" />\n";
+				}
+			}
+			else if ($metadata == "link")
+			{
+				foreach ($items as $link)
+				{
+					$data['metadata'] .= "\t<link rel=\"".$link[0]."\" href=\"".$link[1]."\" />\n";
+				}
+			}
+		}
 
-		// Add default libraries
+		// Add default packages
 		if ($this->config->item('dmcb_packages'))
 		{
 			foreach ($this->config->item('dmcb_packages') as $weight => $value)
@@ -175,6 +209,7 @@ class MY_Controller extends CI_Controller {
 		// Add default Javascript
 		$this->packages[4]['javascript'][] = "\nEffect.InitializePage('".$this->focus."');";
 
+		// Render packages
 		ksort($this->packages);
 		foreach ($this->packages as $weight)
 		{

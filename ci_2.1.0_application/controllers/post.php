@@ -639,6 +639,12 @@ class Post extends MY_Controller {
 		{
 			$data['postcontent'] = $this->load->view('post_wrapper_static', array('post' => $this->post->post, 'post_section' => $post_section, 'comments_section' => $comments_section, 'files_section' => $files_section, 'references_section' => $references_section, 'pingbacks_section' => $pingbacks_section), TRUE);
 		}
+		
+		// Add Google Plus meta data if available
+		if (isset($this->author->user['google']))
+		{
+			$this->metadata['link'][] = array('author', 'https://plus.google.com/'.$this->author->user['google']);
+		}
 
 		$this->_initialize_page('post', $this->post->post['title'], $data, TRUE);
 	}
