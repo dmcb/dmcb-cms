@@ -440,7 +440,7 @@ class Manage_users extends MY_Controller {
 				$this->form_validation->set_rules('personalcopy', 'send yourself a copy', 'xss_clean|strip_tags');
 				$this->form_validation->set_rules('usesignature', 'include signature', 'xss_clean|strip_tags');
 				$this->form_validation->set_rules('emailsubject', 'email subject', 'xss_clean|strip_tags|trim|required|max_length[50]');
-				$this->form_validation->set_rules('emailmessage', 'email message', 'xss_clean|strip_tags|trim|required|max_length[1000]');
+				$this->form_validation->set_rules('emailmessage', 'email message', 'xss_clean|strip_tags|trim|required');
 				$this->form_validation->set_rules('maillist', 'mail list', 'xss_clean|strip_tags');
 			}
 
