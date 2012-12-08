@@ -90,7 +90,24 @@
 			<?php
 				}
 			}
+			
+			if ($captcha)
+			{
 			?>
+			<div class="forminput">
+				<label>Captcha code</label>
+				<img src="<?php echo base_url();?><?php echo $post['urlname'];?>/captcha" alt="Captcha" id="captcha">
+			</div>
+			
+			<div class="forminput">
+				<label>Enter code</label>
+				<input name="captcha" type="text" class="text"/>
+				<?php echo form_error('captcha'); ?>
+			</div>
+			<?php
+			}
+			?>
+			
 			<div class="forminput">
 				<label><?php if (!$this->session->userdata('signedon')) echo 'Comment'; else echo '&nbsp;'; ?></label>
 				<textarea name="comment" rows="" cols=""><?php echo set_value('comment'); ?></textarea>

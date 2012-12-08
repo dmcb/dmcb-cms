@@ -365,9 +365,16 @@ class Post extends MY_Controller {
 					$this->files[$file['fileid']] = $file;
 				}
 			}
+			
+			// Get Captcha settings
+			$this->data['captcha'] = null;
+			if ($this->acl->allow('post', 'captcha')) 
+			{
+				$this->data['captcha'] = TRUE;
+			}
 
 			$method = $this->uri->segment($this->base_segment+1);
-			if ($method == "addcomment" || $method == "attachments" || $method == "comment" || $method == "delete" || $method == "deletecomment" || $method == "editevent" || $method == "editpost" || $method == "permissions" || $method == "reportcomment" || $method == "taguser" ||  $method == "theme")
+			if ($method == "addcomment" || $method == "attachments" || $method == "captcha" || $method == "comment" || $method == "delete" || $method == "deletecomment" || $method == "editevent" || $method == "editpost" || $method == "permissions" || $method == "reportcomment" || $method == "taguser" ||  $method == "theme")
 			{
 				$this->focus = $method;
 				$this->$method();
@@ -401,7 +408,7 @@ class Post extends MY_Controller {
 					$this->load->library('facebook_connect');
 					$session = $this->facebook_connect->session;
 				}
-				$add_comment = $this->load->view('form_post_addcomment', array('post' => $this->post->post, 'session' => $session), TRUE);
+				$add_comment = $this->load->view('form_post_addcomment', array('post' => $this->post->post, 'session' => $session, 'captcha' => $this->data['captcha']), TRUE);
 			}
 			else if ($this->acl->enabled('post', 'addcomment', 'member'))
 			{
@@ -663,6 +670,12 @@ class Post extends MY_Controller {
 			// Anti-spam measure - if hidden 'information' field is filled, we know it's a bot
 			$this->form_validation->set_rules('information', 'information', 'exact_length[0]');
 			$this->form_validation->set_rules('comment', 'comment', 'xss_clean|strip_tags|trim|required|min_length[2]|max_length[15000]|callback_ip_check');
+			
+			// Captcha
+			if ($this->data['captcha'])
+			{
+				$this->form_validation->set_rules('captcha', 'captcha', 'trim|required|callback_commentcaptcha_check');
+			}
 
 			if ($this->form_validation->run())
 			{
@@ -709,6 +722,22 @@ class Post extends MY_Controller {
 			{
 				$this->index();
 			}
+		}
+	}
+	
+	function commentcaptcha_check()
+	{
+		$this->load->library('securimage/securimage');
+		$securimage = new Securimage();	
+
+		if( ! $securimage->check($this->input->post('captcha')))
+		{
+			$this->form_validation->set_message('commentcaptcha_check', 'The code you entered is invalid');
+			return FALSE;
+		}
+		else
+		{
+			return TRUE;
 		}
 	}
 
@@ -920,6 +949,13 @@ class Post extends MY_Controller {
 		}
 		else
 			return TRUE;
+	}
+	
+	function captcha()
+	{
+		$this->load->library('securimage/securimage');
+		$img = new Securimage();
+		$img->show();
 	}
 
 	function comment()
