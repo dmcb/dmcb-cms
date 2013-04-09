@@ -1,7 +1,7 @@
 	<!-- swfupload -->
-	<script type="text/javascript" src="<?php echo base_url();?>includes/swfupload/2.2.0.5/swfupload.js"></script>
-	<script type="text/javascript" src="<?php echo base_url();?>includes/swfupload/2.2.0.5/fileprogress.js"></script>
-	<script type="text/javascript" src="<?php echo base_url();?>includes/swfupload/2.2.0.5/handlers.js"></script>
+	<script type="text/javascript" src="<?php echo base_url();?>assets/lib/swfupload/2.2.0.5/swfupload.js"></script>
+	<script type="text/javascript" src="<?php echo base_url();?>assets/lib/swfupload/2.2.0.5/fileprogress.js"></script>
+	<script type="text/javascript" src="<?php echo base_url();?>assets/lib/swfupload/2.2.0.5/handlers.js"></script>
 	<script type="text/javascript">
 		<!--
 			var swfu;
@@ -33,15 +33,15 @@
 					upload_complete_handler : uploadComplete,
 
 					// Button Settings
-					button_image_url : "<?php echo base_url();?>includes/swfupload/2.2.0.5/browse.gif",	// Relative to the SWF file, or absolute
+					button_image_url : "<?php echo base_url();?>assets/lib/swfupload/2.2.0.5/browse.gif",	// Relative to the SWF file, or absolute
 					button_placeholder_id : "spanButtonPlaceholder",
-					<?php $size = getimagesize('includes/swfupload/2.2.0.5/browse.gif'); ?>
+					<?php $size = getimagesize('assets/lib/swfupload/2.2.0.5/browse.gif'); ?>
 					button_width: <?php echo $size[0];?>,
 					button_height: <?php echo $size[1]/4;?>,
 					button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
 
 					// Flash Settings
-					flash_url : "<?php echo base_url();?>includes/swfupload/2.2.0.5/swfupload.swf",
+					flash_url : "<?php echo base_url();?>assets/lib/swfupload/2.2.0.5/swfupload.swf",
 
 					custom_settings : {
 						progress_target : "fsUploadProgress",
@@ -54,4 +54,4 @@
 			});
 		-->
 	</script>
-	<style type="text/css" media="all">@import "<?php echo base_url();?>includes/swfupload/2.2.0.5/default.css";</style>
+	<style type="text/css" media="all">@import "<?php echo base_url();?>assets/lib/swfupload/2.2.0.5/default.css";</style>

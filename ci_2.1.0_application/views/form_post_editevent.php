@@ -13,7 +13,7 @@
 			<div class="forminput">
 				<label>Date (YYYYMMDD)</label>
 				<input name="eventdate" type="text" class="text" maxlength="8" value="<?php $default = NULL; if (isset($post['event']['date'])) $default = date('Ymd',strtotime($post['event']['date'])); echo set_value('eventdate', $default); ?>"/>
-				<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?php echo base_url();?>includes/images/calendar.gif" style="border:0px; cursor:pointer;" />
+				<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?php echo base_url();?>assets/images/calendar.gif" style="border:0px; cursor:pointer;" />
 				<?php echo form_error('eventdate'); ?>
 			</div>
 			
@@ -28,7 +28,7 @@
 			<div class="forminput">
 				<label>End date (YYYYMMDD)</label>
 				<input name="eventenddate" type="text" class="text" maxlength="8" value="<?php $default = NULL; if (isset($post['event']['enddate'])) $default = date('Ymd',strtotime($post['event']['enddate'])); echo set_value('eventenddate', $default); ?>"/>
-				<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?php echo base_url();?>includes/images/calendar.gif" style="border:0px; cursor:pointer;" />
+				<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?php echo base_url();?>assets/images/calendar.gif" style="border:0px; cursor:pointer;" />
 				<?php echo form_error('eventenddate'); ?>
 			</div>
 			

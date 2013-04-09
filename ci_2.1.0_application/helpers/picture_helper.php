@@ -30,14 +30,14 @@ if ( ! function_exists('generate_profile_picture'))
 	{
 		$CI =& get_instance();
 
-		$default_image = base_url().'includes/images/avatar.png';
+		$default_image = base_url().'assets/images/avatar.png';
 
 		$square = FALSE;
 		if (!is_int($size) && !ctype_digit($size))
 		{
 			if ($size == "large")
 			{
-				$default_image = base_url().'includes/images/avatar_large.png';
+				$default_image = base_url().'assets/images/avatar_large.png';
 				$size = $CI->config->item('dmcb_avatar_size_large');
 				if ($CI->config->item('dmcb_avatar_size_large_square') == "true")
 				{

@@ -24,7 +24,7 @@
 				<div class="forminput">
 					<label>End Date (YYYYMMDD)</label>
 					<input name="subscribedate" type="text" class="text" maxlength="8" value="<?php $default = NULL; if (isset($subscription['date'])) $default = date('Ymd',strtotime($subscription['date'])); echo set_value('subscribedate', $default); ?>"/>
-					<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?php echo base_url();?>includes/images/calendar.gif" style="border:0px; cursor:pointer;" />
+					<img alt="Calendar" onclick="new CalendarDateSelect( $(this).previous(), {year_range:10} );" src="<?php echo base_url();?>assets/images/calendar.gif" style="border:0px; cursor:pointer;" />
 					<?php echo form_error('subscribedate'); ?>
 				</div>
 				

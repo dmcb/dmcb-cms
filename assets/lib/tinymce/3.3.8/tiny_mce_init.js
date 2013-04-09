@@ -1,6 +1,6 @@
 tinyMCE.init({
 	editor_selector : "page_editor",
-	content_css : "/includes/styles/elements.css",
+	content_css : "/assets/css/elements.css",
 	mode : "textareas",
 	document_base_url : "/",
 	convert_urls : false,
@@ -21,7 +21,7 @@ tinyMCE.init({
 
 tinyMCE.init({
 	editor_selector : "post_editor",
-	content_css : "/includes/styles/elements.css",
+	content_css : "/assets/css/elements.css",
 	mode : "textareas",
 	document_base_url : "/",
 	convert_urls : false,
@@ -42,7 +42,7 @@ tinyMCE.init({
 
 tinyMCE.init({
 	editor_selector : "template_editor",
-	content_css : "/includes/styles/elements.css",
+	content_css : "/assets/css/elements.css",
 	mode : "textareas",
 	document_base_url : "/",
 	convert_urls : false,

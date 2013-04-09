@@ -199,12 +199,12 @@ class MY_Controller extends CI_Controller {
 		}
 
 		// Add default CSS files
-		$this->packages[0]['cssfiles'][] = base_url().'includes/styles/elements.css';
-		$this->packages[0]['cssfiles'][] = base_url().'includes/styles/layout.css';
+		$this->packages[0]['cssfiles'][] = base_url().'assets/css/elements.css';
+		$this->packages[0]['cssfiles'][] = base_url().'assets/css/layout.css';
 
 		// Add default JS files
-		$this->packages[3]['jsfiles'][] = base_url().'includes/scripts/functions.js';
-		$this->packages[3]['jsfiles'][] = base_url().'includes/scripts/panels.js';
+		$this->packages[3]['jsfiles'][] = base_url().'assets/css/functions.js';
+		$this->packages[3]['jsfiles'][] = base_url().'assets/css/panels.js';
 
 		// Add default Javascript
 		$this->packages[4]['javascript'][] = "\nEffect.InitializePage('".$this->focus."');";

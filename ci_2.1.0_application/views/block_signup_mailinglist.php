@@ -6,7 +6,7 @@ Event.observe('maillist_signup', 'submit', function(event) {
 		parameters: { ajax:true },
 		onCreate: function() {
 			$('maillist_error').update(null);
-			$('maillist_loading').update('<img src=\"".base_url()."includes/images/ajax-loader.gif\" alt=\"Please wait...\" />');
+			$('maillist_loading').update('<img src=\"".base_url()."assets/images/ajax-loader.gif\" alt=\"Please wait...\" />');
 		},
 		onComplete: function() {
 			$('maillist_loading').update(null);

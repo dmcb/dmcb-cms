@@ -6,7 +6,7 @@ Event.observe('waiver', 'submit', function(event) {
 		parameters: { ajax:true },
 		onCreate: function() {
 			$('waiver_error').update(null);
-			$('waiver_loading').update('<img src=\"".base_url()."includes/images/ajax-loader.gif\" alt=\"Please wait...\" />');
+			$('waiver_loading').update('<img src=\"".base_url()."assets/images/ajax-loader.gif\" alt=\"Please wait...\" />');
 		},
 		onComplete: function() {
 			$('waiver_loading').update(null);
