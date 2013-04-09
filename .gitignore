@@ -4,7 +4,7 @@ Thumbs.db
 .sass-cache
 
 # Ignore all site-specific files
-.htaccess
+/.htaccess
 backup/
 cgi-bin/
 ci_*_application/cache
