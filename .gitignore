@@ -23,5 +23,6 @@ assets/lib/cufon/*/fonts/
 assets/lib/swfupload/*/*.gif
 assets/lib/swfupload/*/*.css
 source/css/custom/*
+source/images/custom/*
 /robots.txt
 /favicon.*
