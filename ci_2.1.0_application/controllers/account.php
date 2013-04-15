@@ -48,11 +48,13 @@ class Account extends MY_Controller {
 			// You can only edit the account if it's your own, or you have special privileges
 			$this->data['person_edited'] = "your";
 			$this->data['self_editing'] = TRUE;
+			$this->data['set_password'] = FALSE;
 			$this->data['change_permissions'] = FALSE;
 			if ($yourself->user['userid'] != $this->user->user['userid'])
 			{
 				$this->data['person_edited'] = $this->user->user['displayname']."'s";
 				$this->data['self_editing'] = FALSE;
+
 				if ($this->acl->allow('site', 'change_role')) 
 				{
 					$this->data['change_permissions'] = TRUE;
@@ -61,9 +63,13 @@ class Account extends MY_Controller {
 					$this->load->helper('menu');
 					$this->data['pages'] = generate_all_pages(TRUE);
 				}
+				if ($this->acl->allow('site', 'set_password')) 
+				{
+					$this->data['set_password'] = TRUE;
+				}
 			}
 
-			if ($this->acl->allow('site', 'set_password') || $this->data['self_editing'] || $this->_access_denied())
+			if ($this->acl->allow('site', 'manage_users') || $this->data['self_editing'] || $this->_access_denied())
 			{
 				// Get blogs and blocked users
 				$this->blogs = $this->user->get_rss();
@@ -160,18 +166,26 @@ class Account extends MY_Controller {
 		// Load page
 		$this->data['user'] = $this->user->user;
 		$this->account_views['account_report'] = $this->load->view('account_report', $this->data, TRUE);
-		$this->account_views['edit_name'] = $this->load->view('form_account_editname', $this->data, TRUE);
 		if ($this->data['self_editing'])
 		{
 			$this->account_views['change_password'] = $this->load->view('form_account_changepassword', $this->data, TRUE);
+			$this->account_views['update_email'] = $this->load->view('form_account_updateemail', $this->data, TRUE);
+			$this->account_views['message_settings'] = $this->load->view('form_account_messagesettings', $this->data, TRUE);
 		}
 		else
 		{
-			$this->account_views['change_password'] = $this->load->view('form_account_resetpassword', $this->data, TRUE);
-			$this->account_views['manage_page_permissions'] = $this->load->view('form_account_pagepermissions', $this->data, TRUE);
+			if ($this->data['set_password'])
+			{
+				$this->account_views['edit_name'] = $this->load->view('form_account_editname', $this->data, TRUE);
+				$this->account_views['change_password'] = $this->load->view('form_account_resetpassword', $this->data, TRUE);
+				$this->account_views['update_email'] = $this->load->view('form_account_updateemail', $this->data, TRUE);
+				$this->account_views['message_settings'] = $this->load->view('form_account_messagesettings', $this->data, TRUE);
+			}
+			if ($this->data['change_permissions'])
+			{
+				$this->account_views['manage_page_permissions'] = $this->load->view('form_account_pagepermissions', $this->data, TRUE);
+			}
 		}
-		$this->account_views['update_email'] = $this->load->view('form_account_updateemail', $this->data, TRUE);
-		$this->account_views['message_settings'] = $this->load->view('form_account_messagesettings', $this->data, TRUE);
 
 		if ($this->config->item('dmcb_signon_facebook') == "true" && $this->data['self_editing'])
 		{
@@ -181,47 +195,50 @@ class Account extends MY_Controller {
 		$this->_initialize_page('account', 'Account', $this->account_views);
 	}
 
-	function blogsettings() // Not used any more
-	{
-		for ($i=0; $i<=$this->blogs->num_rows(); $i++)
-		{
-			$this->form_validation->set_rules('rssfeed'.($i+1), 'blog rss feed url', 'xss_clean|strip_tags|trim|prep_url|max_length[150]');
-		}
+	// function blogsettings() // Not used any more
+	// {
+	// 	for ($i=0; $i<=$this->blogs->num_rows(); $i++)
+	// 	{
+	// 		$this->form_validation->set_rules('rssfeed'.($i+1), 'blog rss feed url', 'xss_clean|strip_tags|trim|prep_url|max_length[150]');
+	// 	}
 
-		if ($this->form_validation->run())
-		{
-			$this->user->remove_rss();
-			for ($i=0; $i<=$this->blogs->num_rows(); $i++)
-			{
-				$field = 'rssfeed'.($i+1);
-				$this->user->add_rss(set_value($field));
+	// 	if ($this->form_validation->run())
+	// 	{
+	// 		$this->user->remove_rss();
+	// 		for ($i=0; $i<=$this->blogs->num_rows(); $i++)
+	// 		{
+	// 			$field = 'rssfeed'.($i+1);
+	// 			$this->user->add_rss(set_value($field));
 
-			}
-			$message = 'You have successfully updated '.$this->data['person_edited'].' blog settings. <a href="'.base_url().'account/'.$this->user->user['urlname'].'">Return to '.$this->data['person_edited'].' account</a>.';
-			$this->_message("Account update", $message, "Success");
-		}
-		else
-		{
-			$this->index();
-		}
-	}
+	// 		}
+	// 		$message = 'You have successfully updated '.$this->data['person_edited'].' blog settings. <a href="'.base_url().'account/'.$this->user->user['urlname'].'">Return to '.$this->data['person_edited'].' account</a>.';
+	// 		$this->_message("Account update", $message, "Success");
+	// 	}
+	// 	else
+	// 	{
+	// 		$this->index();
+	// 	}
+	// }
 
 	function changepassword()
 	{
-		$this->form_validation->set_rules('oldpassword', 'old password', 'xss_clean|trim|required|callback_password_check|md5');
-		$this->form_validation->set_rules('newpassword', 'new password', 'xss_clean|trim|required|min_length[6]|max_length[15]|matches[confirmpassword]|md5');
-		$this->form_validation->set_rules('confirmpassword', 'confirm password', 'xss_clean|trim|required|min_length[6]|max_length[15]|md5');
+		if ($this->data['self_editing'] || $this->_access_denied())
+		{
+			$this->form_validation->set_rules('oldpassword', 'old password', 'xss_clean|trim|required|callback_password_check|md5');
+			$this->form_validation->set_rules('newpassword', 'new password', 'xss_clean|trim|required|min_length[6]|max_length[15]|matches[confirmpassword]|md5');
+			$this->form_validation->set_rules('confirmpassword', 'confirm password', 'xss_clean|trim|required|min_length[6]|max_length[15]|md5');
 
-		if ($this->form_validation->run())
-		{
-			$this->user->new_user['password'] = set_value('newpassword');
-			$this->user->save();
-			$message = 'You have successfully changed '.$this->data['person_edited'].' password. The change will take effect when you next log on. <a href="'.base_url().'account/'.$this->user->user['urlname'].'">Return to '.$this->data['person_edited'].' account</a>.';
-			$this->_message("Account update", $message, "Success");
-		}
-		else
-		{
-			$this->index();
+			if ($this->form_validation->run())
+			{
+				$this->user->new_user['password'] = set_value('newpassword');
+				$this->user->save();
+				$message = 'You have successfully changed '.$this->data['person_edited'].' password. The change will take effect when you next log on. <a href="'.base_url().'account/'.$this->user->user['urlname'].'">Return to '.$this->data['person_edited'].' account</a>.';
+				$this->_message("Account update", $message, "Success");
+			}
+			else
+			{
+				$this->index();
+			}
 		}
 	}
 
@@ -240,19 +257,22 @@ class Account extends MY_Controller {
 
 	function editname()
 	{
-		$this->form_validation->set_rules('displayname', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_check');
+		if ($this->data['self_editing'] || $this->data['set_password'] || $this->_access_denied())
+		{
+			$this->form_validation->set_rules('displayname', 'display name', 'xss_clean|strip_tags|trim|required|min_length[3]|max_length[30]|callback_displayname_check');
 
-		if ($this->form_validation->run())
-		{
-			$this->user->new_user['displayname'] = set_value('displayname');
-			$this->user->save();
-			$this->session->set_userdata('displayname',$this->user->user['displayname']);
-			$this->session->set_userdata('urlname',$this->user->user['urlname']);
-			redirect('account/'.$this->user->user['urlname'].'/editname');
-		}
-		else
-		{
-			$this->index();
+			if ($this->form_validation->run())
+			{
+				$this->user->new_user['displayname'] = set_value('displayname');
+				$this->user->save();
+				$this->session->set_userdata('displayname',$this->user->user['displayname']);
+				$this->session->set_userdata('urlname',$this->user->user['urlname']);
+				redirect('account/'.$this->user->user['urlname'].'/editname');
+			}
+			else
+			{
+				$this->index();
+			}
 		}
 	}
 
@@ -277,34 +297,37 @@ class Account extends MY_Controller {
 
 	function messagesettings()
 	{
-		$this->form_validation->set_rules('mailinglist', 'on mailing list', 'xss_clean|strip_tags');
-		$this->form_validation->set_rules('getmessages', 'allow messages', 'xss_clean|strip_tags');
-		for ($i=0; $i<=$this->blocked->num_rows(); $i++)
+		if ($this->data['self_editing'] || $this->data['set_password'] || $this->_access_denied())
 		{
-			$this->form_validation->set_rules('block'.($i+1), 'display name of the blocked user', 'xss_clean|strip_tags|trim|min_length[3]|max_length[30]|callback_displayname_exists_check');
-		}
-
-		if ($this->form_validation->run())
-		{
-			$this->user->remove_blocked_users();
-			$added = array();
+			$this->form_validation->set_rules('mailinglist', 'on mailing list', 'xss_clean|strip_tags');
+			$this->form_validation->set_rules('getmessages', 'allow messages', 'xss_clean|strip_tags');
 			for ($i=0; $i<=$this->blocked->num_rows(); $i++)
 			{
-				$field = 'block'.($i+1);
-				if (set_value($field) != "")
-				{
-					$this->user->add_blocked_user(set_value($field));
-					$added[strtolower(set_value($field))] = TRUE;
-				}
+				$this->form_validation->set_rules('block'.($i+1), 'display name of the blocked user', 'xss_clean|strip_tags|trim|min_length[3]|max_length[30]|callback_displayname_exists_check');
 			}
-			$this->user->new_user['mailinglist'] = set_value('mailinglist');
-			$this->user->new_user['getmessages'] = set_value('getmessages');
-			$this->user->save();
-			redirect('account/'.$this->user->user['urlname'].'/messagesettings');
-		}
-		else
-		{
-			$this->index();
+
+			if ($this->form_validation->run())
+			{
+				$this->user->remove_blocked_users();
+				$added = array();
+				for ($i=0; $i<=$this->blocked->num_rows(); $i++)
+				{
+					$field = 'block'.($i+1);
+					if (set_value($field) != "")
+					{
+						$this->user->add_blocked_user(set_value($field));
+						$added[strtolower(set_value($field))] = TRUE;
+					}
+				}
+				$this->user->new_user['mailinglist'] = set_value('mailinglist');
+				$this->user->new_user['getmessages'] = set_value('getmessages');
+				$this->user->save();
+				redirect('account/'.$this->user->user['urlname'].'/messagesettings');
+			}
+			else
+			{
+				$this->index();
+			}
 		}
 	}
 
@@ -413,7 +436,7 @@ class Account extends MY_Controller {
 
 	function resetpassword()
 	{
-		if (($this->input->post('buttonchoice', TRUE) == "reset" && $this->acl->allow('site', 'set_password', TRUE)) || $this->_access_denied())
+		if (($this->input->post('buttonchoice', TRUE) == "reset" && $this->data['set_password']) || $this->_access_denied())
 		{
 			$this->load->helper('string');
 			$password = random_string();
@@ -450,30 +473,33 @@ class Account extends MY_Controller {
 
 	function updateemail()
 	{
-		$this->form_validation->set_rules('email', 'email address', 'xss_clean|strip_tags|trim|required||max_length[50]|valid_email|callback_email_check');
-
-		if ($this->form_validation->run())
+		if ($this->data['self_editing'] || $this->data['set_password'] || $this->_access_denied())
 		{
-			$this->user->new_user['email'] = set_value('email');
-			$this->user->save();
+			$this->form_validation->set_rules('email', 'email address', 'xss_clean|strip_tags|trim|required||max_length[50]|valid_email|callback_email_check');
 
-			$note = "You have changed your email address at ".$this->config->item('dmcb_friendly_server').".";
-			if ($this->data['self_editing'])
+			if ($this->form_validation->run())
 			{
-				$note = "An administrator has changed your email address at ".$this->config->item('dmcb_friendly_server').".";
+				$this->user->new_user['email'] = set_value('email');
+				$this->user->save();
+
+				$note = "You have changed your email address at ".$this->config->item('dmcb_friendly_server').".";
+				if ($this->data['self_editing'])
+				{
+					$note = "An administrator has changed your email address at ".$this->config->item('dmcb_friendly_server').".";
+				}
+				$this->load->model('notifications_model');
+				$this->notifications_model->send(
+					$this->user->user['email'],
+					$this->config->item('dmcb_friendly_server').' account',
+					$note."\n\nBefore you can log in you must activate your address by going to the following URL, ".base_url()."activate/".$this->user->user['userid']."/".$this->user->user['code']
+				);
+				$message = 'You have successfully updated '.$this->data['person_edited'].' email address. This new address must be activated, an activation email is being sent. <a href="'.base_url().'account/'.$this->user->user['urlname'].'">Return to '.$this->data['person_edited'].' account</a>.';
+				$this->_message("Account update", $message, "Success");
 			}
-			$this->load->model('notifications_model');
-			$this->notifications_model->send(
-				$this->user->user['email'],
-				$this->config->item('dmcb_friendly_server').' account',
-				$note."\n\nBefore you can log in you must activate your address by going to the following URL, ".base_url()."activate/".$this->user->user['userid']."/".$this->user->user['code']
-			);
-			$message = 'You have successfully updated '.$this->data['person_edited'].' email address. This new address must be activated, an activation email is being sent. <a href="'.base_url().'account/'.$this->user->user['urlname'].'">Return to '.$this->data['person_edited'].' account</a>.';
-			$this->_message("Account update", $message, "Success");
-		}
-		else
-		{
-			$this->index();
+			else
+			{
+				$this->index();
+			}
 		}
 	}
 

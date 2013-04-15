@@ -79,7 +79,7 @@ class Manage_users extends MY_Controller {
 			);
 
 			$method = $this->uri->segment(2);
-			if ($method == "adduser" || $method == "email" || $method == "mailinglist" || $method == "report" || $method == "subscription")
+			if ($method == "adduser" || $method == "email" || $method == "mailinglist" || $method == "subscription")
 			{
 				$this->focus = $method;
 				$this->$method();
@@ -754,62 +754,6 @@ class Manage_users extends MY_Controller {
 				$this->index();
 			}
 		}
-	}
-
-	function report()
-	{
-		$user = instantiate_library('user', $this->uri->segment(3));
-		$this->data['user'] = $user->user;
-
-		// Set email list to user
-		$this->session->set_flashdata('maillist', array($user->user['userid']));
-
-		// Get moderation activity
-		$this->data['moderations'] = $this->notifications_model->get($user->user['userid']);
-
-		// Get subscription
-		if ($this->acl->enabled('site', 'subscribe'))
-		{
-			$this->load->model('subscriptions_model');
-			$this->data['subscription'] = $this->subscriptions_model->get($user->user['userid']);
-		}
-
-		// Get all roles
-		$this->load->model('acls_model');
-		$roles = $this->acls_model->get_roles_all();
-		$rolestable = array();
-		foreach ($roles->result_array() as $role)
-		{
-			$rolestable[$role['roleid']] = $role['role'];
-		}
-
-		// Get any special site privileges for the user
-		$this->data['privileges'] = array();
-		$site_role = $this->acls_model->get($user->user['userid'], 'site');
-		if ($site_role != NULL && $this->acls_model->get_role_name($site_role) != "member")
-		{
-			array_push($this->data['privileges'], array('on' => 'site', 'role' => $rolestable[$site_role]));
-		}
-		$page_privileges = $this->acls_model->get_all($user->user['userid'], 'page');
-		foreach ($page_privileges->result_array() as $page_privilege)
-		{
-			$object = instantiate_library('page', $page_privilege['attachedid']);
-			if (isset($object->page['pageid']))
-			{
-				array_push($this->data['privileges'], array('on' => 'page', 'role' => $rolestable[$page_privilege['roleid']], 'page' => $object->page));
-			}
-		}
-		$post_privileges = $this->acls_model->get_all($user->user['userid'], 'post');
-		foreach ($post_privileges->result_array() as $post_privilege)
-		{
-			$object = instantiate_library('post', $post_privilege['attachedid']);
-			if (isset($object->post['postid']))
-			{
-				array_push($this->data['privileges'], array('on' => 'post', 'role' => $rolestable[$post_privilege['roleid']], 'post' => $object->post));
-			}
-		}
-
-		$this->_initialize_page("user_report", "User report", $this->data);
 	}
 
 	function subscription()
