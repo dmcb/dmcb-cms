@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * dmcb extension to CI 2.1.0 security library
+ * dmcb extension to CI 2.1.3 security library
  *
  * Adds CSRF whitelist of servers
  *
@@ -55,15 +55,14 @@ class MY_Security extends CI_Security {
 		}
 		else // end dmcb code change
 		{
-			// If no POST data exists we will set the CSRF cookie
-			if (count($_POST) == 0)
+			// If it's not a POST request we will set the CSRF cookie
+			if (strtoupper($_SERVER['REQUEST_METHOD']) !== 'POST')
 			{
 				return $this->csrf_set_cookie();
 			}
 
 			// Do the tokens exist in both the _POST and _COOKIE arrays?
-			if ( ! isset($_POST[$this->_csrf_token_name]) OR
-				 ! isset($_COOKIE[$this->_csrf_cookie_name]))
+			if ( ! isset($_POST[$this->_csrf_token_name], $_COOKIE[$this->_csrf_cookie_name]))
 			{
 				$this->csrf_show_error();
 			}
@@ -83,7 +82,7 @@ class MY_Security extends CI_Security {
 			$this->_csrf_set_hash();
 			$this->csrf_set_cookie();
 
-			log_message('debug', "CSRF token verified ");
+			log_message('debug', 'CSRF token verified');
 
 			return $this;
 		}
