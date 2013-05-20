@@ -1,7 +1,5 @@
-<div class="fullcolumn">
+<div class="block-edit">
 	<p>Please configure the settings of the block '<?php echo $block['title'];?>'.</p>
-
-	<div class="seperator">&nbsp;</div>
 
 	<form action="<?php echo base_url().'block/'.$block['blockinstanceid']?>/edit" method="post" onsubmit="return dmcb.submit(this);">
 		<fieldset>
@@ -23,12 +21,12 @@
 				<?php
 					if ($block['variables']->num_rows() > 0)
 					{
-						echo '<div class="formnotes">';
+						echo '<div class="formnotes"><ul>';
 						foreach ($block['variables']->result_array() as $variable)
 						{
-							echo '<strong>'.ucfirst(str_replace('_', ' ', $variable['variablename'])).'</strong>: '.$variable['variabledescription'].'<br/>';
+							echo '<li><span class="variable-name">'.ucfirst(str_replace('_', ' ', $variable['variablename'])).'</span>: '.$variable['variabledescription'].'</li>';
 						}
-						echo '</div>';
+						echo '</ul></div>';
 					}
 
 					foreach ($block['variables']->result_array() as $variable)

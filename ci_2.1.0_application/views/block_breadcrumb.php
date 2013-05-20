@@ -1,4 +1,4 @@
-<span class="breadcrumb">
+<span class="block breadcrumb">
 <?php
 	$first = TRUE;
 	foreach ($links as $link)

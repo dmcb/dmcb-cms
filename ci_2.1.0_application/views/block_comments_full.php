@@ -1,8 +1,8 @@
-<div class="comment full">
+<div class="block comment full">
 <?php
 	echo generate_profile_picture("small", $comment['user'], $comment['displayname'], $comment['email']);
-	echo '<blockquote class="comment" id="comment'.$comment['commentid'].'">'.$comment['content'].'</blockquote>';
-	echo '<h6>Comment made on '.date('F jS, Y \a\t g:i a', strtotime($comment['date'])).' by ';
+	echo '<blockquote class="comment-content" id="comment'.$comment['commentid'].'">'.$comment['content'].'</blockquote>';
+	echo '<span class="comment-meta">Comment made on '.date('F jS, Y \a\t g:i a', strtotime($comment['date'])).' by ';
 	if ($comment['user'] != NULL && $comment['user']['enabledprofile'])
 	{
 		echo '<a href="'.base_url().'profile/'.$comment['user']['urlname'].'">'.$comment['user']['displayname'].'</a>';
@@ -11,12 +11,12 @@
 	{
 		echo $comment['displayname'];
 	}
-	echo '</h6>';
+	echo '</span>';
 
 	// Admin options
 	if ((isset($this->can_report_comment) && $this->can_report_comment) || (isset($this->can_delete_comment) && $this->can_delete_comment) || (isset($this->can_holdback_comment) && $this->can_holdback_comment))
 	{
-		echo '<h6>';
+		echo '<span class="admin-bar">';
 		if (isset($this->can_report_comment) && $this->can_report_comment)
 		{
 			echo '<a href="javascript:dmcb.linksubmit(\'commentform'.$comment['commentid'].'\');">Report abusive comment</a>';
@@ -37,7 +37,7 @@
 		{
 			echo '<a href="'.base_url().$comment['post']['urlname'].'/deletecomment/'.$comment['commentid'].'">Delete</a>';
 		}
-		echo '</h6>';
+		echo '</span>';
 	}
 ?>
 

@@ -1,4 +1,4 @@
-<blockquote>
+<blockquote class="block comment large">
 	<?php
 		echo character_limiter(preg_replace('/<br\/>/',' ',$comment['content']), 200).'<br/>-';
 		echo $comment['displayname'];
