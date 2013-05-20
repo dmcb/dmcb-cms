@@ -72,7 +72,7 @@ if (defined('ENVIRONMENT'))
  * NO TRAILING SLASH!
  *
  */
-	$application_folder = 'ci_2.1.0_application';
+	$application_folder = 'ci_2.1.3_application';
 
 /*
  * --------------------------------------------------------------------
