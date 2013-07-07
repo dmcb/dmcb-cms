@@ -1665,38 +1665,38 @@ class Block_lib {
 		}
 		if (isset($this->block['values']['query']))
 		{
-			$hasuser = preg_match('/&from=\S+/', $this->block['values']['query']);
-			$hastag = preg_match('/&tag=\S+/', $this->block['values']['query']);
-			if (!$hasuser && !$hastag)
+
+/*
+			$this->CI->load->library('twitter/tmhOAuth');
+			$client= new tmhOAuth( array(
+			  'consumer_key'    => $this->CI->config->item('dmcb_twitter_consumer_token'),
+			  'consumer_secret' => $this->CI->config->item('dmcb_twitter_consumer_secret'),
+			  'token'           => $this->CI->config->item('dmcb_twitter_access_token'),
+			  'secret'          => $this->CI->config->item('dmcb_twitter_access_secret'),
+			) );
+			
+			$code = $client->user_request( $client->url('1.1/account/verify_credentials') );
+			var_dump( $code );
+*/
+			$this->CI->load->library('twitter/twitteroauth');
+			$connection = $this->CI->twitteroauth->create($this->CI->config->item('dmcb_twitter_consumer_token'),$this->CI->config->item('dmcb_twitter_consumer_secret'),$this->CI->config->item('dmcb_twitter_access_token'),$this->CI->config->item('dmcb_twitter_access_secret'));
+			$tweets = $connection->get('https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name='.$this->block['values']['query'].'&include_rts=true&count='.$this->block['values']['limit']);
+
+			$tweet_count = 0;
+			foreach ($tweets as $tweet)
 			{
-				$this->error = "Incorrectly formed query.";
+				$tweet_count++;
+
+				$data = array();
+				$data['date'] = date("F jS, Y", strtotime($tweet->created_at));
+				$data['text'] = $tweet->text;
+
+				array_push($this->contents, array("view" => "block_".$this->block['function'], "data" => $data));
 			}
-			else
+
+			if (!$tweet_count)
 			{
-				$this->CI->load->library('simplepie');
-				$this->CI->simplepie->set_feed_url("http://search.twitter.com/search.atom?q=".$this->block['values']['query']);
-				$this->CI->simplepie->init();
-				$tweet_count = 0;
-				$tweets = $this->CI->simplepie;
-				foreach ($tweets->get_items(0, $this->block['values']['limit']) as $tweet)
-				{
-					$tweet_count++;
-					if (!$hasuser && $hastag)
-					{
-						$namepieces = explode(" ",$tweet->get_author()->get_name());
-						$object = instantiate_library('user', $namepieces[0], 'twitter');
-						$user = $object->user;
-						array_push($this->contents, array("view" => "block_".$this->block['function']."_tag", "data" => array("tweet" => $tweet, "author" => $namepieces[0], "user" => $user)));
-					}
-					else
-					{
-						array_push($this->contents, array("view" => "block_".$this->block['function']."_user", "data" => array("tweet" => $tweet)));
-					}
-				}
-				if (!$tweet_count)
-				{
-					$this->error = "No recent twitter activity.";
-				}
+				$this->error = "No recent twitter activity.";
 			}
 		}
 		else
