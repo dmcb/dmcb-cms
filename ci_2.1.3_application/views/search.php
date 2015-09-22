@@ -136,7 +136,7 @@
 		{
 			if ($i < 5 || $search_type == "posts")
 			{
-				echo '<tr class="data"><td colspan="2"><a href="'.base_url().$post['urlname'].'/search">'.$post['title'].'</a></td></tr>';
+				echo '<tr class="data"><td colspan="2"><a href="'.base_url().$post['urlname'].'/search">'.$post['title'].'</a> - '.date("F jS, Y", strtotime($post['date'])).'</td></tr>';
 			}
 			$i++;
 		}
