@@ -1688,10 +1688,13 @@ class Block_lib {
 				$tweet_count++;
 
 				$data = array();
-				$data['date'] = date("F jS, Y", strtotime($tweet->created_at));
-				$data['text'] = $tweet->text;
-
-				array_push($this->contents, array("view" => "block_".$this->block['function'], "data" => $data));
+				if (isset($tweet->created_at) && isset($tweet->text))
+				{
+				       $data['date'] = date("F jS, Y", strtotime($tweet->created_at));
+				       $data['text'] = $tweet->text;
+                               
+				       array_push($this->contents, array("view" => "block_".$this->block['function'], "data" => $data));
+				}
 			}
 
 			if (!$tweet_count)
