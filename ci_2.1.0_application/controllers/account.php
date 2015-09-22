@@ -23,7 +23,7 @@ class Account extends MY_Controller {
 	function _remap()
 	{
 		// Doesn't use ACLs, if you are signed on, you can edit your own account
-		if ($this->session->userdata('signedon') || redirect(base_url().'signon'.$this->uri->uri_string()))
+		if ($this->session->userdata('signedon') || redirect(base_url().'signon/'.$this->uri->uri_string()))
 		{
 			// Get your own account
 			$yourself = instantiate_library('user', $this->session->userdata('userid'));

@@ -73,7 +73,7 @@ class MY_Controller extends CI_Controller {
 			$this->lang->load('signon', 'english', FALSE, TRUE, APPPATH.'site_specific_');
 			$this->session->set_flashdata('signon_message', $this->lang->line('signon_required'));
 		}
-		redirect('signon'.$this->uri->uri_string());
+		redirect('signon/'.$this->uri->uri_string());
 	}
 
 	// Generic redirection page

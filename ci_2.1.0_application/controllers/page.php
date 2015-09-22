@@ -111,7 +111,7 @@ class Page extends MY_Controller {
 			}
 			else
 			{
-				$this->data['message'] .= "<br/><br/>If you do have a subscription, please <a href=\"".base_url()."signon".uri_string()."\">sign on</a>.<br/>If you don't have a subscription, you can start a free trial by creating an account <a href=\"".base_url()."signon\">here</a>, or you can <a href=\"".base_url()."subscription\">subscribe for a full account</a> for unlimited access.";
+				$this->data['message'] .= "<br/><br/>If you do have a subscription, please <a href=\"".base_url()."signon/".uri_string()."\">sign on</a>.<br/>If you don't have a subscription, you can start a free trial by creating an account <a href=\"".base_url()."signon\">here</a>, or you can <a href=\"".base_url()."subscription\">subscribe for a full account</a> for unlimited access.";
 			}
 			$this->_message("Subscription required", $this->data['message']);
 		}
