@@ -56,7 +56,7 @@ if (defined('ENVIRONMENT'))
  * as this file.
  *
  */
-	$system_path = 'ci_2.1.3_system';
+	$system_path = 'ci_2.2.6_system';
 
 /*
  *---------------------------------------------------------------
@@ -72,7 +72,7 @@ if (defined('ENVIRONMENT'))
  * NO TRAILING SLASH!
  *
  */
-	$application_folder = 'ci_2.1.3_application';
+	$application_folder = 'ci_2.2.6_application';
 
 /*
  * --------------------------------------------------------------------

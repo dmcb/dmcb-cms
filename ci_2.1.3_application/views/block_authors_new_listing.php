@@ -1,1 +1,0 @@
-<span class="author">	<?php 	if ($user['enabledprofile'])	{		echo '<a href="'.base_url().'profile/'.$user['urlname'].'">'.$user['displayname'].'</a>';	}	else	{		echo $user['displayname'];	}	?>,	first post: <a href="<?php echo base_url();?><?php echo $author['posturlname'];?>"><?php echo $author['title'];?></a></span><br/>
