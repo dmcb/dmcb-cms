@@ -1,0 +1,1 @@
+	<url><?php echo PHP_EOL;?>		<loc><?php echo htmlspecialchars_decode($loc);?></loc><?php echo PHP_EOL;?><?phpif (isset($lastmod)){	echo "		<lastmod>$lastmod</lastmod>".PHP_EOL;}if (isset($changefreq)){	echo "		<changefreq>$changefreq</changefreq>".PHP_EOL;}if (isset($priority)){	echo "		<priority>$priority</priority>".PHP_EOL;}?>	</url><?php echo PHP_EOL;?>

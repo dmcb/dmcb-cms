@@ -1,0 +1,1 @@
+<span class="author">	<?php 	if ($user['enabledprofile'])	{		echo '<a href="'.base_url().'profile/'.$user['urlname'].'">'.$user['displayname'].'</a>';	}	else	{		echo $user['displayname'];	}	?></span><br/>
